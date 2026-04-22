@@ -1,0 +1,277 @@
+import { Component, inject, signal } from '@angular/core';
+import { RouterLink, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { CartService } from '../../core/services/cart.service';
+
+@Component({
+  selector: 'app-checkout',
+  standalone: true,
+  imports: [RouterLink, CommonModule, FormsModule, ReactiveFormsModule],
+  template: `
+    <div class="checkout-view">
+      <div class="checkout-header">
+        <a routerLink="/carrinho" class="btn-ghost back">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
+          Voltar ao carrinho
+        </a>
+        <div class="section-label" style="margin-top:20px;">Passo 2 de 3</div>
+        <h1 class="checkout-title">Entrega & <em>Pagamento</em></h1>
+      </div>
+
+      <div class="checkout-steps">
+        <div class="step done"><div class="step-num">✓</div><div class="step-label">Carrinho</div></div>
+        <div class="step-line done"></div>
+        <div class="step active"><div class="step-num">2</div><div class="step-label">Entrega & Pagamento</div></div>
+        <div class="step-line"></div>
+        <div class="step pending"><div class="step-num">3</div><div class="step-label">Confirmação</div></div>
+      </div>
+
+      <div class="checkout-layout">
+        <div class="form-panel" [formGroup]="form">
+
+          <!-- Contact -->
+          <div class="form-section">
+            <div class="form-section-title">Informações de contacto</div>
+            <div class="form-grid cols2">
+              <div class="form-field">
+                <label>Primeiro nome</label>
+                <input formControlName="firstName" type="text" placeholder="Maria"
+                       [class.error]="hasError('firstName')">
+              </div>
+              <div class="form-field">
+                <label>Apelido</label>
+                <input formControlName="lastName" type="text" placeholder="Silva"
+                       [class.error]="hasError('lastName')">
+              </div>
+              <div class="form-field">
+                <label>Email</label>
+                <input formControlName="email" type="email" placeholder="maria@email.com"
+                       [class.error]="hasError('email')">
+              </div>
+              <div class="form-field">
+                <label>Telemóvel</label>
+                <input formControlName="phone" type="tel" placeholder="+351 9XX XXX XXX">
+              </div>
+            </div>
+          </div>
+
+          <!-- Address -->
+          <div class="form-section">
+            <div class="form-section-title">Morada de entrega</div>
+            <div class="form-grid cols2">
+              <div class="form-field span2">
+                <label>Morada</label>
+                <input formControlName="address" type="text" placeholder="Rua, número, andar"
+                       [class.error]="hasError('address')">
+              </div>
+              <div class="form-field">
+                <label>Código postal</label>
+                <input formControlName="postcode" type="text" placeholder="1000-001"
+                       [class.error]="hasError('postcode')">
+              </div>
+              <div class="form-field">
+                <label>Cidade</label>
+                <input formControlName="city" type="text" placeholder="Lisboa"
+                       [class.error]="hasError('city')">
+              </div>
+              <div class="form-field span2">
+                <label>País</label>
+                <select formControlName="country">
+                  <option>Portugal</option>
+                  <option>Espanha</option>
+                  <option>França</option>
+                  <option>Brasil</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Shipping -->
+          <div class="form-section">
+            <div class="form-section-title">Método de envio</div>
+            <div class="shipping-options">
+              @for (opt of shippingOptions; track opt.id) {
+                <div class="shipping-option" [class.selected]="selectedShipping() === opt.id"
+                     (click)="selectedShipping.set(opt.id)">
+                  <div class="ship-radio"></div>
+                  <div class="ship-info">
+                    <div class="ship-name">{{ opt.name }}</div>
+                    <div class="ship-eta">{{ opt.eta }}</div>
+                  </div>
+                  <span class="ship-price" [class.free]="opt.price === 0">
+                    {{ opt.price === 0 ? 'Gratuito' : (opt.price | number:'1.2-2') + ' €' }}
+                  </span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Payment -->
+          <div class="form-section">
+            <div class="form-section-title">Pagamento</div>
+            <div class="payment-methods">
+              @for (method of payMethods; track method.id) {
+                <div class="pay-method" [class.selected]="selectedPayment() === method.id"
+                     (click)="selectedPayment.set(method.id)">
+                  <span class="pay-icon-em">{{ method.icon }}</span>
+                  <span class="pay-label">{{ method.label }}</span>
+                </div>
+              }
+            </div>
+
+            <!-- Card fields -->
+            @if (selectedPayment() === 'card') {
+              <div class="card-form" [formGroup]="cardForm">
+                <div class="form-grid">
+                  <div class="form-field">
+                    <label>Número do cartão</label>
+                    <input formControlName="number" type="text" placeholder="1234 5678 9012 3456"
+                           (input)="formatCard($event)" maxlength="19">
+                  </div>
+                </div>
+                <div class="form-grid cols3">
+                  <div class="form-field" style="grid-column:span 2;">
+                    <label>Nome no cartão</label>
+                    <input formControlName="name" type="text" placeholder="MARIA SILVA" style="text-transform:uppercase;">
+                  </div>
+                  <div class="form-field">
+                    <label>Validade</label>
+                    <input formControlName="expiry" type="text" placeholder="MM/AA" maxlength="5">
+                  </div>
+                </div>
+                <div class="form-grid cols3">
+                  <div class="form-field">
+                    <label>CVV</label>
+                    <input formControlName="cvv" type="text" placeholder="123" maxlength="4">
+                  </div>
+                </div>
+              </div>
+            }
+
+            @if (selectedPayment() === 'mbway') {
+              <div class="alt-pay-form">
+                <div class="form-field">
+                  <label>Número de telemóvel MB Way</label>
+                  <input type="tel" placeholder="+351 9XX XXX XXX">
+                </div>
+                <p class="pay-note">Irá receber uma notificação na app MB Way para confirmar o pagamento.</p>
+              </div>
+            }
+
+            @if (selectedPayment() === 'multibanco') {
+              <div class="alt-pay-form">
+                <div class="mb-info">
+                  <p>Após confirmar a encomenda, receberá por email a referência Multibanco. A encomenda será processada após confirmação do pagamento (até 24h úteis).</p>
+                </div>
+              </div>
+            }
+          </div>
+
+          <button class="btn-primary" [disabled]="processing()" (click)="placeOrder()">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>{{ processing() ? 'A processar...' : 'Confirmar encomenda · ' + (cart.total() | number:'1.2-2') + ' €' }}</span>
+          </button>
+          <p class="secure-note">🔒 Pagamento 100% seguro · Encriptação SSL</p>
+        </div>
+
+        <!-- Sticky summary -->
+        <div class="order-summary">
+          <div class="summary-title">Resumo da encomenda</div>
+          <!-- Mini items -->
+          <div class="mini-items">
+            @for (item of cart.items(); track $index) {
+              <div class="mini-item">
+                <div class="mini-img" [style.background]="'linear-gradient(145deg,' + item.product.gradientFrom + ',' + item.product.gradientTo + ')'"></div>
+                <div class="mini-info">
+                  <div class="mini-brand">{{ item.product.brand }}</div>
+                  <div class="mini-name">{{ item.product.name }}</div>
+                  <div class="mini-meta">{{ item.selectedShade }} · ×{{ item.quantity }}</div>
+                </div>
+                <div class="mini-price">{{ (item.product.price * item.quantity) | number:'1.2-2' }} €</div>
+              </div>
+            }
+          </div>
+          <div class="summary-lines">
+            <div class="summary-line"><span class="lbl">Subtotal</span><span class="val">{{ cart.subtotal() | number:'1.2-2' }} €</span></div>
+            @if (cart.discount() > 0) {
+              <div class="summary-line discount"><span class="lbl">Desconto</span><span class="val">−{{ cart.discount() | number:'1.2-2' }} €</span></div>
+            }
+            <div class="summary-line free"><span class="lbl">Envio</span><span class="val">Gratuito</span></div>
+          </div>
+          <div class="summary-total">
+            <span class="lbl">Total</span>
+            <span class="val">{{ cart.total() | number:'1.2-2' }} €</span>
+          </div>
+          <div class="rewards-banner">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <div class="rewards-banner-text">
+              <strong>+{{ cart.rewardPoints() }} pontos Makeup Rewards</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
+  styleUrls: ['./checkout.component.scss']
+})
+export class CheckoutComponent {
+  cart       = inject(CartService);
+  private fb     = inject(FormBuilder);
+  private router = inject(Router);
+
+  processing      = signal(false);
+  selectedShipping = signal('standard');
+  selectedPayment  = signal('card');
+
+  form = this.fb.group({
+    firstName: ['', Validators.required],
+    lastName:  ['', Validators.required],
+    email:     ['', [Validators.required, Validators.email]],
+    phone:     [''],
+    address:   ['', Validators.required],
+    postcode:  ['', Validators.required],
+    city:      ['', Validators.required],
+    country:   ['Portugal'],
+  });
+
+  cardForm = this.fb.group({
+    number: [''], name: [''], expiry: [''], cvv: ['']
+  });
+
+  shippingOptions = [
+    { id: 'standard', name: 'CTT Expresso Standard', eta: '2–4 dias úteis', price: 0 },
+    { id: 'express',  name: 'CTT Expresso Urgente',  eta: '1–2 dias úteis', price: 4.99 },
+    { id: 'pickup',   name: 'Levantamento em loja — Lisboa', eta: 'Disponível amanhã', price: 0 },
+  ];
+
+  payMethods = [
+    { id: 'card',       icon: '💳', label: 'Cartão' },
+    { id: 'mbway',      icon: '📱', label: 'MB Way' },
+    { id: 'paypal',     icon: '🅿',  label: 'PayPal' },
+    { id: 'multibanco', icon: '🏧', label: 'Multibanco' },
+    { id: 'applepay',   icon: '🍎', label: 'Apple Pay' },
+    { id: 'googlepay',  icon: 'G',  label: 'Google Pay' },
+  ];
+
+  hasError(field: string): boolean {
+    const c = this.form.get(field);
+    return !!(c?.invalid && c?.touched);
+  }
+
+  formatCard(e: Event): void {
+    const input = e.target as HTMLInputElement;
+    const v = input.value.replace(/\D/g, '').substring(0, 16);
+    input.value = v.replace(/(.{4})/g, '$1 ').trim();
+  }
+
+  placeOrder(): void {
+    this.form.markAllAsTouched();
+    if (this.form.invalid) return;
+    this.processing.set(true);
+    setTimeout(() => {
+      this.cart.clear();
+      this.router.navigate(['/confirmacao']);
+    }, 1800);
+  }
+}
