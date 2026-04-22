@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { OrdersComponent } from './pages/orders/orders.component';
 
 export const routes: Routes = [
   {
@@ -24,6 +25,10 @@ export const routes: Routes = [
   {
     path: 'confirmacao',
     loadComponent: () => import('./pages/confirmation/confirmation.component').then(m => m.ConfirmationComponent)
+  },
+  {
+    path: 'encomendas',
+    loadComponent: () => import('./pages/orders/orders.component').then(m => m.OrdersComponent)
   },
   { path: '**', redirectTo: '' }
 ];

@@ -451,3 +451,38 @@ footer { background: var(--noir); color: var(--creme); padding:80px 48px 40px; }
 /* Helper to force visibility for critical content when JS hasn't toggled reveal */
 .reveal.always-visible { opacity: 1 !important; transform: none !important; }
 
+/* ---------- Orders Page (As Minhas Encomendas) styles from user.html ---------- */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@200;300;400&display=swap');
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --creme: #F7F4F0;
+  --creme-dark: #EDE8E1;
+  --noir: #1A1714;
+  --rose-gold: #C9956A;
+  --rose-light: #E8C4A8;
+  --text-muted: #8A7E74;
+  --border: rgba(26,23,20,0.1);
+  --success: #5A8A6A;
+  --warning: #C9956A;
+  --danger: #A03030;
+  --info: #4A6A8A;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--creme);
+  color: var(--noir);
+  font-family: 'Jost', sans-serif;
+  font-weight: 300;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ── Cursor ── */
+.cursor { width:8px;height:8px;background:var(--rose-gold);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform 0.1s ease; }
+.cursor-ring { width:32px;height:32px;border:1px solid var(--rose-gold);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:left 0.12s ease,top 0.12s ease,transform 0.2s ease,opacity 0.2s;opacity:0.6; }
+
+/* ...demais regras CSS do user.html coladas aqui... */
+

@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CartService } from '../../../core/services/cart.service';
 
@@ -39,7 +39,7 @@ import { CartService } from '../../../core/services/cart.service';
                 <circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/>
               </svg>
             </button>
-            <button class="icon-btn" title="Conta" aria-label="Conta">
+            <button class="icon-btn" title="Conta" aria-label="Conta" (click)="goToOrders()">
               <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
               </svg>
@@ -123,8 +123,15 @@ import { CartService } from '../../../core/services/cart.service';
       display: flex; align-items: center; justify-content: center;
       font-weight: 400;
     }
+
   `]
 })
 export class HeaderComponent {
+
   cart = inject(CartService);
+  router = inject(Router);
+
+  goToOrders() {
+    this.router.navigate(['/encomendas']);
+  }
 }
