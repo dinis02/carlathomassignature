@@ -144,7 +144,6 @@ import { Product } from '../../core/models/models';
               <div class="product-info">
                 <div class="product-brand">{{ product.brand }}</div>
                 <div class="product-name"><em>{{ product.name }}</em></div>
-                <div class="product-desc">{{ product.description }}</div>
                 <div class="product-rating">
                   <div class="stars">
                     @for (s of starsArray(product.rating); track $index) {
