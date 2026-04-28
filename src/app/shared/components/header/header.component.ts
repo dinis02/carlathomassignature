@@ -2,11 +2,14 @@ import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CartService } from '../../../core/services/cart.service';
+import { AdminService } from '../../../core/services/admin.service';
+import { AdminModalComponent } from '../admin-modal.component';
+import { LoginModalComponent } from '../login-modal.component';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, CommonModule],
+  imports: [RouterLink, RouterLinkActive, CommonModule, AdminModalComponent, LoginModalComponent],
   styleUrls: ['./header.component.scss'],
   template: `
     <div class="announcement">
@@ -39,7 +42,7 @@ import { CartService } from '../../../core/services/cart.service';
                 <circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/>
               </svg>
             </button>
-            <button class="icon-btn" title="Conta" aria-label="Conta" (click)="goToOrders()">
+            <button class="icon-btn" title="Conta" aria-label="Conta" (click)="openLoginModal()">
               <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
               </svg>
@@ -63,6 +66,11 @@ import { CartService } from '../../../core/services/cart.service';
         </div>
       </div>
     </header>
+    <app-login-modal *ngIf="showLoginModal"
+      (closeModal)="closeLoginModal()"
+      (loginResult)="onLogin($event)"
+    ></app-login-modal>
+    <app-admin-modal *ngIf="shouldShowAdminModal"></app-admin-modal>
   `,
   styles: [`
     .announcement {
@@ -130,8 +138,29 @@ export class HeaderComponent {
 
   cart = inject(CartService);
   router = inject(Router);
+  adminService = inject(AdminService);
+  showLoginModal = false;
+  showAdminModal = false;
 
-  goToOrders() {
-    this.router.navigate(['/encomendas']);
+  openLoginModal() {
+    this.showLoginModal = true;
+  }
+  closeLoginModal() {
+    this.showLoginModal = false;
+  }
+  onLogin(type: 'admin' | 'user') {
+    this.showLoginModal = false;
+    if (type === 'admin') {
+      this.showAdminModal = true;
+      this.adminService.loginAsAdmin();
+      this.router.navigate(['/admin']);
+    } else {
+      this.showAdminModal = false;
+      this.router.navigate(['/encomendas']);
+    }
+  }
+  get shouldShowAdminModal() {
+    return this.showAdminModal && this.adminService.isAdmin();
   }
 }
+
