@@ -1,3 +1,5 @@
+import os
+scss = r"""
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@200;300;400;500&display=swap');
 
 .admin-root {
@@ -1367,3 +1369,8 @@
     to   { opacity: 1; transform: translateY(0); }
   }
 }
+"""
+out = r'c:\Users\dionisio.rosca\Downloads\carlathomassignature\src\app\pages\admin\admin.component.scss'
+with open(out, 'w', encoding='utf-8') as f:
+    f.write(scss.lstrip('\n'))
+print('Written:', out)

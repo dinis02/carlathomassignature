@@ -3,6 +3,7 @@ import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CartService } from '../../../core/services/cart.service';
 import { AdminService } from '../../../core/services/admin.service';
+import { AccountSession, AuthService } from '../../../core/services/auth.service';
 import { AdminModalComponent } from '../admin-modal.component';
 import { LoginModalComponent } from '../login-modal.component';
 
@@ -139,6 +140,7 @@ export class HeaderComponent {
   cart = inject(CartService);
   router = inject(Router);
   adminService = inject(AdminService);
+  auth = inject(AuthService);
   showLoginModal = false;
   showAdminModal = false;
 
@@ -148,9 +150,9 @@ export class HeaderComponent {
   closeLoginModal() {
     this.showLoginModal = false;
   }
-  onLogin(type: 'admin' | 'user') {
+  onLogin(session: AccountSession) {
     this.showLoginModal = false;
-    if (type === 'admin') {
+    if (session.role === 'admin') {
       this.showAdminModal = true;
       this.adminService.loginAsAdmin();
       this.router.navigate(['/admin']);
@@ -160,7 +162,7 @@ export class HeaderComponent {
     }
   }
   get shouldShowAdminModal() {
-    return this.showAdminModal && this.adminService.isAdmin();
+    return this.showAdminModal && this.auth.isAdmin();
   }
 }
 

@@ -2,7 +2,9 @@ import { Component, inject, signal } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
 import { CartService } from '../../core/services/cart.service';
+import { OrderService } from '../../core/services/order.service';
 
 @Component({
   selector: 'app-checkout',
@@ -219,6 +221,7 @@ export class CheckoutComponent {
   cart       = inject(CartService);
   private fb     = inject(FormBuilder);
   private router = inject(Router);
+  private orderService = inject(OrderService);
 
   processing      = signal(false);
   selectedShipping = signal('standard');
@@ -265,13 +268,42 @@ export class CheckoutComponent {
     input.value = v.replace(/(.{4})/g, '$1 ').trim();
   }
 
-  placeOrder(): void {
+  async placeOrder(): Promise<void> {
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
     this.processing.set(true);
-    setTimeout(() => {
+
+    const selectedShipping = this.shippingOptions.find(opt => opt.id === this.selectedShipping());
+    const shipping = selectedShipping?.price || 0;
+    const total = this.cart.total() + shipping;
+    const payload = {
+      customer: {
+        firstName: this.form.value.firstName || '',
+        lastName: this.form.value.lastName || '',
+        email: this.form.value.email || '',
+        phone: this.form.value.phone || '',
+        address: this.form.value.address || '',
+        postcode: this.form.value.postcode || '',
+        city: this.form.value.city || '',
+        country: this.form.value.country || 'Portugal'
+      },
+      items: this.cart.items(),
+      subtotal: this.cart.subtotal(),
+      discount: this.cart.discount(),
+      shipping,
+      total,
+      shippingMethod: this.selectedShipping(),
+      paymentMethod: this.selectedPayment(),
+      rewardPoints: this.cart.rewardPoints()
+    };
+
+    try {
+      const order = await firstValueFrom(this.orderService.createOrder(payload));
       this.cart.clear();
-      this.router.navigate(['/confirmacao']);
-    }, 1800);
+      this.router.navigate(['/confirmacao'], { queryParams: { order: order.id, total } });
+    } catch {
+      this.processing.set(false);
+      alert('Nao foi possivel gravar a encomenda. Confirme se a API da BD esta ligada.');
+    }
   }
 }

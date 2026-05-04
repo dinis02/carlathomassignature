@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -36,11 +36,11 @@ import { CommonModule } from '@angular/common';
       <div class="confirm-order-box">
         <div class="confirm-row">
           <span class="lbl">Número de encomenda</span>
-          <span>#CTS-{{ orderNumber }}</span>
+          <span>{{ orderNumber }}</span>
         </div>
         <div class="confirm-row">
           <span class="lbl">Total pago</span>
-          <span class="price">61,60 €</span>
+          <span class="price">{{ total }} €</span>
         </div>
         <div class="confirm-row">
           <span class="lbl">Envio</span>
@@ -92,9 +92,15 @@ import { CommonModule } from '@angular/common';
   `]
 })
 export class ConfirmationComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+
   orderNumber = '';
+  total = '0,00';
 
   ngOnInit(): void {
-    this.orderNumber = '2025-0' + Math.floor(Math.random() * 9000 + 1000);
+    const order = this.route.snapshot.queryParamMap.get('order');
+    const total = Number(this.route.snapshot.queryParamMap.get('total') || 0);
+    this.orderNumber = order || 'CTS-2025-0' + Math.floor(Math.random() * 9000 + 1000);
+    this.total = total.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 }

@@ -1,3 +1,5 @@
+import os
+html = r"""
 <div class="admin-root">
   <div class="cursor" id="adminCursor"></div>
   <div class="cursor-ring" id="adminCursorRing"></div>
@@ -53,7 +55,7 @@
           <div class="admin-name">Dinis Rosca</div>
           <div class="admin-role">Super Admin</div>
         </div>
-        <button class="logout-btn" title="Terminar sess&#xE3;o" (click)="logout()">
+        <button class="logout-btn" title="Terminar sess&#xE3;o">
           <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         </button>
       </div>
@@ -660,3 +662,8 @@
   </div>
 
 </div>
+"""
+out = os.path.join(os.path.dirname(__file__), 'src', 'app', 'pages', 'admin', 'admin.component.html')
+with open(out, 'w', encoding='utf-8') as f:
+    f.write(html.lstrip('\n'))
+print('Written:', out)
