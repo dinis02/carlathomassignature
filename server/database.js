@@ -71,6 +71,9 @@ db.exec(`
     payment_method TEXT NOT NULL,
     reward_points INTEGER NOT NULL DEFAULT 0,
     status TEXT NOT NULL DEFAULT 'processando',
+    payment_status TEXT NOT NULL DEFAULT 'unpaid',
+    stripe_session_id TEXT,
+    stripe_payment_intent_id TEXT,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
 
@@ -102,6 +105,17 @@ db.exec(`
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
 `);
+
+function ensureColumn(table, column, definition) {
+  const columns = db.prepare(`PRAGMA table_info(${table})`).all().map(col => col.name);
+  if (!columns.includes(column)) {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+  }
+}
+
+ensureColumn('orders', 'payment_status', "TEXT NOT NULL DEFAULT 'unpaid'");
+ensureColumn('orders', 'stripe_session_id', 'TEXT');
+ensureColumn('orders', 'stripe_payment_intent_id', 'TEXT');
 
 const seedProducts = [
   {

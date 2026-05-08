@@ -21,6 +21,11 @@ import { LoginModalComponent } from '../login-modal.component';
 
     <header>
       <div class="header-inner">
+        <button class="mobile-menu-btn" title="Menu" aria-label="Menu" (click)="toggleMobileMenu()">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
         <nav class="nav-left">
           <a routerLink="/produtos" [queryParams]="{cat:'Maquilhagem'}" class="nav-link" routerLinkActive="active">Maquilhagem</a>
           <a routerLink="/produtos" [queryParams]="{cat:'Cabelo'}" class="nav-link">Cabelo</a>
@@ -67,6 +72,24 @@ import { LoginModalComponent } from '../login-modal.component';
         </div>
       </div>
     </header>
+    <div class="mobile-menu-backdrop" *ngIf="mobileMenuOpen" (click)="closeMobileMenu()"></div>
+    <nav class="mobile-menu" [class.open]="mobileMenuOpen" aria-label="Menu mobile">
+      <div class="mobile-menu-head">
+        <div>
+          <span class="mobile-menu-brand">Carla Thomas</span>
+          <span class="mobile-menu-sub">Signature</span>
+        </div>
+        <button class="mobile-menu-close" type="button" aria-label="Fechar menu" (click)="closeMobileMenu()">×</button>
+      </div>
+      <a routerLink="/" (click)="closeMobileMenu()">Inicio</a>
+      <a routerLink="/produtos" [queryParams]="{cat:'Maquilhagem'}" (click)="closeMobileMenu()">Maquilhagem</a>
+      <a routerLink="/produtos" [queryParams]="{cat:'Cabelo'}" (click)="closeMobileMenu()">Cabelo</a>
+      <a routerLink="/produtos" [queryParams]="{cat:'Rosto'}" (click)="closeMobileMenu()">Rosto</a>
+      <a routerLink="/produtos" [queryParams]="{cat:'Corpo'}" (click)="closeMobileMenu()">Corpo</a>
+      <a routerLink="/produtos" [queryParams]="{cat:'Acessórios'}" (click)="closeMobileMenu()">Acessorios</a>
+      <a routerLink="/produtos" (click)="closeMobileMenu()">Marcas</a>
+      <a routerLink="/encomendas" (click)="closeMobileMenu()">A minha conta</a>
+    </nav>
     <app-login-modal *ngIf="showLoginModal"
       (closeModal)="closeLoginModal()"
       (loginResult)="onLogin($event)"
@@ -116,6 +139,17 @@ import { LoginModalComponent } from '../login-modal.component';
     }
 
     .header-icons { display: flex; gap: 20px; align-items: center; }
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--noir);
+      width: 36px;
+      height: 36px;
+      align-items: center;
+      justify-content: center;
+      cursor: none;
+    }
     .icon-btn {
       background: none; border: none; cursor: none;
       color: var(--noir); width: 36px; height: 36px;
@@ -133,6 +167,139 @@ import { LoginModalComponent } from '../login-modal.component';
       font-weight: 400;
     }
 
+    .mobile-menu-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(26,23,20,0.36);
+      z-index: 998;
+    }
+
+    .mobile-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: min(86vw, 340px);
+      height: 100vh;
+      background: var(--creme);
+      border-right: 1px solid var(--border);
+      z-index: 999;
+      transform: translateX(-100%);
+      transition: transform 0.28s ease;
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      box-shadow: 18px 0 60px rgba(26,23,20,0.16);
+    }
+
+    .mobile-menu.open {
+      transform: translateX(0);
+    }
+
+    .mobile-menu-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      padding-bottom: 22px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .mobile-menu-brand {
+      display: block;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 26px;
+      font-style: italic;
+      font-weight: 300;
+      line-height: 1;
+    }
+
+    .mobile-menu-sub {
+      display: block;
+      margin-top: 5px;
+      color: var(--rose-gold);
+      font-size: 8px;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+    }
+
+    .mobile-menu-close {
+      border: 1px solid var(--border);
+      background: transparent;
+      width: 34px;
+      height: 34px;
+      color: var(--noir);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 24px;
+      line-height: 1;
+      cursor: none;
+    }
+
+    .mobile-menu a {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+      color: var(--noir);
+      text-decoration: none;
+      font-size: 11px;
+      letter-spacing: 2.4px;
+      text-transform: uppercase;
+      font-weight: 300;
+    }
+
+    @media (max-width: 1024px) {
+      .header-inner {
+        padding: 0 24px;
+        grid-template-columns: auto 1fr auto;
+        gap: 16px;
+      }
+
+      .nav-left,
+      .nav-right nav {
+        display: none !important;
+      }
+
+      .mobile-menu-btn {
+        display: inline-flex;
+      }
+
+      .nav-right {
+        justify-content: flex-end;
+      }
+
+      .logo-img {
+        width: 132px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .announcement {
+        padding: 8px 14px;
+        font-size: 9px;
+        letter-spacing: 1.5px;
+        line-height: 1.5;
+      }
+
+      .header-inner {
+        height: 64px;
+        padding: 0 14px;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .logo-img {
+        width: 112px;
+      }
+
+      .header-icons {
+        gap: 8px;
+      }
+
+      .icon-btn {
+        width: 32px;
+        height: 32px;
+      }
+    }
+
   `]
 })
 export class HeaderComponent {
@@ -143,8 +310,16 @@ export class HeaderComponent {
   auth = inject(AuthService);
   showLoginModal = false;
   showAdminModal = false;
+  mobileMenuOpen = false;
 
+  toggleMobileMenu() {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+  }
+  closeMobileMenu() {
+    this.mobileMenuOpen = false;
+  }
   openLoginModal() {
+    this.closeMobileMenu();
     this.showLoginModal = true;
   }
   closeLoginModal() {

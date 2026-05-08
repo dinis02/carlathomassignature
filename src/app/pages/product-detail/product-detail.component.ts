@@ -28,17 +28,27 @@ import { Product } from '../../core/models/models';
         <!-- Gallery -->
         <div class="gallery">
           <div class="gallery-main">
-            <div class="gallery-img"
-                 [style.background]="'linear-gradient(145deg,' + thumbBgs[activeThumb()] + ')'">
-            </div>
+            @if (product.image) {
+              <img class="gallery-photo" [src]="product.image" [alt]="product.name">
+            } @else {
+              <div class="gallery-img"
+                   [style.background]="'linear-gradient(145deg,' + thumbBgs[activeThumb()] + ')'">
+              </div>
+            }
             <div class="gallery-zoom-hint">+ Ampliar</div>
           </div>
           <div class="gallery-thumbs">
-            @for (bg of thumbBgs; track $index) {
-              <div class="gallery-thumb" [class.active]="activeThumb() === $index"
-                   [style.background]="'linear-gradient(145deg,' + bg + ')'"
-                   (click)="activeThumb.set($index)">
+            @if (product.image) {
+              <div class="gallery-thumb active">
+                <img class="gallery-thumb-photo" [src]="product.image" [alt]="product.name">
               </div>
+            } @else {
+              @for (bg of thumbBgs; track $index) {
+                <div class="gallery-thumb" [class.active]="activeThumb() === $index"
+                     [style.background]="'linear-gradient(145deg,' + bg + ')'"
+                     (click)="activeThumb.set($index)">
+                </div>
+              }
             }
           </div>
         </div>
@@ -179,8 +189,10 @@ import { Product } from '../../core/models/models';
           <div class="related-grid">
             @for (rel of related; track rel.id) {
               <a [routerLink]="['/produto', rel.id]" class="rel-card">
-                <div class="rel-img"
-                     [style.background]="'linear-gradient(145deg,' + rel.gradientFrom + ',' + rel.gradientTo + ')'">
+                <div class="rel-img" [style.background]="rel.image ? 'none' : 'linear-gradient(145deg,' + rel.gradientFrom + ',' + rel.gradientTo + ')'">
+                  @if (rel.image) {
+                    <img class="rel-photo" [src]="rel.image" [alt]="rel.name">
+                  }
                 </div>
                 <div class="rel-info">
                   <div class="rel-brand">{{ rel.brand }}</div>
@@ -248,15 +260,19 @@ export class ProductDetailComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe(p => {
       const id = +p['id'];
-      this.product = this.productSvc.getById(id);
-      if (this.product) {
-        this.related = this.productSvc.getRelated(id);
-        this.selectedShade.set(this.product.shades?.[0]?.name ?? '');
-        this.selectedFinish.set(this.product.finishes?.[0] ?? '');
-        this.activeThumb.set(0);
-        this.qty.set(1);
-      }
+      this.productSvc.loadAll().subscribe(() => this.setProduct(id));
     });
+  }
+
+  private setProduct(id: number): void {
+    this.product = this.productSvc.getById(id);
+    if (this.product) {
+      this.related = this.productSvc.getRelated(id);
+      this.selectedShade.set(this.product.shades?.[0]?.name ?? '');
+      this.selectedFinish.set(this.product.finishes?.[0] ?? '');
+      this.activeThumb.set(0);
+      this.qty.set(1);
+    }
   }
 
   changeQty(d: number): void { this.qty.set(Math.max(1, this.qty() + d)); }

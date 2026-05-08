@@ -7,7 +7,8 @@
     "api": "node server/index.js",
     "dev": "concurrently \"npm run api\" \"npm start\"",
     "build": "ng build",
-    "watch": "ng build --watch --configuration development"
+    "watch": "ng build --watch --configuration development",
+    "supabase:migrate-products": "node scripts/migrate-products-to-supabase.js"
   },
   "private": true,
   "dependencies": {
@@ -19,9 +20,13 @@
     "@angular/platform-browser": "^20.3.19",
     "@angular/platform-browser-dynamic": "^20.3.19",
     "@angular/router": "^20.3.19",
+    "@supabase/supabase-js": "^2.105.3",
     "better-sqlite3": "^12.9.0",
     "concurrently": "^9.2.1",
+    "dotenv": "^17.4.2",
+    "multer": "^2.1.1",
     "rxjs": "~7.8.0",
+    "stripe": "^22.1.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.1"
   },

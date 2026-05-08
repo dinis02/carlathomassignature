@@ -15,7 +15,7 @@ export interface AccountSession {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000/api';
+  private apiUrl = '/api';
   private storageKey = 'carla-thomas-session';
 
   session = signal<AccountSession | null>(this.loadSession());
@@ -55,4 +55,3 @@ export class AuthService {
     }
   }
 }
-

@@ -1,8 +1,12 @@
-import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { Observable, catchError, of, tap } from 'rxjs';
 import { Product } from '../models/models';
 
 @Injectable({ providedIn: 'root' })
 export class ProductService {
+  private http = inject(HttpClient);
+  private apiUrl = '/api';
 
   private products: Product[] = [
     {
@@ -134,6 +138,29 @@ export class ProductService {
 
   getAll(): Product[] { return this.products; }
 
+  loadAll(): Observable<Product[]> {
+    return this.http.get<Product[]>(`${this.apiUrl}/products`).pipe(
+      tap(products => {
+        this.products = products.map(product => ({
+          ...product,
+          category: this.normalizeCategory(product.category)
+        }));
+      }),
+      catchError(() => of(this.products))
+    );
+  }
+
+  createProduct(formData: FormData): Observable<Product> {
+    return this.http.post<Product>(`${this.apiUrl}/products`, formData).pipe(
+      tap(product => {
+        this.products = [
+          ...this.products,
+          { ...product, category: this.normalizeCategory(product.category) }
+        ];
+      })
+    );
+  }
+
   getById(id: number): Product | undefined {
     return this.products.find(p => p.id === id);
   }
@@ -148,5 +175,13 @@ export class ProductService {
   getRelated(id: number): Product[] {
     const p = this.getById(id);
     return this.products.filter(x => x.id !== id && x.category === p?.category).slice(0, 4);
+  }
+
+  private normalizeCategory(category: string): string {
+    const map: Record<string, string> = {
+      Labios: 'Lábios',
+      Acessorios: 'Acessórios'
+    };
+    return map[category] || category;
   }
 }

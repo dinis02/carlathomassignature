@@ -1,6 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { firstValueFrom } from 'rxjs';
+import { OrderService } from '../../core/services/order.service';
 
 @Component({
   selector: 'app-confirmation',
@@ -14,41 +16,38 @@ import { CommonModule } from '@angular/common';
         </svg>
       </div>
 
-      <div class="confirm-eyebrow">Encomenda confirmada</div>
+      <div class="confirm-eyebrow">{{ paymentStatusText }}</div>
 
       <h1 class="confirm-title">
-        Obrigada pela<br>sua <em>confiança</em>
+        Obrigada pela<br>sua <em>confianca</em>
       </h1>
 
-      <p class="confirm-body">
-        A sua encomenda foi recebida com sucesso. Receberá um email de confirmação
-        com os detalhes e o número de tracking assim que for expedida.
-      </p>
+      <p class="confirm-body">{{ confirmationMessage }}</p>
 
       <div class="rewards-earn">
-        <span class="rewards-earn-icon">⭐</span>
+        <span class="rewards-earn-icon">*</span>
         <div class="rewards-earn-text">
-          <strong>+62 pontos Makeup Rewards ganhos!</strong>
-          <span>Saldo total: 214 pontos · equivale a 2,14 € de desconto</span>
+          <strong>+{{ rewardPoints }} pontos Makeup Rewards ganhos!</strong>
+          <span>Os pontos ficam disponiveis depois da confirmacao final da encomenda.</span>
         </div>
       </div>
 
       <div class="confirm-order-box">
         <div class="confirm-row">
-          <span class="lbl">Número de encomenda</span>
+          <span class="lbl">Numero de encomenda</span>
           <span>{{ orderNumber }}</span>
         </div>
         <div class="confirm-row">
           <span class="lbl">Total pago</span>
-          <span class="price">{{ total }} €</span>
+          <span class="price">{{ total }} EUR</span>
         </div>
         <div class="confirm-row">
           <span class="lbl">Envio</span>
-          <span>CTT Expresso · 2–4 dias úteis</span>
+          <span>CTT Expresso · 2-4 dias uteis</span>
         </div>
         <div class="confirm-row">
-          <span class="lbl">Email de confirmação</span>
-          <span>enviado para a sua caixa</span>
+          <span class="lbl">Estado Stripe</span>
+          <span>{{ stripeStatusText }}</span>
         </div>
       </div>
 
@@ -57,7 +56,7 @@ import { CommonModule } from '@angular/common';
           <span>Continuar a comprar</span>
         </a>
         <a routerLink="/" class="btn-secondary">
-          Voltar à página inicial
+          Voltar a pagina inicial
         </a>
       </div>
     </div>
@@ -72,18 +71,35 @@ import { CommonModule } from '@angular/common';
       display: flex; align-items: center; justify-content: center;
       margin: 0 auto 36px; animation: popIn 0.5s ease forwards;
     }
-    .confirm-eyebrow { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: var(--rose-gold); margin-bottom: 16px; font-weight: 300; }
-    .confirm-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(40px,4vw,60px); font-weight: 300; margin-bottom: 20px; line-height: 1.1; em { font-style: italic; color: var(--rose-gold); } }
-    .confirm-body { font-size: 14px; line-height: 1.8; color: var(--text-muted); max-width: 480px; margin: 0 auto 40px; font-weight: 200; }
+    .confirm-eyebrow {
+      font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+      color: var(--rose-gold); margin-bottom: 16px; font-weight: 300;
+    }
+    .confirm-title {
+      font-family: 'Cormorant Garamond', serif; font-size: clamp(40px,4vw,60px);
+      font-weight: 300; margin-bottom: 20px; line-height: 1.1;
+    }
+    .confirm-title em { font-style: italic; color: var(--rose-gold); }
+    .confirm-body {
+      font-size: 14px; line-height: 1.8; color: var(--text-muted);
+      max-width: 480px; margin: 0 auto 40px; font-weight: 200;
+    }
     .rewards-earn {
       background: linear-gradient(135deg,var(--noir),#2A2420); color: var(--creme);
-      padding: 24px 32px; margin-bottom: 40px; display: flex; align-items: center; gap: 20px; text-align: left;
+      padding: 24px 32px; margin-bottom: 40px; display: flex; align-items: center;
+      gap: 20px; text-align: left;
     }
-    .rewards-earn-icon { font-size: 28px; flex-shrink: 0; }
-    .rewards-earn-text strong { display: block; font-size: 15px; font-weight: 300; margin-bottom: 4px; color: var(--rose-gold); }
+    .rewards-earn-icon { font-size: 28px; flex-shrink: 0; color: var(--rose-gold); }
+    .rewards-earn-text strong {
+      display: block; font-size: 15px; font-weight: 300; margin-bottom: 4px; color: var(--rose-gold);
+    }
     .rewards-earn-text span { font-size: 12px; font-weight: 200; color: rgba(247,244,240,0.6); }
     .confirm-order-box { background: var(--creme-dark); padding: 32px; text-align: left; margin-bottom: 40px; }
-    .confirm-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 300; &:last-child { border-bottom: none; } }
+    .confirm-row {
+      display: flex; justify-content: space-between; padding: 10px 0;
+      border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 300;
+    }
+    .confirm-row:last-child { border-bottom: none; }
     .confirm-row .lbl { color: var(--text-muted); }
     .confirm-row .price { color: var(--rose-gold); }
     .confirm-ctas { display: flex; flex-direction: column; gap: 10px; max-width: 320px; margin: 0 auto; }
@@ -93,14 +109,52 @@ import { CommonModule } from '@angular/common';
 })
 export class ConfirmationComponent implements OnInit {
   private route = inject(ActivatedRoute);
+  private orderService = inject(OrderService);
 
   orderNumber = '';
   total = '0,00';
+  rewardPoints = 0;
+  paymentStatusText = 'Encomenda recebida';
+  stripeStatusText = 'a confirmar';
+  confirmationMessage = 'Recebemos a sua encomenda. Estamos a confirmar o estado do pagamento com a Stripe.';
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     const order = this.route.snapshot.queryParamMap.get('order');
     const total = Number(this.route.snapshot.queryParamMap.get('total') || 0);
+    const sessionId = this.route.snapshot.queryParamMap.get('session_id');
+
     this.orderNumber = order || 'CTS-2025-0' + Math.floor(Math.random() * 9000 + 1000);
-    this.total = total.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    this.setTotal(total);
+
+    if (!sessionId) {
+      this.paymentStatusText = 'Encomenda confirmada';
+      this.confirmationMessage = 'A sua encomenda foi recebida com sucesso.';
+      this.stripeStatusText = 'sem sessao Stripe';
+      return;
+    }
+
+    try {
+      const session = await firstValueFrom(this.orderService.getStripeSessionStatus(sessionId));
+      if (session.orderId) this.orderNumber = session.orderId;
+      this.setTotal(session.total || total);
+      this.stripeStatusText = session.paymentStatus;
+
+      if (session.paymentStatus === 'paid') {
+        this.paymentStatusText = 'Pagamento confirmado';
+        this.confirmationMessage = 'O pagamento foi confirmado pela Stripe. A sua encomenda ficou registada e sera preparada para envio.';
+      } else {
+        this.paymentStatusText = 'Pagamento em validacao';
+        this.confirmationMessage = 'A Stripe ainda esta a validar o pagamento. Se o valor tiver sido cobrado, a encomenda sera atualizada automaticamente.';
+      }
+    } catch {
+      this.paymentStatusText = 'Encomenda recebida';
+      this.confirmationMessage = 'Recebemos o regresso da Stripe, mas nao foi possivel confirmar o pagamento neste momento.';
+      this.stripeStatusText = 'erro de confirmacao';
+    }
+  }
+
+  private setTotal(value: number): void {
+    this.total = value.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    this.rewardPoints = Math.floor(value);
   }
 }

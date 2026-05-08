@@ -131,9 +131,13 @@ import { Product } from '../../core/models/models';
           @for (product of sorted(); track product.id) {
             <a [routerLink]="['/produto', product.id]" class="product-card">
               <div class="product-image">
-                <div class="img-placeholder"
-                  [style.background]="'linear-gradient(145deg,' + product.gradientFrom + ',' + product.gradientTo + ')'">
-                </div>
+                @if (product.image) {
+                  <img class="product-photo" [src]="product.image" [alt]="product.name">
+                } @else {
+                  <div class="img-placeholder"
+                    [style.background]="'linear-gradient(145deg,' + product.gradientFrom + ',' + product.gradientTo + ')'">
+                  </div>
+                }
                 @if (product.badge) {
                   <span class="product-badge" [class.dark]="product.badgeDark">{{ product.badge }}</span>
                 }
@@ -183,7 +187,7 @@ export class ProductsComponent implements OnInit, AfterViewInit {
   private cartSvc    = inject(CartService);
   private route      = inject(ActivatedRoute);
 
-  allProducts = this.productSvc.getAll();
+  allProducts = signal<Product[]>(this.productSvc.getAll());
 
   activeCategory = signal('Todos');
   activeBrands   = signal<string[]>([]);
@@ -227,7 +231,7 @@ export class ProductsComponent implements OnInit, AfterViewInit {
   }
 
   filtered = computed(() => {
-    let items = this.allProducts;
+    let items = this.allProducts();
     const cat = this.activeCategory();
     if (cat !== 'Todos') {
       // If the category is a group (e.g. 'Maquilhagem'), expand to its members
@@ -259,6 +263,11 @@ export class ProductsComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.route.queryParams.subscribe(p => {
       if (p['cat']) this.activeCategory.set(p['cat']);
+    });
+
+    this.productSvc.loadAll().subscribe(products => {
+      this.allProducts.set(products);
+      this.refreshBrandCounts(products);
     });
 
     // Ensure the products grid gets the fallback class early. In some
@@ -307,5 +316,13 @@ export class ProductsComponent implements OnInit, AfterViewInit {
 
   starsArray(rating: number): boolean[] {
     return Array.from({ length: 5 }, (_, i) => i < Math.round(rating));
+  }
+
+  private refreshBrandCounts(products: Product[]): void {
+    const counts = new Map<string, number>();
+    products.forEach(product => counts.set(product.brand, (counts.get(product.brand) || 0) + 1));
+    this.brands = [...counts.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([name, count]) => ({ name, count }));
   }
 }

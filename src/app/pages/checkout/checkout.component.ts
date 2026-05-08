@@ -109,8 +109,8 @@ import { OrderService } from '../../core/services/order.service';
             </div>
           </div>
 
-          <!-- Payment -->
-          <div class="form-section">
+          <!-- Stripe is the default payment method, so the single option stays hidden. -->
+          <div class="form-section" style="display:none;">
             <div class="form-section-title">Pagamento</div>
             <div class="payment-methods">
               @for (method of payMethods; track method.id) {
@@ -122,31 +122,11 @@ import { OrderService } from '../../core/services/order.service';
               }
             </div>
 
-            <!-- Card fields -->
+            <!-- Stripe Checkout -->
             @if (selectedPayment() === 'card') {
-              <div class="card-form" [formGroup]="cardForm">
-                <div class="form-grid">
-                  <div class="form-field">
-                    <label>Número do cartão</label>
-                    <input formControlName="number" type="text" placeholder="1234 5678 9012 3456"
-                           (input)="formatCard($event)" maxlength="19">
-                  </div>
-                </div>
-                <div class="form-grid cols3">
-                  <div class="form-field" style="grid-column:span 2;">
-                    <label>Nome no cartão</label>
-                    <input formControlName="name" type="text" placeholder="MARIA SILVA" style="text-transform:uppercase;">
-                  </div>
-                  <div class="form-field">
-                    <label>Validade</label>
-                    <input formControlName="expiry" type="text" placeholder="MM/AA" maxlength="5">
-                  </div>
-                </div>
-                <div class="form-grid cols3">
-                  <div class="form-field">
-                    <label>CVV</label>
-                    <input formControlName="cvv" type="text" placeholder="123" maxlength="4">
-                  </div>
+              <div class="alt-pay-form">
+                <div class="mb-info">
+                  <p>Ao confirmar, sera redirecionado para o checkout seguro da Stripe para introduzir os dados do cartao.</p>
                 </div>
               </div>
             }
@@ -170,10 +150,13 @@ import { OrderService } from '../../core/services/order.service';
             }
           </div>
 
-          <button class="btn-primary" [disabled]="processing()" (click)="placeOrder()">
+          <button class="btn-primary pay-submit" [disabled]="processing()" (click)="placeOrder()">
             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            <span>{{ processing() ? 'A processar...' : 'Confirmar encomenda · ' + (cart.total() | number:'1.2-2') + ' €' }}</span>
+            <span>{{ processing() ? 'A abrir Stripe...' : 'Pagar com Stripe · ' + (cart.total() | number:'1.2-2') + ' €' }}</span>
           </button>
+          @if (paymentError()) {
+            <p class="pay-note" style="color:var(--danger);margin-top:12px;text-align:center;">{{ paymentError() }}</p>
+          }
           <p class="secure-note">🔒 Pagamento 100% seguro · Encriptação SSL</p>
         </div>
 
@@ -224,6 +207,7 @@ export class CheckoutComponent {
   private orderService = inject(OrderService);
 
   processing      = signal(false);
+  paymentError    = signal('');
   selectedShipping = signal('standard');
   selectedPayment  = signal('card');
 
@@ -249,12 +233,7 @@ export class CheckoutComponent {
   ];
 
   payMethods = [
-    { id: 'card',       icon: '💳', label: 'Cartão' },
-    { id: 'mbway',      icon: '📱', label: 'MB Way' },
-    { id: 'paypal',     icon: '🅿',  label: 'PayPal' },
-    { id: 'multibanco', icon: '🏧', label: 'Multibanco' },
-    { id: 'applepay',   icon: '🍎', label: 'Apple Pay' },
-    { id: 'googlepay',  icon: 'G',  label: 'Google Pay' },
+    { id: 'card', icon: 'card', label: 'Cartao via Stripe' },
   ];
 
   hasError(field: string): boolean {
@@ -270,7 +249,15 @@ export class CheckoutComponent {
 
   async placeOrder(): Promise<void> {
     this.form.markAllAsTouched();
-    if (this.form.invalid) return;
+    this.paymentError.set('');
+    if (this.cart.count() === 0) {
+      this.paymentError.set('O carrinho esta vazio. Adicione um produto antes de pagar.');
+      return;
+    }
+    if (this.form.invalid) {
+      this.paymentError.set('Preencha os dados obrigatorios antes de seguir para a Stripe.');
+      return;
+    }
     this.processing.set(true);
 
     const selectedShipping = this.shippingOptions.find(opt => opt.id === this.selectedShipping());
@@ -298,12 +285,11 @@ export class CheckoutComponent {
     };
 
     try {
-      const order = await firstValueFrom(this.orderService.createOrder(payload));
-      this.cart.clear();
-      this.router.navigate(['/confirmacao'], { queryParams: { order: order.id, total } });
-    } catch {
+      const session = await firstValueFrom(this.orderService.createStripeCheckoutSession(payload));
+      window.location.href = session.url;
+    } catch (err: any) {
       this.processing.set(false);
-      alert('Nao foi possivel gravar a encomenda. Confirme se a API da BD esta ligada.');
+      this.paymentError.set(err?.error?.error || 'Nao foi possivel abrir o pagamento Stripe.');
     }
   }
 }

@@ -306,3 +306,110 @@ footer { background:var(--noir);color:var(--creme);padding:60px 48px 40px; }
 @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
+@media (max-width: 1024px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+    padding: 40px 28px 96px;
+  }
+
+  .account-sidebar {
+    position: static;
+  }
+
+  .sidebar-menu {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .stats-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .order-card-header {
+    grid-template-columns: 1fr auto;
+    gap: 14px;
+  }
+
+  .order-preview,
+  .order-info,
+  .order-total,
+  .order-status {
+    grid-column: span 2;
+    justify-content: flex-start;
+    text-align: left;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-hero {
+    padding: 44px 20px;
+  }
+
+  .page-hero-content,
+  .orders-toolbar,
+  .toolbar-right,
+  .tracking-box,
+  .footer-bottom {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .account-nav-inner,
+  .main-layout {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .main-layout {
+    padding-top: 28px;
+    padding-bottom: 72px;
+  }
+
+  .sidebar-menu,
+  .stats-row,
+  .order-detail-grid,
+  .footer-top {
+    grid-template-columns: 1fr;
+  }
+
+  .search-box {
+    max-width: none;
+  }
+
+  .order-card-header {
+    padding: 20px;
+  }
+
+  .order-panel-inner {
+    padding: 0 20px 24px;
+  }
+
+  .order-timeline {
+    overflow-x: auto;
+    padding-bottom: 18px;
+  }
+
+  .timeline-step {
+    min-width: 94px;
+  }
+
+  .order-items-header {
+    display: none;
+  }
+
+  .order-item-row {
+    grid-template-columns: 56px 1fr;
+    gap: 14px;
+  }
+
+  .order-item-qty,
+  .order-item-price {
+    grid-column: 2;
+    text-align: left;
+  }
+
+  footer {
+    padding: 56px 20px 32px;
+  }
+}
+

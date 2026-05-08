@@ -17,6 +17,8 @@ export interface Product {
   howToApply?: string;
   ingredients?: string;
   image?: string;
+  stock?: number;
+  isActive?: boolean;
 }
 
 export interface Shade {

@@ -16,6 +16,28 @@
 
 html { scroll-behavior: smooth; }
 
+html,
+body {
+  width: 100%;
+  min-width: 0;
+}
+
+app-root,
+app-header,
+app-footer,
+app-home,
+app-products,
+app-product-detail,
+app-cart,
+app-checkout,
+app-confirmation,
+app-orders,
+app-admin {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
 body {
   background: var(--creme);
   color: var(--noir);
@@ -247,6 +269,8 @@ a { text-decoration: none; color: inherit; }
 /* ── Page wrapper ── */
 .page-wrapper {
   min-height: calc(100vh - 108px);
+  width: 100%;
+  min-width: 0;
 }
 
 /* ---------- Page specific styles from provided design ---------- */
@@ -486,4 +510,202 @@ body {
 .cursor-ring { width:32px;height:32px;border:1px solid var(--rose-gold);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:left 0.12s ease,top 0.12s ease,transform 0.2s ease,opacity 0.2s;opacity:0.6; }
 
 /* ...demais regras CSS do user.html coladas aqui... */
+
+@media (pointer: coarse), (max-width: 768px) {
+  body,
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  .nav-link,
+  .icon-btn,
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost {
+    cursor: auto !important;
+  }
+
+  .cursor,
+  .cursor-ring,
+  app-cursor {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .header-inner {
+    padding: 0 24px;
+    grid-template-columns: auto 1fr auto;
+    gap: 16px;
+  }
+
+  .nav-left,
+  .nav-right nav {
+    display: none !important;
+  }
+
+  .nav-right {
+    justify-content: flex-end;
+  }
+
+  .logo-img {
+    width: 132px;
+  }
+
+  .hero,
+  .editorial-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    min-height: auto;
+  }
+
+  .hero-text {
+    padding: 72px 32px 48px;
+  }
+
+  .hero-image {
+    min-height: 360px;
+  }
+
+  .categories-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(3, 260px);
+  }
+
+  .category-card:first-child {
+    grid-row: span 1;
+    grid-column: span 2;
+  }
+
+  .products-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .footer-top {
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+}
+
+@media (max-width: 640px) {
+  .announcement {
+    padding: 8px 14px;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    line-height: 1.5;
+  }
+
+  .header-inner {
+    height: 64px;
+    padding: 0 14px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .logo-img {
+    width: 112px;
+  }
+
+  .header-icons {
+    gap: 8px;
+  }
+
+  .icon-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .section,
+  .products-inner,
+  .brands-section,
+  .editorial,
+  .newsletter,
+  footer {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .section,
+  .products-section,
+  .editorial,
+  .newsletter {
+    padding-top: 72px;
+    padding-bottom: 72px;
+  }
+
+  .section-header,
+  .page-hero-content,
+  .footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .hero-text {
+    padding: 56px 20px 40px;
+  }
+
+  .hero-title {
+    font-size: clamp(42px, 14vw, 58px);
+    letter-spacing: 0;
+  }
+
+  .hero-cta,
+  .newsletter-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero-cta .btn-primary,
+  .hero-cta .btn-ghost {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hero-image {
+    min-height: 280px;
+  }
+
+  .hero-tag,
+  .rewards-badge {
+    display: none;
+  }
+
+  .categories-grid,
+  .products-grid,
+  .footer-top,
+  .editorial-images {
+    grid-template-columns: 1fr;
+  }
+
+  .categories-grid {
+    grid-template-rows: none;
+  }
+
+  .category-card,
+  .category-card:first-child {
+    grid-column: auto;
+    min-height: 240px;
+  }
+
+  .products-grid {
+    gap: 10px;
+  }
+
+  .brands-row {
+    gap: 24px;
+  }
+
+  .editorial-images {
+    height: auto;
+  }
+
+  .editorial-img {
+    min-height: 260px;
+    margin: 0 !important;
+  }
+}
 

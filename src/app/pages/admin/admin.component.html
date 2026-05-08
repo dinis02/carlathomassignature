@@ -364,102 +364,36 @@
             </div>
             <select class="filter-select"><option>Todas as categorias</option><option>L&#xE1;bios</option><option>Rosto</option><option>Olhos</option><option>Corpo</option></select>
             <select class="filter-select"><option>Todas as marcas</option><option>Charlotte Tilbury</option><option>NARS</option><option>La Mer</option><option>Carla Thomas</option></select>
-            <span class="table-title" style="margin-left:auto;">12 produtos</span>
+            <span class="table-title" style="margin-left:auto;">{{ adminProducts.length }} produtos</span>
           </div>
         </div>
         <div class="products-admin-grid" id="productsTable">
-          <div class="product-admin-card" (click)="openProductPanel('1')">
-            <div class="product-admin-img" style="background:linear-gradient(145deg,#C9A08A,#A07050);">
-              <div class="product-admin-overlay"></div>
-              <div class="product-admin-actions">
-                <button class="btn btn-primary btn-sm" (click)="$event.stopPropagation();openProductPanel('1')">Editar</button>
-                <button class="btn btn-ghost btn-sm" (click)="$event.stopPropagation()">Duplicar</button>
+          @for (product of adminProducts; track product.id) {
+            <div class="product-admin-card" (click)="openProductPanel('' + product.id)">
+              <div class="product-admin-img" [style.background]="product.image ? 'none' : 'linear-gradient(145deg,' + product.gradientFrom + ',' + product.gradientTo + ')'">
+                @if (product.image) {
+                  <img class="product-admin-photo" [src]="product.image" [alt]="product.name">
+                }
+                <div class="product-admin-overlay"></div>
+                <div class="product-admin-actions">
+                  <button class="btn btn-primary btn-sm" (click)="$event.stopPropagation();openProductPanel('' + product.id)">Editar</button>
+                </div>
+              </div>
+              <div class="product-admin-body">
+                <div class="product-admin-brand">{{ product.brand }}</div>
+                <div class="product-admin-name">{{ product.name }}</div>
+                <div class="product-admin-footer">
+                  <span class="product-admin-price">{{ product.price | number:'1.2-2' }} &euro;</span>
+                  <span class="badge" [class.ativo]="(product.stock || 0) > 0" [class.esgotado]="(product.stock || 0) === 0"><span class="badge-dot"></span>{{ (product.stock || 0) > 0 ? 'Activo' : 'Esgotado' }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--border2);font-size:10px;color:var(--muted);">
+                  <span>Stock: {{ product.stock || 0 }} un.</span><span>{{ product.category }}</span>
+                </div>
               </div>
             </div>
-            <div class="product-admin-body">
-              <div class="product-admin-brand">Charlotte Tilbury</div>
-              <div class="product-admin-name">Pillow Talk Lipstick</div>
-              <div class="product-admin-footer"><span class="product-admin-price">33,60 &euro;</span><span class="badge promocao"><span class="badge-dot"></span>Promo&#xE7;&#xE3;o</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--border2);font-size:10px;color:var(--muted);"><span>Stock: 24 un.</span><span>Vendidos: 38</span></div>
-            </div>
-          </div>
-          <div class="product-admin-card" (click)="openProductPanel('2')">
-            <div class="product-admin-img" style="background:linear-gradient(145deg,#E8D0C0,#D4B8A8);">
-              <div class="product-admin-overlay"></div>
-              <div class="product-admin-actions">
-                <button class="btn btn-primary btn-sm" (click)="$event.stopPropagation();openProductPanel('2')">Editar</button>
-                <button class="btn btn-ghost btn-sm" (click)="$event.stopPropagation()">Duplicar</button>
-              </div>
-            </div>
-            <div class="product-admin-body">
-              <div class="product-admin-brand">Carla Thomas</div>
-              <div class="product-admin-name">Rose Glow Lip Gloss</div>
-              <div class="product-admin-footer"><span class="product-admin-price">28,00 &euro;</span><span class="badge" style="background:rgba(160,48,48,0.1);color:var(--danger);"><span class="badge-dot" style="background:var(--danger);"></span>Stock baixo</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--border2);font-size:10px;color:var(--muted);"><span style="color:var(--danger);">Stock: 3 un.</span><span>Vendidos: 312</span></div>
-            </div>
-          </div>
-          <div class="product-admin-card" (click)="openProductPanel('3')">
-            <div class="product-admin-img" style="background:linear-gradient(145deg,#C4B0A0,#B09080);">
-              <div class="product-admin-overlay"></div>
-              <div class="product-admin-actions">
-                <button class="btn btn-primary btn-sm" (click)="$event.stopPropagation();openProductPanel('3')">Editar</button>
-                <button class="btn btn-ghost btn-sm" (click)="$event.stopPropagation()">Duplicar</button>
-              </div>
-            </div>
-            <div class="product-admin-body">
-              <div class="product-admin-brand">La Mer</div>
-              <div class="product-admin-name">Creme de la Mer</div>
-              <div class="product-admin-footer"><span class="product-admin-price">185,00 &euro;</span><span class="badge ativo"><span class="badge-dot"></span>Activo</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--border2);font-size:10px;color:var(--muted);"><span>Stock: 8 un.</span><span>Vendidos: 15</span></div>
-            </div>
-          </div>
-          <div class="product-admin-card" (click)="openProductPanel('4')">
-            <div class="product-admin-img" style="background:linear-gradient(145deg,#2A2220,#1A1714);">
-              <div class="product-admin-overlay"></div>
-              <div class="product-admin-actions">
-                <button class="btn btn-primary btn-sm" (click)="$event.stopPropagation();openProductPanel('4')">Editar</button>
-                <button class="btn btn-ghost btn-sm" (click)="$event.stopPropagation()">Duplicar</button>
-              </div>
-            </div>
-            <div class="product-admin-body">
-              <div class="product-admin-brand">Charlotte Tilbury</div>
-              <div class="product-admin-name">Pillow Talk Lip Liner</div>
-              <div class="product-admin-footer"><span class="product-admin-price">18,00 &euro;</span><span class="badge ativo"><span class="badge-dot"></span>Activo</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--border2);font-size:10px;color:var(--muted);"><span>Stock: 42 un.</span><span>Vendidos: 248</span></div>
-            </div>
-          </div>
-          <div class="product-admin-card" (click)="openProductPanel('5')">
-            <div class="product-admin-img" style="background:linear-gradient(145deg,#B8A898,#A09080);opacity:0.7;">
-              <div class="product-admin-overlay"></div>
-              <div class="product-admin-actions">
-                <button class="btn btn-primary btn-sm" (click)="$event.stopPropagation();openProductPanel('5')">Editar</button>
-              </div>
-            </div>
-            <div class="product-admin-body">
-              <div class="product-admin-brand">Armani Beauty</div>
-              <div class="product-admin-name">Lip Maestro Velvet</div>
-              <div class="product-admin-footer"><span class="product-admin-price" style="color:var(--muted);">38,00 &euro;</span><span class="badge esgotado"><span class="badge-dot"></span>Esgotado</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--border2);font-size:10px;color:var(--muted);"><span style="color:var(--danger);">Stock: 0 un.</span><span>Vendidos: 76</span></div>
-            </div>
-          </div>
-          <div class="product-admin-card" (click)="openProductPanel('6')">
-            <div class="product-admin-img" style="background:linear-gradient(145deg,#8A6A7A,#6A4A5A);">
-              <div class="product-admin-overlay"></div>
-              <div class="product-admin-actions">
-                <button class="btn btn-primary btn-sm" (click)="$event.stopPropagation();openProductPanel('6')">Editar</button>
-                <button class="btn btn-ghost btn-sm" (click)="$event.stopPropagation()">Duplicar</button>
-              </div>
-            </div>
-            <div class="product-admin-body">
-              <div class="product-admin-brand">NARS</div>
-              <div class="product-admin-name">Velvet Matte Lip Pencil</div>
-              <div class="product-admin-footer"><span class="product-admin-price">26,00 &euro;</span><span class="badge ativo"><span class="badge-dot"></span>Activo</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--border2);font-size:10px;color:var(--muted);"><span>Stock: 19 un.</span><span>Vendidos: 54</span></div>
-            </div>
-          </div>
+          }
         </div>
       </div>
-
       <!-- VIEW: CUSTOMERS -->
       <div class="view" [class.active]="activeView==='customers'">
         <div class="page-header"><div class="page-header-left"><div class="page-eyebrow">Base de dados</div><h1>Clientes</h1></div></div>
@@ -628,26 +562,38 @@
         <div class="form-section">
           <div class="form-section-title">Informa&#xE7;&#xE3;o geral</div>
           <div class="form-grid cols2">
-            <div class="form-field span2"><label>Nome do produto</label><input type="text" placeholder="Ex: Pillow Talk Lipstick"></div>
-            <div class="form-field"><label>Marca</label><input type="text" placeholder="Ex: Charlotte Tilbury"></div>
-            <div class="form-field"><label>Categoria</label><select><option>L&#xE1;bios</option><option>Rosto</option><option>Olhos</option><option>Corpo</option></select></div>
-            <div class="form-field"><label>Pre&#xE7;o (EUR)</label><input type="number" placeholder="0.00"></div>
-            <div class="form-field"><label>Pre&#xE7;o promocional</label><input type="number" placeholder="0.00"></div>
-            <div class="form-field span2"><label>Descri&#xE7;&#xE3;o</label><textarea placeholder="Descri&#xE7;&#xE3;o do produto..."></textarea></div>
+            <div class="form-field span2">
+              <label>Fotografia do produto</label>
+              <label class="image-upload-box">
+                @if (selectedProductPreview) {
+                  <img [src]="selectedProductPreview" alt="Preview do produto">
+                } @else {
+                  <span>Carregar fotografia</span>
+                }
+                <input type="file" accept="image/*" (change)="onProductImageSelected($event)">
+              </label>
+            </div>
+            <div class="form-field span2"><label>Nome do produto</label><input type="text" placeholder="Ex: Pillow Talk Lipstick" [(ngModel)]="productForm.name" name="productName"></div>
+            <div class="form-field"><label>Marca</label><input type="text" placeholder="Ex: Charlotte Tilbury" [(ngModel)]="productForm.brand" name="productBrand"></div>
+            <div class="form-field"><label>Categoria</label><select [(ngModel)]="productForm.category" name="productCategory"><option>Lábios</option><option>Rosto</option><option>Olhos</option><option>Corpo</option><option>Acessórios</option></select></div>
+            <div class="form-field"><label>Pre&#xE7;o (EUR)</label><input type="number" placeholder="0.00" [(ngModel)]="productForm.price" name="productPrice"></div>
+            <div class="form-field"><label>Pre&#xE7;o promocional</label><input type="number" placeholder="0.00" [(ngModel)]="productForm.originalPrice" name="productOriginalPrice"></div>
+            <div class="form-field span2"><label>Descri&#xE7;&#xE3;o</label><textarea placeholder="Descri&#xE7;&#xE3;o do produto..." [(ngModel)]="productForm.description" name="productDescription"></textarea></div>
           </div>
         </div>
         <div class="form-section">
           <div class="form-section-title">Stock e visibilidade</div>
           <div class="form-grid cols3">
-            <div class="form-field"><label>Stock</label><input type="number" placeholder="0"></div>
-            <div class="form-field"><label>SKU</label><input type="text" placeholder="CTS-001"></div>
-            <div class="form-field"><label>Estado</label><select><option>Activo</option><option>Inactivo</option><option>Esgotado</option></select></div>
+            <div class="form-field"><label>Stock</label><input type="number" placeholder="0" [(ngModel)]="productForm.stock" name="productStock"></div>
+            <div class="form-field"><label>Etiqueta</label><input type="text" placeholder="Novo" [(ngModel)]="productForm.badge" name="productBadge"></div>
+            <div class="form-field"><label>Acabamentos</label><input type="text" placeholder="Matte, Brilhante" [(ngModel)]="productForm.finishes" name="productFinishes"></div>
+            <div class="form-field span2"><label>Tons</label><input type="text" placeholder="Pillow Talk, Rose, Nude" [(ngModel)]="productForm.shades" name="productShades"></div>
           </div>
         </div>
       </div>
       <div class="side-panel-footer">
         <button class="btn btn-ghost" (click)="closeProductPanel()">Cancelar</button>
-        <button class="btn btn-primary" (click)="showToast('Produto guardado','success');closeProductPanel()">Guardar produto</button>
+        <button class="btn btn-primary" [disabled]="savingProduct" (click)="saveProduct()">{{ savingProduct ? 'A guardar...' : 'Guardar produto' }}</button>
       </div>
     </div>
   </div>
