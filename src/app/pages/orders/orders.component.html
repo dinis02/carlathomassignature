@@ -119,7 +119,37 @@
       </div>
 
       <div class="orders-list" *ngIf="isActive('wishlist')">
-        <div class="empty-orders">
+        <div *ngIf="wishlistError" class="settings-error">{{ wishlistError }}</div>
+
+        <div *ngIf="wishlistLoading" class="empty-orders">
+          <h3>A carregar wishlist...</h3>
+          <p>Estamos a procurar os produtos guardados na tua conta.</p>
+        </div>
+
+        <div *ngIf="!wishlistLoading && wishlistProducts.length > 0" class="wishlist-grid">
+          @for (product of wishlistProducts; track product.id) {
+            <article class="wishlist-card">
+              <a [routerLink]="['/produto', product.id]" class="wishlist-image">
+                @if (product.image) {
+                  <img [src]="product.image" [alt]="product.name" />
+                } @else {
+                  <span [style.background]="'linear-gradient(145deg,' + product.gradientFrom + ',' + product.gradientTo + ')'"></span>
+                }
+              </a>
+              <div class="wishlist-info">
+                <div class="stat-label">{{ product.brand }}</div>
+                <h3>{{ product.name }}</h3>
+                <p>{{ product.price | number:'1.2-2' }} €</p>
+                <div class="wishlist-actions">
+                  <a [routerLink]="['/produto', product.id]" class="action-btn primary">Ver produto</a>
+                  <button type="button" class="action-btn" (click)="removeWishlist(product.id)">Remover</button>
+                </div>
+              </div>
+            </article>
+          }
+        </div>
+
+        <div *ngIf="!wishlistLoading && wishlistProducts.length === 0" class="empty-orders">
           <svg width="54" height="54" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l7.78-7.78a5.5 5.5 0 0 0 1.06-8.84Z"/></svg>
           <h3>Wishlist vazia</h3>
           <p>Os produtos guardados para mais tarde vao aparecer nesta area.</p>
@@ -136,9 +166,6 @@
               <p>{{ addressLine }}</p>
               <p>{{ addressPostcode }} {{ addressCity }}</p>
               <p>{{ addressCountry }}</p>
-              @if (addressPhone) {
-                <p class="address-muted">{{ addressPhone }}</p>
-              }
             </div>
             <button type="button" class="action-btn" (click)="addressLoaded = false; loadAddress()">Atualizar</button>
           </div>
@@ -158,10 +185,6 @@
           <label>
             <span>Nome</span>
             <input type="text" name="addressName" [(ngModel)]="addressName" />
-          </label>
-          <label>
-            <span>Telemovel</span>
-            <input type="tel" name="addressPhone" [(ngModel)]="addressPhone" />
           </label>
           <label>
             <span>Morada</span>
@@ -200,6 +223,10 @@
           <label>
             <span>Email</span>
             <input type="email" name="profileEmail" [(ngModel)]="profileEmail" required />
+          </label>
+          <label>
+            <span>Telemovel</span>
+            <input type="tel" name="profilePhone" [(ngModel)]="profilePhone" />
           </label>
           <div *ngIf="profileError" class="settings-error">{{ profileError }}</div>
           <div *ngIf="profileMessage" class="settings-success">{{ profileMessage }}</div>

@@ -3,6 +3,9 @@ import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { Product } from '../../core/models/models';
+import { ProductService } from '../../core/services/product.service';
+import { WishlistService } from '../../core/services/wishlist.service';
 
 type AccountSection = 'overview' | 'orders' | 'wishlist' | 'addresses' | 'settings';
 
@@ -16,13 +19,15 @@ type AccountSection = 'overview' | 'orders' | 'wishlist' | 'addresses' | 'settin
 export class OrdersComponent {
   auth = inject(AuthService);
   private router = inject(Router);
+  private productSvc = inject(ProductService);
+  wishlist = inject(WishlistService);
 
   session = this.auth.session;
   activeSection: AccountSection = 'overview';
   profileName = '';
   profileEmail = '';
+  profilePhone = '';
   addressName = '';
-  addressPhone = '';
   addressLine = '';
   addressPostcode = '';
   addressCity = '';
@@ -40,6 +45,9 @@ export class OrdersComponent {
   passwordMessage = '';
   passwordError = '';
   addressLoaded = false;
+  allProducts: Product[] = this.productSvc.getAll();
+  wishlistLoading = false;
+  wishlistError = '';
 
   get initials(): string {
     const name = this.session()?.name || 'Cliente';
@@ -58,9 +66,13 @@ export class OrdersComponent {
     if (section === 'settings' && account) {
       this.profileName = account.name;
       this.profileEmail = account.email;
+      void this.loadProfilePhone();
     }
     if (section === 'addresses') {
       void this.loadAddress();
+    }
+    if (section === 'wishlist') {
+      void this.loadWishlist();
     }
   }
 
@@ -79,6 +91,18 @@ export class OrdersComponent {
 
     this.savingProfile = true;
     this.auth.updateAccount(this.profileName, this.profileEmail).then(() => {
+      const account = this.session();
+      if (!account) return;
+      return this.auth.saveCheckoutProfile({
+        name: this.profileName,
+        email: this.profileEmail,
+        phone: this.profilePhone,
+        address: this.addressLine,
+        postcode: this.addressPostcode,
+        city: this.addressCity,
+        country: this.addressCountry || 'Portugal'
+      });
+    }).then(() => {
       this.savingProfile = false;
       this.profileMessage = 'Dados guardados. Se mudou o email, confirme a mensagem enviada pela Supabase.';
     }).catch(err => {
@@ -88,7 +112,15 @@ export class OrdersComponent {
   }
 
   get hasSavedAddress(): boolean {
-    return !!(this.addressLine || this.addressPostcode || this.addressCity || this.addressPhone);
+    return !!(this.addressLine || this.addressPostcode || this.addressCity);
+  }
+
+  loadProfilePhone(): Promise<void> {
+    return this.auth.getCheckoutProfile().then(profile => {
+      this.profilePhone = profile?.phone || '';
+    }).catch(() => {
+      this.profilePhone = '';
+    });
   }
 
   loadAddress(): Promise<void> {
@@ -96,7 +128,6 @@ export class OrdersComponent {
     return this.auth.getCheckoutProfile().then(profile => {
       const account = this.session();
       this.addressName = profile?.name || account?.name || '';
-      this.addressPhone = profile?.phone || '';
       this.addressLine = profile?.address || '';
       this.addressPostcode = profile?.postcode || '';
       this.addressCity = profile?.city || '';
@@ -126,7 +157,7 @@ export class OrdersComponent {
     this.auth.saveCheckoutProfile({
       name: this.addressName || account.name,
       email: account.email,
-      phone: this.addressPhone,
+      phone: this.profilePhone,
       address: this.addressLine,
       postcode: this.addressPostcode,
       city: this.addressCity,
@@ -171,5 +202,44 @@ export class OrdersComponent {
   logout(): void {
     this.auth.logout();
     this.router.navigate(['/']);
+  }
+
+  get wishlistProducts(): Product[] {
+    const ids = this.wishlist.ids();
+    return ids
+      .map(id => this.allProducts.find(product => product.id === id))
+      .filter((product): product is Product => !!product);
+  }
+
+  loadWishlist(): Promise<void> {
+    this.wishlistLoading = true;
+    this.wishlistError = '';
+
+    return new Promise(resolve => {
+      this.productSvc.loadAll().subscribe({
+        next: products => {
+          this.allProducts = products;
+          this.wishlist.load().then(() => {
+            this.wishlistLoading = false;
+            resolve();
+          }).catch(err => {
+            this.wishlistLoading = false;
+            this.wishlistError = err?.message || 'Nao foi possivel carregar a wishlist.';
+            resolve();
+          });
+        },
+        error: () => {
+          this.wishlistLoading = false;
+          this.wishlistError = 'Nao foi possivel carregar os produtos.';
+          resolve();
+        }
+      });
+    });
+  }
+
+  removeWishlist(productId: number): void {
+    void this.wishlist.remove(productId).catch(err => {
+      this.wishlistError = err?.message || 'Nao foi possivel remover o produto.';
+    });
   }
 }

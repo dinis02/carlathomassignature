@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProductService } from '../../core/services/product.service';
 import { CartService } from '../../core/services/cart.service';
+import { WishlistService } from '../../core/services/wishlist.service';
 import { Product } from '../../core/models/models';
 
 @Component({
@@ -142,7 +143,12 @@ import { Product } from '../../core/models/models';
                   <span class="product-badge" [class.dark]="product.badgeDark">{{ product.badge }}</span>
                 }
                 <div class="product-actions" (click)="$event.preventDefault()">
-                  <button class="product-action-btn wishlist-active" title="Wishlist"></button>
+                  <button
+                    class="product-action-btn"
+                    [class.saved]="wishlist.isSaved(product.id)"
+                    [title]="wishlist.isSaved(product.id) ? 'Remover da wishlist' : 'Adicionar a wishlist'"
+                    (click)="toggleWishlist($event, product)">
+                  </button>
                 </div>
               </div>
               <div class="product-info">
@@ -185,6 +191,7 @@ import { Product } from '../../core/models/models';
 export class ProductsComponent implements OnInit, AfterViewInit {
   private productSvc = inject(ProductService);
   private cartSvc    = inject(CartService);
+  wishlist           = inject(WishlistService);
   private route      = inject(ActivatedRoute);
 
   allProducts = signal<Product[]>(this.productSvc.getAll());
@@ -261,6 +268,8 @@ export class ProductsComponent implements OnInit, AfterViewInit {
   });
 
   ngOnInit(): void {
+    void this.wishlist.load().catch(() => undefined);
+
     this.route.queryParams.subscribe(p => {
       if (p['cat']) this.activeCategory.set(p['cat']);
     });
@@ -312,6 +321,14 @@ export class ProductsComponent implements OnInit, AfterViewInit {
   addToCart(e: Event, product: Product): void {
     e.preventDefault(); e.stopPropagation();
     this.cartSvc.add(product);
+  }
+
+  toggleWishlist(e: Event, product: Product): void {
+    e.preventDefault();
+    e.stopPropagation();
+    void this.wishlist.toggle(product.id).catch(err => {
+      window.alert(err?.message || 'Nao foi possivel guardar na wishlist.');
+    });
   }
 
   starsArray(rating: number): boolean[] {

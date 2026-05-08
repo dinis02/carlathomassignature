@@ -47,7 +47,20 @@
 .info-panel { }
 .meta-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
 .brand-tag { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--rose-gold); font-weight: 300; }
-.share-btn { background: none; border: none; cursor: none; color: var(--text-muted); transition: color 0.2s; &:hover { color: var(--noir); } }
+.share-btn {
+  background: none;
+  border: none;
+  cursor: none;
+  color: var(--text-muted);
+  transition: color 0.2s;
+  &:hover,
+  &.saved {
+    color: var(--rose-gold);
+  }
+  &.saved svg {
+    fill: currentColor;
+  }
+}
 
 .product-title {
   font-family: 'Cormorant Garamond', serif;
@@ -106,6 +119,13 @@
 .cta-block { display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
 .btn-primary.added { background: var(--success) !important; }
 .btn-primary.added::before { display: none; }
+.btn-secondary.saved {
+  border-color: var(--rose-gold);
+  color: var(--rose-gold);
+}
+.btn-secondary.saved svg {
+  fill: currentColor;
+}
 
 .accordion { border-top: 1px solid var(--border); }
 .accordion-item {

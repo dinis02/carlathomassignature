@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ProductService } from '../../core/services/product.service';
 import { CartService } from '../../core/services/cart.service';
+import { WishlistService } from '../../core/services/wishlist.service';
 import { Product } from '../../core/models/models';
 
 @Component({
@@ -58,7 +59,11 @@ import { Product } from '../../core/models/models';
           <div class="meta-top">
             <span class="brand-tag">{{ product.brand }}</span>
             <div class="share-btns">
-              <button class="share-btn" title="Guardar">
+              <button
+                class="share-btn"
+                [class.saved]="isWishlistSaved()"
+                [title]="isWishlistSaved() ? 'Remover da wishlist' : 'Guardar na wishlist'"
+                (click)="toggleWishlist()">
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
               </button>
             </div>
@@ -138,9 +143,9 @@ import { Product } from '../../core/models/models';
               <span>Comprar agora</span>
               <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
             </button>
-            <button class="btn-secondary">
+            <button class="btn-secondary" [class.saved]="isWishlistSaved()" (click)="toggleWishlist()">
               <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-              Guardar na wishlist
+              {{ isWishlistSaved() ? 'Guardado na wishlist' : 'Guardar na wishlist' }}
             </button>
           </div>
 
@@ -219,6 +224,7 @@ export class ProductDetailComponent implements OnInit {
   private route      = inject(ActivatedRoute);
   private router     = inject(Router);
   private sanitizer  = inject(DomSanitizer);
+  private wishlist   = inject(WishlistService);
 
   product: Product | undefined;
   related: Product[] = [];
@@ -258,6 +264,8 @@ export class ProductDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    void this.wishlist.load().catch(() => undefined);
+
     this.route.params.subscribe(p => {
       const id = +p['id'];
       this.productSvc.loadAll().subscribe(() => this.setProduct(id));
@@ -287,6 +295,17 @@ export class ProductDetailComponent implements OnInit {
   buyNow(): void {
     this.addToCart();
     this.router.navigate(['/carrinho']);
+  }
+
+  isWishlistSaved(): boolean {
+    return !!this.product && this.wishlist.isSaved(this.product.id);
+  }
+
+  toggleWishlist(): void {
+    if (!this.product) return;
+    void this.wishlist.toggle(this.product.id).catch(err => {
+      window.alert(err?.message || 'Nao foi possivel guardar na wishlist.');
+    });
   }
 
   starsArray(r: number): boolean[] {

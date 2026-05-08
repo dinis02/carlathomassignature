@@ -47,6 +47,13 @@ create table if not exists public.profiles (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.wishlist_items (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  product_id bigint not null references public.products(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (user_id, product_id)
+);
+
 alter table public.profiles add column if not exists phone text;
 alter table public.profiles add column if not exists address text;
 alter table public.profiles add column if not exists postcode text;
@@ -67,6 +74,7 @@ alter table public.products enable row level security;
 alter table public.product_shades enable row level security;
 alter table public.product_finishes enable row level security;
 alter table public.profiles enable row level security;
+alter table public.wishlist_items enable row level security;
 alter table public.user_accounts enable row level security;
 
 drop policy if exists "Public can read active products" on public.products;
@@ -117,6 +125,27 @@ with check (
 drop policy if exists "Service role manages profiles" on public.profiles;
 create policy "Service role manages profiles"
 on public.profiles for all
+using (auth.role() = 'service_role')
+with check (auth.role() = 'service_role');
+
+drop policy if exists "Users can read own wishlist" on public.wishlist_items;
+create policy "Users can read own wishlist"
+on public.wishlist_items for select
+using (auth.uid() = user_id);
+
+drop policy if exists "Users can add own wishlist" on public.wishlist_items;
+create policy "Users can add own wishlist"
+on public.wishlist_items for insert
+with check (auth.uid() = user_id);
+
+drop policy if exists "Users can delete own wishlist" on public.wishlist_items;
+create policy "Users can delete own wishlist"
+on public.wishlist_items for delete
+using (auth.uid() = user_id);
+
+drop policy if exists "Service role manages wishlist" on public.wishlist_items;
+create policy "Service role manages wishlist"
+on public.wishlist_items for all
 using (auth.role() = 'service_role')
 with check (auth.role() = 'service_role');
 
