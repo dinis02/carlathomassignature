@@ -18,11 +18,11 @@ import { AccountSession, AuthService } from '../../core/services/auth.service';
       </div>
 
       <div class="login-heading">
-        <div class="section-label">{{ mode === 'login' ? 'Acesso privado' : 'Nova cliente' }}</div>
-        <h2>{{ mode === 'login' ? 'Entrar na sua' : 'Criar a sua' }} <em>conta</em></h2>
+        <div class="section-label">{{ headingLabel }}</div>
+        <h2>{{ headingTitle }} <em>{{ headingAccent }}</em></h2>
       </div>
 
-      <div class="login-tabs" aria-label="Tipo de acesso">
+      <div class="login-tabs" aria-label="Tipo de acesso" *ngIf="mode !== 'reset'">
         <button type="button" [class.active]="mode === 'login'" (click)="setMode('login')">Entrar</button>
         <button type="button" [class.active]="mode === 'register'" (click)="setMode('register')">Criar conta</button>
       </div>
@@ -38,21 +38,30 @@ import { AccountSession, AuthService } from '../../core/services/auth.service';
           <input type="text" placeholder="cliente@email.com" [(ngModel)]="username" name="username" required />
         </label>
 
-        <label class="login-field">
+        <label *ngIf="mode !== 'reset'" class="login-field">
           <span>Senha</span>
           <input type="password" placeholder="••••••••" [(ngModel)]="password" name="password" required />
         </label>
 
         <div *ngIf="loginError" class="login-error">{{ errorMessage }}</div>
+        <div *ngIf="successMessage" class="login-success">{{ successMessage }}</div>
 
         <button class="login-submit" type="submit" [disabled]="loading">
           <span>
-            {{ loading ? 'A processar...' : (mode === 'login' ? 'Entrar' : 'Criar conta') }}
+            {{ submitLabel }}
           </span>
         </button>
 
+        <button *ngIf="mode !== 'reset'" type="button" class="oauth-submit" [disabled]="loading" (click)="loginWithGoogle()">
+          Entrar com Google
+        </button>
+
+        <button *ngIf="mode === 'login'" type="button" class="login-switch" (click)="setMode('reset')">
+          Definir ou recuperar password
+        </button>
+
         <button type="button" class="login-switch" (click)="setMode(mode === 'login' ? 'register' : 'login')">
-          {{ mode === 'login' ? 'Ainda nao tem conta? Criar conta' : 'Ja tem conta? Entrar' }}
+          {{ switchLabel }}
         </button>
       </form>
 
@@ -272,6 +281,25 @@ import { AccountSession, AuthService } from '../../core/services/auth.service';
       opacity: 0.65;
     }
 
+    .oauth-submit {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.58);
+      color: var(--noir);
+      padding: 14px 18px;
+      font-family: 'Jost', sans-serif;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .oauth-submit:hover {
+      border-color: var(--rose-gold);
+      background: white;
+    }
+
     .login-switch {
       align-self: center;
       border: 0;
@@ -295,6 +323,16 @@ import { AccountSession, AuthService } from '../../core/services/auth.service';
       border-left: 2px solid #A03030;
       background: rgba(160, 48, 48, 0.08);
       color: #A03030;
+      padding: 12px 14px;
+      font-size: 12px;
+      line-height: 1.5;
+      font-weight: 300;
+    }
+
+    .login-success {
+      border-left: 2px solid #4D7A5D;
+      background: rgba(77, 122, 93, 0.09);
+      color: #315B3E;
       padding: 12px 14px;
       font-size: 12px;
       line-height: 1.5;
@@ -360,26 +398,70 @@ export class LoginModalComponent {
 
   private auth = inject(AuthService);
 
-  mode: 'login' | 'register' = 'login';
+  mode: 'login' | 'register' | 'reset' = 'login';
   name = '';
   username = '';
   password = '';
   loginError = false;
   loading = false;
   errorMessage = 'Usuario ou senha invalidos';
+  successMessage = '';
+
+  get headingLabel(): string {
+    if (this.mode === 'register') return 'Nova cliente';
+    if (this.mode === 'reset') return 'Acesso seguro';
+    return 'Acesso privado';
+  }
+
+  get headingTitle(): string {
+    if (this.mode === 'register') return 'Criar a sua';
+    if (this.mode === 'reset') return 'Definir';
+    return 'Entrar na sua';
+  }
+
+  get headingAccent(): string {
+    return this.mode === 'reset' ? 'password' : 'conta';
+  }
+
+  get submitLabel(): string {
+    if (this.loading) return 'A processar...';
+    if (this.mode === 'register') return 'Criar conta';
+    if (this.mode === 'reset') return 'Enviar email';
+    return 'Entrar';
+  }
+
+  get switchLabel(): string {
+    if (this.mode === 'register') return 'Ja tem conta? Entrar';
+    if (this.mode === 'reset') return 'Voltar ao login';
+    return 'Ainda nao tem conta? Criar conta';
+  }
 
   close(): void {
     this.closeModal.emit();
   }
 
-  setMode(mode: 'login' | 'register'): void {
+  setMode(mode: 'login' | 'register' | 'reset'): void {
     this.mode = mode;
     this.loginError = false;
+    this.successMessage = '';
   }
 
   submit(): void {
     this.loginError = false;
+    this.successMessage = '';
     this.loading = true;
+
+    if (this.mode === 'reset') {
+      this.auth.requestPasswordReset(this.username).then(() => {
+        this.loading = false;
+        this.successMessage = 'Enviamos um email para definir a sua password.';
+      }).catch(err => {
+        this.loading = false;
+        this.loginError = true;
+        this.errorMessage = err?.message || 'Nao foi possivel enviar o email.';
+      });
+      return;
+    }
 
     const request = this.mode === 'login'
       ? this.auth.login(this.username, this.password)
@@ -393,8 +475,18 @@ export class LoginModalComponent {
       error: err => {
         this.loading = false;
         this.loginError = true;
-        this.errorMessage = err?.error?.error || 'Usuario ou senha invalidos';
+        this.errorMessage = err?.error?.error || err?.message || 'Usuario ou senha invalidos';
       }
+    });
+  }
+
+  loginWithGoogle(): void {
+    this.loading = true;
+    this.loginError = false;
+    this.auth.signInWithGoogle().catch(err => {
+      this.loading = false;
+      this.loginError = true;
+      this.errorMessage = err?.message || 'Nao foi possivel entrar com Google';
     });
   }
 }

@@ -1,10 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 import { CartService } from '../../core/services/cart.service';
 import { OrderService } from '../../core/services/order.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-checkout',
@@ -35,6 +36,26 @@ import { OrderService } from '../../core/services/order.service';
           <!-- Contact -->
           <div class="form-section">
             <div class="form-section-title">Informações de contacto</div>
+            @if (session(); as account) {
+              <div class="account-checkout-note">
+                <strong>Conta ativa</strong>
+                <span>Os dados foram preenchidos com a sua conta. Ao pagar, ficam guardados para a proxima compra.</span>
+              </div>
+            } @else {
+              <div class="checkout-account-box">
+                <label class="checkout-check">
+                  <input type="checkbox" [checked]="createAccount()" (change)="toggleCreateAccount($any($event.target).checked)">
+                  <span>Criar conta com estes dados</span>
+                </label>
+                @if (createAccount()) {
+                  <div class="form-field">
+                    <label>Password da conta</label>
+                    <input formControlName="accountPassword" type="password" placeholder="Minimo 8 caracteres"
+                           [class.error]="hasError('accountPassword')">
+                  </div>
+                }
+              </div>
+            }
             <div class="form-grid cols2">
               <div class="form-field">
                 <label>Primeiro nome</label>
@@ -200,16 +221,20 @@ import { OrderService } from '../../core/services/order.service';
   `,
   styleUrls: ['./checkout.component.scss']
 })
-export class CheckoutComponent {
+export class CheckoutComponent implements OnInit {
   cart       = inject(CartService);
   private fb     = inject(FormBuilder);
   private router = inject(Router);
   private orderService = inject(OrderService);
+  private auth = inject(AuthService);
+
+  session = this.auth.session;
 
   processing      = signal(false);
   paymentError    = signal('');
   selectedShipping = signal('standard');
   selectedPayment  = signal('card');
+  createAccount   = signal(false);
 
   form = this.fb.group({
     firstName: ['', Validators.required],
@@ -220,6 +245,7 @@ export class CheckoutComponent {
     postcode:  ['', Validators.required],
     city:      ['', Validators.required],
     country:   ['Portugal'],
+    accountPassword: [''],
   });
 
   cardForm = this.fb.group({
@@ -235,6 +261,49 @@ export class CheckoutComponent {
   payMethods = [
     { id: 'card', icon: 'card', label: 'Cartao via Stripe' },
   ];
+
+  async ngOnInit(): Promise<void> {
+    const session = await this.auth.ready();
+    if (!session) return;
+
+    const [firstName, ...lastParts] = session.name.split(' ').filter(Boolean);
+    this.form.patchValue({
+      firstName: firstName || session.name,
+      lastName: lastParts.join(' '),
+      email: session.email
+    });
+
+    try {
+      const profile = await this.auth.getCheckoutProfile();
+      if (!profile) return;
+
+      const [profileFirstName, ...profileLastParts] = (profile.name || session.name).split(' ').filter(Boolean);
+      this.form.patchValue({
+        firstName: profileFirstName || firstName || '',
+        lastName: profileLastParts.join(' ') || lastParts.join(' '),
+        email: profile.email || session.email,
+        phone: profile.phone || '',
+        address: profile.address || '',
+        postcode: profile.postcode || '',
+        city: profile.city || '',
+        country: profile.country || 'Portugal'
+      });
+    } catch {
+      // Optional saved checkout details are not required to continue.
+    }
+  }
+
+  toggleCreateAccount(checked: boolean): void {
+    this.createAccount.set(checked);
+    const passwordControl = this.form.get('accountPassword');
+    if (checked) {
+      passwordControl?.setValidators([Validators.required, Validators.minLength(8)]);
+    } else {
+      passwordControl?.clearValidators();
+      passwordControl?.setValue('');
+    }
+    passwordControl?.updateValueAndValidity();
+  }
 
   hasError(field: string): boolean {
     const c = this.form.get(field);
@@ -285,11 +354,33 @@ export class CheckoutComponent {
     };
 
     try {
+      await this.prepareCheckoutAccount();
       const session = await firstValueFrom(this.orderService.createStripeCheckoutSession(payload));
       window.location.href = session.url;
     } catch (err: any) {
       this.processing.set(false);
-      this.paymentError.set(err?.error?.error || 'Nao foi possivel abrir o pagamento Stripe.');
+      this.paymentError.set(err?.error?.error || err?.message || 'Nao foi possivel abrir o pagamento Stripe.');
     }
+  }
+
+  private async prepareCheckoutAccount(): Promise<void> {
+    const email = this.form.value.email || '';
+    const fullName = `${this.form.value.firstName || ''} ${this.form.value.lastName || ''}`.trim();
+
+    if (!this.session() && this.createAccount()) {
+      await firstValueFrom(this.auth.register(fullName, email, this.form.value.accountPassword || ''));
+    }
+
+    if (!this.session()) return;
+
+    await this.auth.saveCheckoutProfile({
+      name: fullName,
+      email,
+      phone: this.form.value.phone || '',
+      address: this.form.value.address || '',
+      postcode: this.form.value.postcode || '',
+      city: this.form.value.city || '',
+      country: this.form.value.country || 'Portugal'
+    });
   }
 }

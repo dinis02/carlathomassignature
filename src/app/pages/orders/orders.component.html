@@ -1,461 +1,231 @@
-<!-- Page hero -->
+@if (session(); as account) {
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <div class="breadcrumb">
+        <a routerLink="/">Inicio</a><span class="breadcrumb-sep">-</span>
+        <span>A minha conta</span>
+      </div>
+      <div class="page-hero-content">
+        <h1 class="page-hero-title">A minha <em>conta</em></h1>
+        <div class="page-hero-meta">
+          <div class="page-hero-count">1</div>
+          <div class="page-hero-count-label">sessao ativa</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<div class="page-hero">
-<div class="page-hero-inner">
-<div class="breadcrumb">
-<a href="#">Início</a><span class="breadcrumb-sep">—</span>
-<a href="#">A minha conta</a><span class="breadcrumb-sep">—</span>
-<span>Encomendas</span>
-</div>
-<div class="page-hero-content">
-<h1 class="page-hero-title">As minhas <em>encomendas</em></h1>
-<div class="page-hero-meta">
-<div class="page-hero-count" id="heroCount">7</div>
-<div class="page-hero-count-label">encomendas no total</div>
-</div>
-</div>
-</div>
-</div>
+  <div class="account-nav">
+    <div class="account-nav-inner">
+      <button type="button" class="acc-tab" [class.active]="isActive('overview')" (click)="setSection('overview')">Visao geral</button>
+      <button type="button" class="acc-tab" [class.active]="isActive('orders')" (click)="setSection('orders')">Encomendas</button>
+      <button type="button" class="acc-tab" [class.active]="isActive('wishlist')" (click)="setSection('wishlist')">Wishlist</button>
+      <button type="button" class="acc-tab" [class.active]="isActive('addresses')" (click)="setSection('addresses')">Enderecos</button>
+      <button type="button" class="acc-tab" [class.active]="isActive('settings')" (click)="setSection('settings')">Definicoes</button>
+    </div>
+  </div>
 
-<!-- Account nav -->
+  <div class="main-layout">
+    <aside class="account-sidebar">
+      <div class="account-profile">
+        <div class="profile-avatar">{{ initials }}</div>
+        <div class="profile-name">{{ account.name }}</div>
+        <div class="profile-email">{{ account.email }}</div>
+        <div class="rewards-chip">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Cliente autenticado
+        </div>
+      </div>
 
-<div class="account-nav">
-<div class="account-nav-inner">
-<button class="acc-tab" onclick="accTab(this)">Visão geral</button>
-<button class="acc-tab active" onclick="accTab(this)">Encomendas</button>
-<button class="acc-tab" onclick="accTab(this)">Wishlist</button>
-<button class="acc-tab" onclick="accTab(this)">Makeup Rewards</button>
-<button class="acc-tab" onclick="accTab(this)">Devoluções</button>
-<button class="acc-tab" onclick="accTab(this)">Endereços</button>
-<button class="acc-tab" onclick="accTab(this)">Definições</button>
-</div>
-</div>
+      <div class="sidebar-menu">
+        <button type="button" class="sidebar-menu-item" [class.active]="isActive('overview')" (click)="setSection('overview')">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Visao geral
+        </button>
+        <button type="button" class="sidebar-menu-item" [class.active]="isActive('orders')" (click)="setSection('orders')">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
+          Encomendas
+          <span class="menu-badge">0</span>
+        </button>
+        <button type="button" class="sidebar-menu-item" [class.active]="isActive('wishlist')" (click)="setSection('wishlist')">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          Wishlist
+        </button>
+        <button type="button" class="sidebar-menu-item" [class.active]="isActive('addresses')" (click)="setSection('addresses')">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 10c0 7-9 12-9 12S3 17 3 10a9 9 0 1 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          Enderecos
+        </button>
+        <button type="button" class="sidebar-menu-item" [class.active]="isActive('settings')" (click)="setSection('settings')">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 .6 1.65 1.65 0 0 0-.35 1.1V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-.35-1.1 1.65 1.65 0 0 0-1-.6 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-.6-1 1.65 1.65 0 0 0-1.1-.35H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.1-.35 1.65 1.65 0 0 0 .6-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06A2 2 0 0 1 7.23 3.6l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-.6 1.65 1.65 0 0 0 .35-1.1V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 .35 1.1 1.65 1.65 0 0 0 1 .6 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.33.34.63.6 1 .26.37.62.6 1.1.6H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.1.35c-.37.26-.63.62-.6 1.05Z"/></svg>
+          Definicoes
+        </button>
+        <button type="button" class="sidebar-menu-item logout-entry" (click)="logout()">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Terminar sessao
+        </button>
+      </div>
+    </aside>
 
-<!-- Main layout -->
+    <main>
+      <div class="stats-row">
+        <div class="stat-card active">
+          <div class="stat-label">Estado</div>
+          <div class="stat-value">Online</div>
+          <div class="stat-sub">sessao iniciada como cliente</div>
+        </div>
+        <div class="stat-card success">
+          <div class="stat-label">Tipo de conta</div>
+          <div class="stat-value" style="color:var(--success)">User</div>
+          <div class="stat-sub">area privada de cliente</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Encomendas</div>
+          <div class="stat-value">0</div>
+          <div class="stat-sub">historico real ligado a conta</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Rewards</div>
+          <div class="stat-value">0</div>
+          <div class="stat-sub">pontos disponiveis</div>
+        </div>
+      </div>
 
-<div class="main-layout">
+      <div class="orders-list" *ngIf="isActive('overview')">
+        <div class="account-real-card">
+          <div>
+            <div class="stat-label">Sessao ativa</div>
+            <h2>Bem-vinda/o, {{ account.name }}</h2>
+            <p>Esta pagina esta ligada ao teu login real. Quando iniciares sessao como cliente, ves esta area. Quando iniciares sessao como admin, vais diretamente para o painel de administracao.</p>
+          </div>
+          <a routerLink="/produtos" class="action-btn primary">Continuar a comprar</a>
+        </div>
 
-<!-- Sidebar -->
+        <div class="account-real-card muted">
+          <div>
+            <div class="stat-label">Email da conta</div>
+            <h3>{{ account.email }}</h3>
+            <p>Usado para login, confirmacoes de encomenda e comunicacoes da loja.</p>
+          </div>
+        </div>
+      </div>
 
-<aside class="account-sidebar">
-<div class="account-profile">
-<div class="profile-avatar">M</div>
-<div class="profile-name">Maria Silva</div>
-<div class="profile-email">maria.silva&#64;email.com</div>
-<div class="rewards-chip">
-<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-214 pontos Rewards
-</div>
-</div>
+      <div class="orders-list" *ngIf="isActive('orders')">
+        <div class="empty-orders">
+          <svg width="54" height="54" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
+          <h3>Ainda nao existem encomendas</h3>
+          <p>Quando fizeres uma compra, o historico aparece aqui.</p>
+          <a routerLink="/produtos" class="action-btn primary">Continuar a comprar</a>
+        </div>
+      </div>
 
+      <div class="orders-list" *ngIf="isActive('wishlist')">
+        <div class="empty-orders">
+          <svg width="54" height="54" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l7.78-7.78a5.5 5.5 0 0 0 1.06-8.84Z"/></svg>
+          <h3>Wishlist vazia</h3>
+          <p>Os produtos guardados para mais tarde vao aparecer nesta area.</p>
+          <a routerLink="/produtos" class="action-btn primary">Ver produtos</a>
+        </div>
+      </div>
 
-<div class="sidebar-menu">
-<a href="#" class="sidebar-menu-item">
-<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-Visão geral
-</a>
-<a href="#" class="sidebar-menu-item active">
-<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
-Encomendas
-<span class="menu-badge">7</span>
-</a>
-<a href="#" class="sidebar-menu-item">
-<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-Wishlist
-<span class="menu-badge">12</span>
-</a>
-<a href="#" class="sidebar-menu-item">
-<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-Makeup Rewards
-</a>
-<a href="#" class="sidebar-menu-item">
-<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.45"/></svg>
-Devoluções
-<span class="menu-badge" style="background:var(--danger);">1</span>
-</a>
-<a href="#" class="sidebar-menu-item">
-<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-Endereços
-</a>
-<a href="#" class="sidebar-menu-item">
-<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-Definições
-</a>
-<a href="#" class="sidebar-menu-item" style="margin-top:8px;border-top:1px solid var(--border);padding-top:16px;">
-<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-Terminar sessão
-</a>
-</div>
+      <div class="orders-list" *ngIf="isActive('addresses')">
+        @if (hasSavedAddress) {
+          <div class="address-card">
+            <div>
+              <div class="stat-label">Endereco principal</div>
+              <h3>{{ addressName || account.name }}</h3>
+              <p>{{ addressLine }}</p>
+              <p>{{ addressPostcode }} {{ addressCity }}</p>
+              <p>{{ addressCountry }}</p>
+              @if (addressPhone) {
+                <p class="address-muted">{{ addressPhone }}</p>
+              }
+            </div>
+            <button type="button" class="action-btn" (click)="addressLoaded = false; loadAddress()">Atualizar</button>
+          </div>
+        } @else {
+          <div class="account-real-card muted">
+            <div>
+              <div class="stat-label">Enderecos</div>
+              <h3>Sem enderecos guardados</h3>
+              <p>Quando adicionares uma morada no checkout, ela aparece aqui automaticamente.</p>
+            </div>
+          </div>
+        }
 
-<!-- Rewards mini panel -->
-<div class="rewards-section">
-<div class="rewards-section-title">Makeup Rewards</div>
-<div style="display:flex;align-items:baseline;gap:12px;margin-bottom:16px;">
-<div class="rewards-big">214</div>
-<div class="rewards-big-sub">pontos</div>
-</div>
-<div class="rewards-progress">
-<div class="rewards-labels"><span>0</span><span>Nível Gold: 300pts</span></div>
-<div class="rewards-progress-bar"><div class="rewards-progress-fill" style="width:71%"></div></div>
-</div>
-<div class="rewards-history">
-<div class="reward-line"><span>Encomenda #4817</span><span class="points">+62 pts</span></div>
-<div class="reward-line"><span>Encomenda #4203</span><span class="points">+44 pts</span></div>
-<div class="reward-line"><span>Desconto aplicado</span><span class="points neg">−30 pts</span></div>
-<div class="reward-line"><span>Encomenda #3891</span><span class="points">+38 pts</span></div>
-</div>
-</div>
+        <form class="settings-card address-form" (ngSubmit)="saveAddress()">
+          <div class="stat-label">Editar endereco</div>
+          <h3>Morada de entrega</h3>
+          <label>
+            <span>Nome</span>
+            <input type="text" name="addressName" [(ngModel)]="addressName" />
+          </label>
+          <label>
+            <span>Telemovel</span>
+            <input type="tel" name="addressPhone" [(ngModel)]="addressPhone" />
+          </label>
+          <label>
+            <span>Morada</span>
+            <input type="text" name="addressLine" [(ngModel)]="addressLine" required />
+          </label>
+          <div class="settings-form-grid">
+            <label>
+              <span>Codigo postal</span>
+              <input type="text" name="addressPostcode" [(ngModel)]="addressPostcode" required />
+            </label>
+            <label>
+              <span>Cidade</span>
+              <input type="text" name="addressCity" [(ngModel)]="addressCity" required />
+            </label>
+          </div>
+          <label>
+            <span>Pais</span>
+            <input type="text" name="addressCountry" [(ngModel)]="addressCountry" />
+          </label>
+          <div *ngIf="addressError" class="settings-error">{{ addressError }}</div>
+          <div *ngIf="addressMessage" class="settings-success">{{ addressMessage }}</div>
+          <button class="action-btn primary" type="submit" [disabled]="savingAddress">
+            {{ savingAddress ? 'A guardar...' : 'Guardar endereco' }}
+          </button>
+        </form>
+      </div>
 
+      <div class="settings-grid" *ngIf="isActive('settings')">
+        <form class="settings-card" (ngSubmit)="saveProfile()">
+          <div class="stat-label">Dados da conta</div>
+          <h3>Nome e email</h3>
+          <label>
+            <span>Nome</span>
+            <input type="text" name="profileName" [(ngModel)]="profileName" required />
+          </label>
+          <label>
+            <span>Email</span>
+            <input type="email" name="profileEmail" [(ngModel)]="profileEmail" required />
+          </label>
+          <div *ngIf="profileError" class="settings-error">{{ profileError }}</div>
+          <div *ngIf="profileMessage" class="settings-success">{{ profileMessage }}</div>
+          <button class="action-btn primary" type="submit" [disabled]="savingProfile">
+            {{ savingProfile ? 'A guardar...' : 'Guardar dados' }}
+          </button>
+        </form>
 
-</aside>
-
-<!-- Orders main area -->
-
-<main>
-
-<!-- Stats -->
-<div class="stats-row">
-<div class="stat-card active clickable" onclick="filterStatus('todos')">
-<div class="stat-label">Total de encomendas</div>
-<div class="stat-value">7</div>
-<div class="stat-sub">desde Jan 2024</div>
-</div>
-<div class="stat-card success clickable" onclick="filterStatus('entregue')">
-<div class="stat-label">Entregues</div>
-<div class="stat-value" style="color:var(--success)">4</div>
-<div class="stat-sub">concluídas com sucesso</div>
-</div>
-<div class="stat-card warning clickable" onclick="filterStatus('enviado')">
-<div class="stat-label">Em trânsito</div>
-<div class="stat-value" style="color:var(--info)">2</div>
-<div class="stat-sub">a caminho de si</div>
-</div>
-<div class="stat-card clickable" onclick="filterStatus('cancelado')">
-<div class="stat-label">Canceladas</div>
-<div class="stat-value" style="color:var(--danger)">1</div>
-<div class="stat-sub">em 2024</div>
-</div>
-</div>
-
-<!-- Toolbar -->
-<div class="orders-toolbar">
-<div class="search-box">
-<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
-<input type="text" placeholder="Pesquisar por nº de encomenda ou produto..." id="searchInput" oninput="filterOrders()">
-</div>
-<div class="filter-pills">
-<button class="filter-pill active" data-filter="todos" onclick="filterPill(this)">Todas</button>
-<button class="filter-pill" data-filter="entregue" onclick="filterPill(this)">Entregues</button>
-<button class="filter-pill" data-filter="enviado" onclick="filterPill(this)">Em trânsito</button>
-<button class="filter-pill" data-filter="processando" onclick="filterPill(this)">Em processamento</button>
-<button class="filter-pill" data-filter="cancelado" onclick="filterPill(this)">Canceladas</button>
-</div>
-<div class="toolbar-right">
-<select class="sort-select" onchange="sortOrders(this.value)">
-<option value="date-desc">Mais recentes</option>
-<option value="date-asc">Mais antigas</option>
-<option value="total-desc">Valor: maior</option>
-<option value="total-asc">Valor: menor</option>
-</select>
-</div>
-</div>
-
-<!-- Orders list -->
-<div class="orders-list" id="ordersList">
-
-<!-- ORDER 1 — Em trânsito -->
-<div class="order-card" data-status="enviado" data-id="CTS-2025-04817" data-total="61.60" data-date="2025-04-18">
-<div class="order-card-header" onclick="toggleOrder(this.parentElement)">
-<div class="order-num">
-<small>Encomenda</small>
-#CTS-2025-04817
-</div>
-<div class="order-preview">
-<div class="order-thumb" style="background:linear-gradient(145deg,#C9A08A,#A07050);"></div>
-<div class="order-thumb" style="background:linear-gradient(145deg,#E8D0C0,#D4B8A8);"></div>
-</div>
-<div class="order-info">
-<div class="order-date">18 Abril 2025</div>
-<div class="order-items-count">2 artigos · CTT Expresso</div>
-</div>
-<div class="order-total">61,60 €</div>
-<div class="order-status">
-<span class="status-badge enviado">
-<span class="status-dot"></span>Em trânsito
-</span>
-</div>
-<button class="expand-btn">
-<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
-</button>
-</div>
-<div class="order-panel">
-<div class="order-panel-inner">
-
-<!-- Timeline -->
-<div class="order-timeline">
-<div class="timeline-step done">
-<div class="timeline-node"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-<div class="timeline-label">Encomenda recebida</div>
-<div class="timeline-date">18 Abr, 14:32</div>
-</div>
-<div class="timeline-step done">
-<div class="timeline-node"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-<div class="timeline-label">Pagamento confirmado</div>
-<div class="timeline-date">18 Abr, 14:35</div>
-</div>
-<div class="timeline-step done">
-<div class="timeline-node"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-<div class="timeline-label">Em preparação</div>
-<div class="timeline-date">18 Abr, 16:00</div>
-</div>
-<div class="timeline-step active">
-<div class="timeline-node"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 4v4h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
-<div class="timeline-label">Em trânsito</div>
-<div class="timeline-date">19 Abr, 09:12</div>
-</div>
-<div class="timeline-step pending">
-<div class="timeline-node"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
-<div class="timeline-label">Entregue</div>
-<div class="timeline-date">Previsto 22 Abr</div>
-</div>
-</div>
-
-<!-- Tracking -->
-<div class="tracking-box">
-<svg class="tracking-icon" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 4v4h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-<div class="tracking-text">
-<div class="tracking-label">Número de tracking</div>
-<div class="tracking-code">PT 924 847 302 PT</div>
-<div class="tracking-carrier">CTT Expresso · Última actualização: Lisboa, Centro de Triagem · 19 Abr 09:12</div>
-</div>
-<button class="track-btn" onclick="showTracking()">Rastrear envio</button>
-</div>
-
-<!-- Detail grid -->
-<div class="order-detail-grid">
-<div class="order-detail-box">
-<div class="detail-box-label">Morada de entrega</div>
-<div class="detail-box-content"><strong>Maria Silva</strong>Rua das Flores, 42, 3º Dto<br>1200-001 Lisboa<br>Portugal</div>
-</div>
-<div class="order-detail-box">
-<div class="detail-box-label">Método de pagamento</div>
-<div class="detail-box-content"><strong>Cartão Visa</strong>•••• •••• •••• 4521<br>Debitado a 18 Abr 2025<br><span style="color:var(--success);">✓ Pago</span></div>
-</div>
-<div class="order-detail-box">
-<div class="detail-box-label">Método de envio</div>
-<div class="detail-box-content"><strong>CTT Expresso Standard</strong>Entrega estimada: 22 Abr<br>2–4 dias úteis<br>Gratuito</div>
-</div>
-</div>
-
-<!-- Items -->
-<div class="order-items">
-<div class="order-items-header"><span>Produto</span><span>Qtd.</span><span>Preço</span></div>
-<div class="order-item-row">
-<div class="order-item-img" style="background:linear-gradient(145deg,#C9A08A,#A07050);"></div>
-<div class="order-item-details">
-<div class="order-item-brand">Charlotte Tilbury</div>
-<div class="order-item-name">Pillow Talk Lipstick</div>
-<div class="order-item-meta">Tom: Pillow Talk · Acabamento: Matte</div>
-</div>
-<div class="order-item-qty">×1</div>
-<div class="order-item-price">33,60 €</div>
-</div>
-<div class="order-item-row">
-<div class="order-item-img" style="background:linear-gradient(145deg,#E8D0C0,#D4B8A8);"></div>
-<div class="order-item-details">
-<div class="order-item-brand">Carla Thomas</div>
-<div class="order-item-name">Rosé Glow Lip Gloss</div>
-<div class="order-item-meta">Tom: Rosé Gold</div>
-</div>
-<div class="order-item-qty">×1</div>
-<div class="order-item-price">28,00 €</div>
-</div>
-</div>
-
-<!-- Totals -->
-<div class="order-totals">
-<div class="totals-row"><span class="lbl">Subtotal</span><span class="val">61,60 €</span></div>
-<div class="totals-row"><span class="lbl">Desconto (CARLA10)</span><span class="val" style="color:var(--rose-gold);">−0,00 €</span></div>
-<div class="totals-row"><span class="lbl">Envio</span><span class="val" style="color:var(--success);">Gratuito</span></div>
-<div class="totals-row total-final"><span class="lbl">Total</span><span class="val">61,60 €</span></div>
-</div>
-
-<!-- Actions -->
-<div class="order-actions">
-<button class="action-btn primary" onclick="showTracking()">
-<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 4v4h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-Rastrear encomenda
-</button>
-<button class="action-btn" onclick="window.print()">
-<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-Imprimir factura
-</button>
-<button class="action-btn" onclick="alert('Factura enviada para o seu email.')">
-<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-Enviar factura por email
-</button>
-<button class="action-btn" onclick="reorder('CTS-2025-04817')">
-<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.45"/></svg>
-Repetir encomenda
-</button>
-</div>
-</div>
-</div>
-</div>
-
-<!-- ORDER 2 — Entregue -->
-<div class="order-card" data-status="entregue" data-id="CTS-2025-04203" data-total="44.00" data-date="2025-03-22">
-<div class="order-card-header" onclick="toggleOrder(this.parentElement)">
-<div class="order-num"><small>Encomenda</small>#CTS-2025-04203</div>
-<div class="order-preview">
-<div class="order-thumb" style="background:linear-gradient(145deg,#E8C4B0,#D4A890);"></div>
-</div>
-<div class="order-info"><div class="order-date">22 Março 2025</div><div class="order-items-count">1 artigo · CTT Expresso</div></div>
-<div class="order-total">44,00 €</div>
-<div class="order-status"><span class="status-badge entregue"><span class="status-dot"></span>Entregue</span></div>
-<button class="expand-btn"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
-</div>
-<div class="order-panel">
-<div class="order-panel-inner">
-<div class="order-timeline">
-<div class="timeline-step done"><div class="timeline-node"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="timeline-label">Encomenda recebida</div><div class="timeline-date">22 Mar, 11:04</div></div>
-<div class="timeline-step done"><div class="timeline-node"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="timeline-label">Pagamento confirmado</div><div class="timeline-date">22 Mar, 11:06</div></div>
-<div class="timeline-step done"><div class="timeline-node"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="timeline-label">Em preparação</div><div class="timeline-date">22 Mar, 14:00</div></div>
-<div class="timeline-step done"><div class="timeline-node"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="timeline-label">Em trânsito</div><div class="timeline-date">23 Mar, 08:30</div></div>
-<div class="timeline-step done"><div class="timeline-node"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="timeline-label">Entregue</div><div class="timeline-date">25 Mar, 14:22</div></div>
-</div>
-<div class="order-detail-grid">
-<div class="order-detail-box"><div class="detail-box-label">Morada de entrega</div><div class="detail-box-content"><strong>Maria Silva</strong>Rua das Flores, 42, 3º Dto<br>1200-001 Lisboa</div></div>
-<div class="order-detail-box"><div class="detail-box-label">Método de pagamento</div><div class="detail-box-content"><strong>MB Way</strong>+351 912 345 678<br><span style="color:var(--success);">✓ Pago</span></div></div>
-<div class="order-detail-box"><div class="detail-box-label">Entregue em</div><div class="detail-box-content"><strong>25 Março 2025</strong>às 14:22<br>Assinado pelo destinatário</div></div>
-</div>
-<div class="order-items">
-<div class="order-items-header"><span>Produto</span><span>Qtd.</span><span>Preço</span></div>
-<div class="order-item-row">
-<div class="order-item-img" style="background:linear-gradient(145deg,#E8C4B0,#D4A890);"></div>
-<div class="order-item-details">
-<div class="order-item-brand">Charlotte Tilbury</div>
-<div class="order-item-name">Matte Revolution Lipstick</div>
-<div class="order-item-meta">Tom: Pillow Talk · Acabamento: Matte</div>
-</div>
-<div class="order-item-qty">×1</div>
-<div class="order-item-price">44,00 €</div>
-</div>
-</div>
-<div class="order-totals">
-<div class="totals-row"><span class="lbl">Subtotal</span><span class="val">44,00 €</span></div>
-<div class="totals-row"><span class="lbl">Envio</span><span class="val" style="color:var(--success);">Gratuito</span></div>
-<div class="totals-row total-final"><span class="lbl">Total</span><span class="val">44,00 €</span></div>
-</div>
-<div class="order-actions">
-<button class="action-btn primary" onclick="openReturnModal()">
-<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.45"/></svg>
-Devolver artigo
-</button>
-<button class="action-btn" onclick="reorder('CTS-2025-04203')">
-<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.45"/></svg>
-Repetir encomenda
-</button>
-<button class="action-btn">
-<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-Avaliar produto
-</button>
-<button class="action-btn" onclick="window.print()">
-<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-Imprimir factura
-</button>
-</div>
-</div>
-</div>
-</div>
-
-<!-- ORDER 3 — Em processamento -->
-<div class="order-card" data-status="processando" data-id="CTS-2025-05001" data-total="89.00" data-date="2025-04-21">
-<div class="order-card-header" onclick="toggleOrder(this.parentElement)">
-<div class="order-num"><small>Encomenda</small>#CTS-2025-05001</div>
-<div class="order-preview"><div class="order-thumb" style="background:linear-gradient(145deg,#2A2418,#1A1810);"></div></div>
-<div class="order-info"><div class="order-date">21 Abril 2025</div><div class="order-items-count">1 artigo · CTT Urgente</div></div>
-<div class="order-total">89,00 €</div>
-<div class="order-status"><span class="status-badge processando"><span class="status-dot"></span>Em processamento</span></div>
-<button class="expand-btn"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
-</div>
-<div class="order-panel">
-<div class="order-panel-inner">
-<div class="order-timeline">
-<div class="timeline-step done"><div class="timeline-node"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="timeline-label">Encomenda recebida</div><div class="timeline-date">21 Abr, 18:44</div></div>
-<div class="timeline-step done"><div class="timeline-node"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="timeline-label">Pagamento confirmado</div><div class="timeline-date">21 Abr, 18:46</div></div>
-<div class="timeline-step active"><div class="timeline-node"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div><div class="timeline-label">Em preparação</div><div class="timeline-date">Agora</div></div>
-<div class="timeline-step pending"><div class="timeline-node"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 4v4h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div><div class="timeline-label">Em trânsito</div><div class="timeline-date">Previsto 22 Abr</div></div>
-<div class="timeline-step pending"><div class="timeline-node"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div><div class="timeline-label">Entregue</div><div class="timeline-date">Previsto 23 Abr</div></div>
-</div>
-<div class="order-items">
-<div class="order-items-header"><span>Produto</span><span>Qtd.</span><span>Preço</span></div>
-<div class="order-item-row">
-<div class="order-item-img" style="background:linear-gradient(145deg,#2A2418,#1A1810);"></div>
-<div class="order-item-details">
-<div class="order-item-brand">Sana Jardin</div>
-<div class="order-item-name">Jaipur Chant No. 8</div>
-<div class="order-item-meta">Eau de Parfum · 50ml</div>
-</div>
-<div class="order-item-qty">×1</div>
-<div class="order-item-price">89,00 €</div>
-</div>
-</div>
-<div class="order-totals">
-<div class="totals-row"><span class="lbl">Subtotal</span><span class="val">89,00 €</span></div>
-<div class="totals-row"><span class="lbl">Envio CTT Urgente</span><span class="val">4,99 €</span></div>
-<div class="totals-row total-final"><span class="lbl">Total</span><span class="val">93,99 €</span></div>
-</div>
-<div class="order-actions">
-<button class="action-btn danger" onclick="cancelOrder('CTS-2025-05001')">
-<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-Cancelar encomenda
-</button>
-<button class="action-btn">
-<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-Alterar morada
-</button>
-<button class="action-btn" onclick="window.print()">
-<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-Imprimir factura
-</button>
-</div>
-</div>
-</div>
-</div>
-
-<!-- ORDER 4 — Entregue -->
-<div class="order-card" data-status="entregue" data-id="CTS-2025-03891" data-total="110.00" data-date="2025-02-14">
-<div class="order-card-header" onclick="toggleOrder(this.parentElement)">
-<div class="order-num"><small>Encomenda</small>#CTS-2025-03891</div>
-<div class="order-preview">
-<div class="order-thumb" style="background:linear-gradient(145deg,#D4C4B5,#C4B0A0);"></div>
-<div class="order-thumb" style="background:linear-gradient(145deg,#3A302C,#2A2220);"></div>
-<div class="order-thumb" style="background:linear-gradient(145deg,#C9A08A,#A07050);"></div>
-</div>
-<div class="order-info"><div class="order-date">14 Fevereiro 2025</div><div class="order-items-count">3 artigos · CTT Expresso</div></div>
-<div class="order-total">110,00 €</div>
-<div class="order-status"><span class="status-badge entregue"><span class="status-dot"></span>Entregue</span></div>
-<button class="expand-btn"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
-</div>
-<div class="order-panel">
-<div class="order-panel-inner">
-<div class="order-timeline">
-<div class="timeline-step done"><div class="timeline-node"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="timeline-label">Encomenda recebida</div><div class="timeline-date">14 Fev</div></div>
-<div class="timeline-step done"><div class="timeline-node"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="timeline-label">Pagamento confirmado</div><div class="timeline-date">14 Fev</div></div>
-<div class="timeline-step done"><div class="timeline-node"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="timeline-label">Em preparação</div><div class="timeline-date">14 Fev</div></div>
-<div class="timeline-step done"><div class="timeline-node"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="timeline-label">Em trânsito</div><div class="timeline-date">15 Fev</div></div>
-<div class="timeline-step done"><div class="timeline-node"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="timeline-label">Entregue</div><div class="timeline-date">17 Fev, 11:05</div></div>
-</div>
-<div class="order-items">
-<div class="order-items-header"><span>Produto</span><span>Qtd.</span><span>Preço</span></div>
-<div class="order-item-row">
-<div class="order-item-img" style="background:linear-gradient(145deg,#D4C4B5,#C4B0A0);"></div>
-<div class="order-item-details"><div class="order-item-brand">NARS</div><div class="order-item-name">Afterglow Lip Balm</div><div class="order-item-meta">Tom: Nude</div></div>
-<div class="order-item-qty">×1</div><div class="order-item-price">26,00 €</div>
-</div>
-<div class="order-item-row">
-<div class="order-item-img" style="background:linear-gradient(145deg,#3A302C,#2A2220);"></div>
-<div class="order-item-details"><div class="order-item-brand">Dior Beauty</div><div class="order-item-name">Rouge Dior Satin</div><div class="order-item-meta">Tom: Rouge · Acetinado</div></div>
-<div class="order-item-qty">×1</div><div class="order-item-price">39,00 €</div>
-</div>
+        <form class="settings-card" (ngSubmit)="savePassword()">
+          <div class="stat-label">Seguranca</div>
+          <h3>Mudar password</h3>
+          <label>
+            <span>Nova password</span>
+            <input type="password" name="newPassword" [(ngModel)]="newPassword" required minlength="8" />
+          </label>
+          <label>
+            <span>Confirmar password</span>
+            <input type="password" name="confirmPassword" [(ngModel)]="confirmPassword" required minlength="8" />
+          </label>
+          <div *ngIf="passwordError" class="settings-error">{{ passwordError }}</div>
+          <div *ngIf="passwordMessage" class="settings-success">{{ passwordMessage }}</div>
+          <button class="action-btn primary" type="submit" [disabled]="savingPassword">
+            {{ savingPassword ? 'A guardar...' : 'Guardar password' }}
+          </button>
+        </form>
+      </div>
+    </main>
+  </div>
+}

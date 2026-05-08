@@ -8,7 +8,8 @@
     "dev": "concurrently \"npm run api\" \"npm start\"",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "supabase:migrate-products": "node scripts/migrate-products-to-supabase.js"
+    "supabase:migrate-products": "node scripts/migrate-products-to-supabase.js",
+    "supabase:create-admin": "node scripts/create-admin-user.js"
   },
   "private": true,
   "dependencies": {
@@ -36,6 +37,7 @@
     "@angular-devkit/build-angular": "^20.3.25",
     "@angular/cli": "^20.3.25",
     "@angular/compiler-cli": "^20.3.19",
+    "@types/node": "^25.6.2",
     "typescript": "~5.9.3"
   }
 }

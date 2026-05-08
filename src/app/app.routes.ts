@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { OrdersComponent } from './pages/orders/orders.component';
 import { adminGuard } from './core/guards/admin.guard';
+import { accountGuard } from './core/guards/account.guard';
 
 export const routes: Routes = [
   {
@@ -28,7 +29,12 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/confirmation/confirmation.component').then(m => m.ConfirmationComponent)
   },
   {
+    path: 'reset-password',
+    loadComponent: () => import('./pages/reset-password/reset-password.component').then(m => m.ResetPasswordComponent)
+  },
+  {
     path: 'encomendas',
+    canActivate: [accountGuard],
     loadComponent: () => import('./pages/orders/orders.component').then(m => m.OrdersComponent)
   },
   {

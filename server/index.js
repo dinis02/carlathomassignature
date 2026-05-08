@@ -90,6 +90,16 @@ function publicAccount(account) {
   };
 }
 
+function publicSupabaseAccount(account) {
+  return {
+    id: account.id,
+    role: account.role,
+    name: account.name,
+    email: account.email,
+    username: account.username
+  };
+}
+
 function mapProduct(row) {
   const shades = db.prepare('SELECT name, color FROM product_shades WHERE product_id = ?').all(row.id);
   const finishes = db.prepare('SELECT name FROM product_finishes WHERE product_id = ?').all(row.id).map(f => f.name);
@@ -411,10 +421,28 @@ app.post('/api/products', uploadProductImage.single('image'), async (req, res) =
   res.status(201).json(mapProduct(row));
 });
 
-app.post('/api/auth/login', (req, res) => {
+app.post('/api/auth/login', async (req, res) => {
   const login = String(req.body.login || '').trim().toLowerCase();
   const password = String(req.body.password || '');
   if (!login || !password) return res.status(400).json({ error: 'Login e senha sao obrigatorios' });
+
+  if (supabaseEnabled()) {
+    const { data, error } = await supabase
+      .from('user_accounts')
+      .select('*')
+      .or(`email.eq.${login},username.eq.${login}`)
+      .maybeSingle();
+
+    if (error) {
+      return res.status(500).json({ error: 'A tabela de utilizadores ainda nao esta configurada no Supabase' });
+    }
+
+    if (!data || data.password_hash !== hashPassword(password)) {
+      return res.status(401).json({ error: 'Credenciais invalidas' });
+    }
+
+    return res.json(publicSupabaseAccount(data));
+  }
 
   const account = db.prepare(`
     SELECT * FROM user_accounts
@@ -428,13 +456,35 @@ app.post('/api/auth/login', (req, res) => {
   res.json(publicAccount(account));
 });
 
-app.post('/api/auth/register', (req, res) => {
+app.post('/api/auth/register', async (req, res) => {
   const name = String(req.body.name || '').trim();
   const email = String(req.body.email || '').trim().toLowerCase();
   const password = String(req.body.password || '');
 
   if (!name || !email || password.length < 6) {
     return res.status(400).json({ error: 'Nome, email e senha com pelo menos 6 caracteres sao obrigatorios' });
+  }
+
+  if (supabaseEnabled()) {
+    const { data, error } = await supabase
+      .from('user_accounts')
+      .insert({
+        role: 'user',
+        name,
+        email,
+        username: null,
+        password_hash: hashPassword(password)
+      })
+      .select()
+      .single();
+
+    if (!error && data) return res.status(201).json(publicSupabaseAccount(data));
+
+    if (error?.code === '23505') {
+      return res.status(409).json({ error: 'Este email ja existe' });
+    }
+
+    return res.status(500).json({ error: 'Nao foi possivel criar a conta no Supabase' });
   }
 
   try {

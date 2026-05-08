@@ -48,11 +48,20 @@ import { LoginModalComponent } from '../login-modal.component';
                 <circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/>
               </svg>
             </button>
-            <button class="icon-btn" title="Conta" aria-label="Conta" (click)="openLoginModal()">
+            <button class="icon-btn" [title]="auth.session() ? 'A minha conta' : 'Conta'" aria-label="Conta" (click)="handleAccountClick()">
               <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
               </svg>
             </button>
+            @if (auth.session()) {
+              <button class="icon-btn" title="Terminar sessao" aria-label="Terminar sessao" (click)="logout($event)">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                  <path d="M16 17l5-5-5-5"/>
+                  <path d="M21 12H9"/>
+                </svg>
+              </button>
+            }
             <button class="icon-btn" title="Wishlist" aria-label="Wishlist">
               <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
@@ -88,7 +97,11 @@ import { LoginModalComponent } from '../login-modal.component';
       <a routerLink="/produtos" [queryParams]="{cat:'Corpo'}" (click)="closeMobileMenu()">Corpo</a>
       <a routerLink="/produtos" [queryParams]="{cat:'Acessórios'}" (click)="closeMobileMenu()">Acessorios</a>
       <a routerLink="/produtos" (click)="closeMobileMenu()">Marcas</a>
-      <a routerLink="/encomendas" (click)="closeMobileMenu()">A minha conta</a>
+      @if (auth.session()) {
+        <a href="#" (click)="logout($event)">Terminar sessao</a>
+      } @else {
+        <a href="#" (click)="openLoginFromMenu($event)">Entrar / Criar conta</a>
+      }
     </nav>
     <app-login-modal *ngIf="showLoginModal"
       (closeModal)="closeLoginModal()"
@@ -321,6 +334,25 @@ export class HeaderComponent {
   openLoginModal() {
     this.closeMobileMenu();
     this.showLoginModal = true;
+  }
+  handleAccountClick() {
+    const session = this.auth.session();
+    if (!session) {
+      this.openLoginModal();
+      return;
+    }
+    this.router.navigate([session.role === 'admin' ? '/admin' : '/encomendas']);
+  }
+  openLoginFromMenu(event: Event) {
+    event.preventDefault();
+    this.openLoginModal();
+  }
+  logout(event?: Event) {
+    event?.preventDefault();
+    this.auth.logout();
+    this.showAdminModal = false;
+    this.closeMobileMenu();
+    this.router.navigate(['/']);
   }
   closeLoginModal() {
     this.showLoginModal = false;

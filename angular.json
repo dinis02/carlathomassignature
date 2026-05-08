@@ -45,6 +45,9 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.json"
+          },
           "configurations": {
             "production": { "buildTarget": "carla-thomas-signature:build:production" },
             "development": { "buildTarget": "carla-thomas-signature:build:development" }
