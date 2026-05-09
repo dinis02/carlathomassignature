@@ -28,7 +28,7 @@ import { AdminService } from '../../core/services/admin.service';
 export class AdminModalComponent {
   adminService = inject(AdminService);
 
-  close() {
-    this.adminService.logoutAdmin();
+  async close() {
+    await this.adminService.logoutAdmin();
   }
 }

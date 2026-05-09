@@ -139,6 +139,11 @@ import { LoginModalComponent } from '../login-modal.component';
     .logo {
       text-align: center; color: var(--noir); cursor: none;
     }
+    .logo-img {
+      display: block;
+      transform: scale(0.93);
+      transform-origin: center;
+    }
     .logo-main {
       font-family: 'Cormorant Garamond', serif;
       font-size: 26px; font-weight: 300;
@@ -347,12 +352,12 @@ export class HeaderComponent {
     event.preventDefault();
     this.openLoginModal();
   }
-  logout(event?: Event) {
+  async logout(event?: Event) {
     event?.preventDefault();
-    this.auth.logout();
+    await this.adminService.logoutAdmin();
     this.showAdminModal = false;
     this.closeMobileMenu();
-    this.router.navigate(['/']);
+    await this.router.navigate(['/']);
   }
   closeLoginModal() {
     this.showLoginModal = false;
@@ -362,10 +367,12 @@ export class HeaderComponent {
     if (session.role === 'admin') {
       this.showAdminModal = true;
       this.adminService.loginAsAdmin();
-      this.router.navigate(['/admin']);
+      void this.router.navigate(['/admin']).finally(() => {
+        this.showAdminModal = false;
+      });
     } else {
       this.showAdminModal = false;
-      this.router.navigate(['/encomendas']);
+      void this.router.navigate(['/encomendas']);
     }
   }
   get shouldShowAdminModal() {

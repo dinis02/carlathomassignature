@@ -6,7 +6,8 @@ export const accountGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
-  return auth.ready().then(session => {
+  return auth.ready().then(() => {
+    const session = auth.session();
     if (!session) return router.createUrlTree(['/']);
     if (session.role === 'admin') return router.createUrlTree(['/admin']);
     return true;

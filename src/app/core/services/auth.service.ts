@@ -64,7 +64,7 @@ export class AuthService {
   }
 
   ready(): Promise<AccountSession | null> {
-    return this.initPromise;
+    return this.initPromise.then(() => this.session());
   }
 
   login(email: string, password: string): Observable<AccountSession> {
@@ -182,6 +182,7 @@ export class AuthService {
   }
 
   async logout(): Promise<void> {
+    this.session.set(null);
     await this.supabase.auth.signOut();
     this.session.set(null);
   }

@@ -1,0 +1,114 @@
+<div class="about-hero">
+  <div class="about-hero-inner">
+    <div class="breadcrumb">
+      <a routerLink="/">Início</a>
+      <span class="sep">—</span>
+      <span>Sobre</span>
+    </div>
+
+    <div class="about-hero-grid">
+      <div class="about-copy">
+        <div class="eyebrow">Sobre a Carla Thomas Signature</div>
+        <h1 class="title">Beleza que inspira <em>confiança</em>, elegância que permanece.</h1>
+        <p class="lead">
+          A Carla Thomas Signature nasceu da paixão pela beleza elegante, intemporal e sofisticada.
+          Mais do que uma loja, criamos uma experiência onde cada detalhe é pensado para valorizar a
+          confiança, o autocuidado e a autenticidade feminina.
+        </p>
+      </div>
+
+      <div class="about-visual">
+        <img src="assets/editorial-portrait-1.png" alt="Retrato editorial Carla Thomas Signature">
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="about-section">
+  <div class="about-section-inner intro-grid">
+    <article class="text-card">
+      <div class="section-label">A nossa essência</div>
+      <p>
+        Selecionamos cuidadosamente produtos de maquilhagem, skincare, cabelo e acessórios com foco
+        na qualidade, estética e sensação premium. Acreditamos que a beleza não segue regras — ela
+        expressa identidade, atitude e presença.
+      </p>
+      <p>
+        Inspirada num universo minimalista, quente e luxuoso, a Carla Thomas Signature combina
+        tendências modernas com uma curadoria exclusiva, oferecendo produtos que transformam
+        pequenos rituais em momentos especiais.
+      </p>
+    </article>
+
+    <article class="image-card">
+      <img src="assets/editorial-portrait-2.png" alt="Retrato editorial luminoso Carla Thomas Signature">
+    </article>
+  </div>
+</section>
+
+<section class="about-band">
+  <div class="about-section-inner band-grid">
+    <article class="band-card">
+      <div class="section-label">A nossa missão</div>
+      <h2>Experiência premium com intenção.</h2>
+      <p>
+        Proporcionar uma experiência de beleza premium através de produtos cuidadosamente
+        selecionados que elevam a autoestima, a elegância e o bem-estar de cada mulher.
+      </p>
+    </article>
+
+    <article class="band-card">
+      <div class="section-label">A nossa visão</div>
+      <h2>Ser referência em beauty & lifestyle premium.</h2>
+      <p>
+        Tornar-se uma referência no universo beauty & lifestyle premium, reconhecida pela
+        sofisticação, autenticidade e experiência visual única.
+      </p>
+    </article>
+  </div>
+</section>
+
+<section class="about-section">
+  <div class="about-section-inner">
+    <div class="section-head">
+      <div>
+        <div class="section-label">Os nossos valores</div>
+        <h2 class="section-title">O que define<br><em>a marca</em></h2>
+      </div>
+      <p class="section-support">
+        Na Carla Thomas Signature, cada detalhe é escolhido com intenção. Descubra uma curadoria
+        premium de beleza, skincare e acessórios criada para transformar a sua rotina num verdadeiro
+        ritual de elegância.
+      </p>
+    </div>
+
+    <div class="values-grid">
+      <article *ngFor="let value of values" class="value-card">
+        <h3>{{ value.title }}</h3>
+        <p>{{ value.body }}</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="story-strip">
+  <div class="about-section-inner story-strip-inner">
+    <div class="story-copy">
+      <div class="section-label">A nossa história</div>
+      <h2>Criada para transformar rotina em <em>ritual</em>.</h2>
+      <p>
+        A Carla Thomas Signature nasceu da vontade de criar um espaço onde beleza e sofisticação
+        coexistem de forma natural. Cada produto é escolhido não apenas pela sua qualidade, mas
+        pela experiência, sensação e confiança que transmite. Porque acreditamos que a verdadeira
+        beleza vive nos detalhes.
+      </p>
+    </div>
+
+    <div class="story-actions">
+      <a routerLink="/produtos" class="btn-primary"><span>Descobrir produtos</span></a>
+      <a routerLink="/produtos" [queryParams]="{ promo: 'sale' }" class="btn-ghost">
+        Ver promoções
+      </a>
+    </div>
+  </div>
+</section>

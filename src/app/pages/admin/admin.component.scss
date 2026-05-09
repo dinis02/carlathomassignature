@@ -398,6 +398,17 @@
       color: var(--creme-dim);
 
       &:hover { border-color: var(--border); color: var(--creme); }
+
+      &.danger {
+        color: #d9a1a1;
+        border-color: rgba(160,48,48,0.24);
+
+        &:hover {
+          color: #f3d5d5;
+          border-color: rgba(160,48,48,0.5);
+          background: rgba(160,48,48,0.12);
+        }
+      }
     }
 
     &.btn-sm {
@@ -891,6 +902,7 @@
         position: absolute;
         inset: 0;
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
         justify-content: center;
         gap: 8px;

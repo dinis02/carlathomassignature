@@ -121,6 +121,7 @@ function mapProduct(row) {
     ingredients: row.ingredients,
     image: row.image,
     stock: row.stock,
+    isActive: !!row.is_active,
     shades,
     finishes
   };
@@ -145,9 +146,380 @@ function mapSupabaseProduct(row) {
     ingredients: row.ingredients,
     image: row.image,
     stock: row.stock,
+    isActive: !!row.is_active,
     shades: (row.product_shades || []).map(shade => ({ name: shade.name, color: shade.color })),
     finishes: (row.product_finishes || []).map(finish => finish.name)
   };
+}
+
+async function listAdminProducts() {
+  if (supabaseEnabled()) {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*, product_shades(name,color), product_finishes(name)')
+      .order('id', { ascending: true });
+
+    if (!error) return data.map(mapSupabaseProduct);
+    console.warn('Supabase admin products fallback:', error.message);
+  }
+
+  const rows = db.prepare('SELECT * FROM products ORDER BY id').all();
+  return rows.map(mapProduct);
+}
+
+function normalizeOrderStatus(status) {
+  const value = String(status || '').toLowerCase();
+  if (value === 'pending_payment') return 'pending_payment';
+  if (value === 'processando') return 'processando';
+  if (value === 'em transito' || value === 'em_transito' || value === 'shipped') return 'em_transito';
+  if (value === 'entregue' || value === 'delivered') return 'entregue';
+  if (value === 'cancelada' || value === 'cancelado' || value === 'cancelled') return 'cancelada';
+  return value || 'processando';
+}
+
+function orderStatusLabel(status) {
+  const normalized = normalizeOrderStatus(status);
+  const labels = {
+    pending_payment: 'Pagamento pendente',
+    processando: 'Processando',
+    em_transito: 'Em transito',
+    entregue: 'Entregue',
+    cancelada: 'Cancelada'
+  };
+  return labels[normalized] || 'Processando';
+}
+
+function returnStatusLabel(status) {
+  const normalized = String(status || '').toLowerCase();
+  const labels = {
+    pending: 'Pendente',
+    processing: 'Em processamento',
+    resolved: 'Resolvida'
+  };
+  return labels[normalized] || 'Pendente';
+}
+
+function formatDateLabel(dateValue) {
+  const date = new Date(dateValue);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleDateString('pt-PT', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function loadAdminOrderDetail(orderId) {
+  const order = db.prepare(`
+    SELECT
+      o.*,
+      c.first_name,
+      c.last_name,
+      c.email,
+      c.phone,
+      c.address,
+      c.postcode,
+      c.city,
+      c.country
+    FROM orders o
+    JOIN customers c ON c.id = o.customer_id
+    WHERE o.id = ?
+  `).get(orderId);
+
+  if (!order) return null;
+
+  const items = db.prepare(`
+    SELECT product_id, product_name, product_brand, unit_price, quantity, selected_shade, selected_finish
+    FROM order_items
+    WHERE order_id = ?
+    ORDER BY id ASC
+  `).all(orderId);
+
+  return {
+    id: order.id,
+    date: order.created_at,
+    dateLabel: formatDateLabel(order.created_at),
+    customerName: `${order.first_name} ${order.last_name}`.trim(),
+    customerEmail: order.email,
+    customerPhone: order.phone,
+    customerAddress: order.address,
+    customerPostcode: order.postcode,
+    customerCity: order.city,
+    customerCountry: order.country,
+    itemCount: items.reduce((sum, item) => sum + Number(item.quantity || 0), 0),
+    items: items.map(item => ({
+      productId: item.product_id,
+      productName: item.product_name,
+      productBrand: item.product_brand,
+      unitPrice: item.unit_price,
+      quantity: item.quantity,
+      selectedShade: item.selected_shade,
+      selectedFinish: item.selected_finish
+    })),
+    subtotal: order.subtotal,
+    discount: order.discount,
+    shipping: order.shipping,
+    total: order.total,
+    shippingMethod: order.shipping_method,
+    paymentMethod: order.payment_method,
+    paymentStatus: order.payment_status,
+    status: normalizeOrderStatus(order.status),
+    statusLabel: orderStatusLabel(order.status),
+    stripeSessionId: order.stripe_session_id
+  };
+}
+
+function listAdminOrders() {
+  const orders = db.prepare(`
+    SELECT
+      o.id,
+      o.created_at,
+      o.total,
+      o.status,
+      o.shipping_method,
+      c.first_name,
+      c.last_name,
+      c.email,
+      COUNT(oi.id) AS items_count
+    FROM orders o
+    JOIN customers c ON c.id = o.customer_id
+    LEFT JOIN order_items oi ON oi.order_id = o.id
+    GROUP BY o.id
+    ORDER BY datetime(o.created_at) DESC
+  `).all();
+
+  return orders.map(order => ({
+    id: order.id,
+    date: order.created_at,
+    dateLabel: formatDateLabel(order.created_at),
+    customerName: `${order.first_name} ${order.last_name}`.trim(),
+    customerEmail: order.email,
+    itemCount: Number(order.items_count || 0),
+    shippingMethod: order.shipping_method,
+    total: Number(order.total || 0),
+    status: normalizeOrderStatus(order.status),
+    statusLabel: orderStatusLabel(order.status)
+  }));
+}
+
+function listAdminCustomers() {
+  const customers = db.prepare(`
+    SELECT
+      c.id,
+      c.first_name,
+      c.last_name,
+      c.email,
+      c.phone,
+      c.city,
+      c.country,
+      COUNT(o.id) AS orders_count,
+      COALESCE(SUM(o.total), 0) AS total_spent,
+      MAX(o.created_at) AS last_order_at
+    FROM customers c
+    LEFT JOIN orders o ON o.customer_id = c.id
+    GROUP BY c.id
+    ORDER BY datetime(COALESCE(MAX(o.created_at), c.created_at)) DESC
+  `).all();
+
+  const ninetyDaysAgo = Date.now() - 90 * 24 * 60 * 60 * 1000;
+
+  return customers.map(customer => ({
+    id: customer.id,
+    name: `${customer.first_name} ${customer.last_name}`.trim(),
+    email: customer.email,
+    phone: customer.phone,
+    city: customer.city,
+    country: customer.country,
+    ordersCount: Number(customer.orders_count || 0),
+    totalSpent: Number(customer.total_spent || 0),
+    status: customer.last_order_at && new Date(customer.last_order_at).getTime() >= ninetyDaysAgo ? 'active' : 'inactive',
+    statusLabel: customer.last_order_at && new Date(customer.last_order_at).getTime() >= ninetyDaysAgo ? 'Activo' : 'Inactivo',
+    lastOrderAt: customer.last_order_at,
+    lastOrderLabel: customer.last_order_at ? formatDateLabel(customer.last_order_at) : 'Sem encomendas'
+  }));
+}
+
+function listAdminReturns() {
+  const returns = db.prepare(`
+    SELECT
+      r.*,
+      c.first_name,
+      c.last_name
+    FROM order_returns r
+    JOIN orders o ON o.id = r.order_id
+    JOIN customers c ON c.id = o.customer_id
+    ORDER BY datetime(r.created_at) DESC
+  `).all();
+
+  return returns.map(entry => ({
+    id: entry.id,
+    orderId: entry.order_id,
+    customerName: `${entry.first_name} ${entry.last_name}`.trim(),
+    productName: entry.product_name,
+    reason: entry.reason,
+    status: entry.status,
+    statusLabel: returnStatusLabel(entry.status),
+    createdAt: entry.created_at,
+    createdLabel: formatDateLabel(entry.created_at)
+  }));
+}
+
+function getDashboardData() {
+  const today = new Date();
+  const monthStart = new Date(today.getFullYear(), today.getMonth(), 1).toISOString();
+  const yearStart = new Date(today.getFullYear(), 0, 1).toISOString();
+
+  const monthTotals = db.prepare(`
+    SELECT
+      COUNT(*) AS orders_count,
+      COALESCE(SUM(total), 0) AS revenue,
+      COALESCE(AVG(total), 0) AS average_order
+    FROM orders
+    WHERE datetime(created_at) >= datetime(?)
+  `).get(monthStart);
+
+  const returnCounts = db.prepare(`
+    SELECT
+      SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) AS pending,
+      SUM(CASE WHEN status = 'processing' THEN 1 ELSE 0 END) AS processing,
+      SUM(CASE WHEN status = 'resolved' THEN 1 ELSE 0 END) AS resolved
+    FROM order_returns
+  `).get();
+
+  const statusRows = db.prepare(`
+    SELECT status, COUNT(*) AS count
+    FROM orders
+    GROUP BY status
+  `).all();
+
+  const statusCounts = {
+    processando: 0,
+    em_transito: 0,
+    entregue: 0,
+    cancelada: 0,
+    pending_payment: 0
+  };
+  statusRows.forEach(row => {
+    const key = normalizeOrderStatus(row.status);
+    if (Object.prototype.hasOwnProperty.call(statusCounts, key)) statusCounts[key] = Number(row.count || 0);
+  });
+
+  const recentOrders = listAdminOrders().slice(0, 5);
+  const customers = listAdminCustomers();
+  const returns = listAdminReturns();
+
+  const revenueByDayRows = db.prepare(`
+    SELECT strftime('%d', created_at) AS day_label, COALESCE(SUM(total), 0) AS total
+    FROM orders
+    WHERE datetime(created_at) >= datetime(?)
+    GROUP BY strftime('%d', created_at)
+    ORDER BY strftime('%d', created_at) ASC
+  `).all(monthStart);
+
+  const dailyRevenue = revenueByDayRows.map(row => ({
+    label: row.day_label,
+    total: Number(row.total || 0)
+  }));
+
+  const lowStockRows = db.prepare(`
+    SELECT name, stock
+    FROM products
+    WHERE is_active = 1 AND stock <= 5
+    ORDER BY stock ASC, name ASC
+    LIMIT 2
+  `).all();
+
+  const recentCustomers = customers.slice(0, 2).map(customer => ({
+    type: 'customer',
+    message: `Novo cliente - ${customer.name}`,
+    timeLabel: customer.lastOrderLabel
+  }));
+
+  const activities = [
+    ...recentOrders.slice(0, 2).map(order => ({
+      type: 'order',
+      message: `Nova encomenda ${order.id} - ${order.customerName} - ${order.total.toFixed(2)} EUR`,
+      timeLabel: order.dateLabel
+    })),
+    ...returns.slice(0, 1).map(entry => ({
+      type: 'return',
+      message: `Pedido de devolucao - ${entry.orderId} - ${entry.productName}`,
+      timeLabel: entry.createdLabel
+    })),
+    ...lowStockRows.map(product => ({
+      type: 'product',
+      message: `Stock baixo - ${product.name} - ${product.stock} unidades`,
+      timeLabel: 'Stock actual'
+    })),
+    ...recentCustomers
+  ].slice(0, 5);
+
+  const monthlyRows = db.prepare(`
+    SELECT strftime('%m', created_at) AS month_key, COALESCE(SUM(total), 0) AS total
+    FROM orders
+    WHERE datetime(created_at) >= datetime(?)
+    GROUP BY strftime('%m', created_at)
+    ORDER BY strftime('%m', created_at) ASC
+  `).all(yearStart);
+
+  const monthlyRevenue = monthlyRows.map(row => ({
+    label: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'][Number(row.month_key) - 1],
+    total: Number(row.total || 0)
+  }));
+
+  return {
+    revenueMonth: Number(monthTotals.revenue || 0),
+    ordersMonth: Number(monthTotals.orders_count || 0),
+    averageOrderValue: Number(monthTotals.average_order || 0),
+    pendingReturns: Number(returnCounts.pending || 0),
+    statusCounts,
+    dailyRevenue,
+    monthlyRevenue,
+    recentOrders,
+    recentActivity: activities
+  };
+}
+
+function getAnalyticsData() {
+  const totals = db.prepare(`
+    SELECT
+      COUNT(*) AS orders_count,
+      COALESCE(SUM(total), 0) AS revenue,
+      COALESCE(AVG(total), 0) AS average_order
+    FROM orders
+  `).get();
+
+  const subscriberCount = db.prepare('SELECT COUNT(*) AS count FROM newsletter_subscribers').get();
+  const currentYearStart = new Date(new Date().getFullYear(), 0, 1).toISOString();
+  const monthlyRows = db.prepare(`
+    SELECT strftime('%m', created_at) AS month_key, COALESCE(SUM(total), 0) AS total
+    FROM orders
+    WHERE datetime(created_at) >= datetime(?)
+    GROUP BY strftime('%m', created_at)
+    ORDER BY strftime('%m', created_at) ASC
+  `).all(currentYearStart);
+
+  return {
+    totalRevenue: Number(totals.revenue || 0),
+    totalOrders: Number(totals.orders_count || 0),
+    averageOrderValue: Number(totals.average_order || 0),
+    newsletterSubscribers: Number(subscriberCount.count || 0),
+    monthlyRevenue: monthlyRows.map(row => ({
+      label: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'][Number(row.month_key) - 1],
+      total: Number(row.total || 0)
+    }))
+  };
+}
+
+function getStoreSettings() {
+  return db.prepare(`
+    SELECT
+      store_name,
+      contact_email,
+      description,
+      notify_orders,
+      notify_low_stock,
+      notify_returns,
+      notify_new_customers
+    FROM store_settings
+    WHERE id = 1
+  `).get();
 }
 
 function productFileName(file) {
@@ -421,6 +793,139 @@ app.post('/api/products', uploadProductImage.single('image'), async (req, res) =
   res.status(201).json(mapProduct(row));
 });
 
+app.put('/api/products/:id', uploadProductImage.single('image'), async (req, res) => {
+  const productId = Number(req.params.id);
+  const name = String(req.body.name || '').trim();
+  const brand = String(req.body.brand || '').trim();
+  const category = String(req.body.category || '').trim();
+  const price = Number(req.body.price);
+
+  if (!productId || !name || !brand || !category || !Number.isFinite(price) || price <= 0) {
+    return res.status(400).json({ error: 'Nome, marca, categoria e preco valido sao obrigatorios' });
+  }
+
+  const gradientFrom = String(req.body.gradientFrom || '#E8D0C0');
+  const gradientTo = String(req.body.gradientTo || '#C9956A');
+  const originalPrice = req.body.originalPrice ? Number(req.body.originalPrice) : null;
+  const badge = String(req.body.badge || '').trim() || null;
+  const stock = Number.isFinite(Number(req.body.stock)) ? Number(req.body.stock) : 0;
+  const shades = String(req.body.shades || '').split(',').map(s => s.trim()).filter(Boolean);
+  const finishes = String(req.body.finishes || '').split(',').map(s => s.trim()).filter(Boolean);
+
+  if (supabaseEnabled()) {
+    try {
+      const existing = await supabase.from('products').select('image').eq('id', productId).single();
+      const image = req.file ? await uploadProductImageToSupabase(req.file) : existing.data?.image || null;
+
+      const { error } = await supabase
+        .from('products')
+        .update({
+          brand,
+          name,
+          price,
+          original_price: originalPrice,
+          badge,
+          badge_dark: req.body.badgeDark === 'true',
+          gradient_from: gradientFrom,
+          gradient_to: gradientTo,
+          category,
+          description: String(req.body.description || '').trim() || null,
+          how_to_apply: String(req.body.howToApply || '').trim() || null,
+          ingredients: String(req.body.ingredients || '').trim() || null,
+          image,
+          stock
+        })
+        .eq('id', productId);
+
+      if (error) throw error;
+
+      await supabase.from('product_shades').delete().eq('product_id', productId);
+      await supabase.from('product_finishes').delete().eq('product_id', productId);
+
+      if (shades.length) {
+        const shadeRows = shades.map((shade, index) => ({
+          product_id: productId,
+          name: shade,
+          color: ['#C9956A', '#D4806A', '#8B3A5A', '#B02A2A'][index % 4]
+        }));
+        const { error: shadesError } = await supabase.from('product_shades').insert(shadeRows);
+        if (shadesError) throw shadesError;
+      }
+
+      if (finishes.length) {
+        const finishRows = finishes.map(finish => ({ product_id: productId, name: finish }));
+        const { error: finishesError } = await supabase.from('product_finishes').insert(finishRows);
+        if (finishesError) throw finishesError;
+      }
+
+      const { data: fullProduct, error: fullError } = await supabase
+        .from('products')
+        .select('*, product_shades(name,color), product_finishes(name)')
+        .eq('id', productId)
+        .single();
+      if (fullError) throw fullError;
+      return res.json(mapSupabaseProduct(fullProduct));
+    } catch (err) {
+      console.warn('Supabase update product fallback:', err.message);
+    }
+  }
+
+  const existing = db.prepare('SELECT image FROM products WHERE id = ?').get(productId);
+  if (!existing) return res.status(404).json({ error: 'Produto nao encontrado' });
+
+  const image = req.file ? saveProductImageLocally(req.file) : existing.image;
+
+  const result = db.prepare(`
+    UPDATE products
+    SET
+      brand = @brand,
+      name = @name,
+      price = @price,
+      original_price = @originalPrice,
+      badge = @badge,
+      badge_dark = @badgeDark,
+      gradient_from = @gradientFrom,
+      gradient_to = @gradientTo,
+      category = @category,
+      description = @description,
+      how_to_apply = @howToApply,
+      ingredients = @ingredients,
+      image = @image,
+      stock = @stock,
+      updated_at = CURRENT_TIMESTAMP
+    WHERE id = @id
+  `).run({
+    id: productId,
+    brand,
+    name,
+    price,
+    originalPrice,
+    badge,
+    badgeDark: req.body.badgeDark === 'true' ? 1 : 0,
+    gradientFrom,
+    gradientTo,
+    category,
+    description: String(req.body.description || '').trim() || null,
+    howToApply: String(req.body.howToApply || '').trim() || null,
+    ingredients: String(req.body.ingredients || '').trim() || null,
+    image,
+    stock
+  });
+
+  if (!result.changes) return res.status(404).json({ error: 'Produto nao encontrado' });
+
+  db.prepare('DELETE FROM product_shades WHERE product_id = ?').run(productId);
+  db.prepare('DELETE FROM product_finishes WHERE product_id = ?').run(productId);
+
+  const insertShade = db.prepare('INSERT INTO product_shades (product_id, name, color) VALUES (?, ?, ?)');
+  const insertFinish = db.prepare('INSERT INTO product_finishes (product_id, name) VALUES (?, ?)');
+  shades.forEach((shade, index) => insertShade.run(productId, shade, ['#C9956A', '#D4806A', '#8B3A5A', '#B02A2A'][index % 4]));
+  finishes.forEach(finish => insertFinish.run(productId, finish));
+
+  const row = db.prepare('SELECT * FROM products WHERE id = ?').get(productId);
+  res.json(mapProduct(row));
+});
+
 app.post('/api/auth/login', async (req, res) => {
   const login = String(req.body.login || '').trim().toLowerCase();
   const password = String(req.body.password || '');
@@ -508,6 +1013,169 @@ app.get('/api/orders', (_req, res) => {
     ORDER BY o.created_at DESC
   `).all();
   res.json(orders);
+});
+
+app.get('/api/admin/dashboard', (_req, res) => {
+  res.json(getDashboardData());
+});
+
+app.get('/api/admin/products', async (_req, res) => {
+  res.json(await listAdminProducts());
+});
+
+app.get('/api/admin/orders', (_req, res) => {
+  res.json(listAdminOrders());
+});
+
+app.get('/api/admin/orders/:id', (req, res) => {
+  const order = loadAdminOrderDetail(req.params.id);
+  if (!order) return res.status(404).json({ error: 'Encomenda nao encontrada' });
+  res.json(order);
+});
+
+app.patch('/api/admin/orders/:id', (req, res) => {
+  const allowed = ['processando', 'em_transito', 'entregue', 'cancelada', 'pending_payment'];
+  const nextStatus = normalizeOrderStatus(req.body.status);
+  if (!allowed.includes(nextStatus)) {
+    return res.status(400).json({ error: 'Estado invalido' });
+  }
+
+  const result = db.prepare('UPDATE orders SET status = ? WHERE id = ?').run(nextStatus, req.params.id);
+  if (!result.changes) return res.status(404).json({ error: 'Encomenda nao encontrada' });
+
+  const order = loadAdminOrderDetail(req.params.id);
+  res.json(order);
+});
+
+app.get('/api/admin/customers', (_req, res) => {
+  res.json(listAdminCustomers());
+});
+
+app.get('/api/admin/returns', (_req, res) => {
+  res.json(listAdminReturns());
+});
+
+app.get('/api/admin/analytics', (_req, res) => {
+  res.json(getAnalyticsData());
+});
+
+app.patch('/api/admin/products/:id/archive', async (req, res) => {
+  const productId = Number(req.params.id);
+  const isActive = req.body.isActive !== false;
+
+  if (!productId) {
+    return res.status(400).json({ error: 'Produto invalido' });
+  }
+
+  if (supabaseEnabled()) {
+    try {
+      const { error } = await supabase
+        .from('products')
+        .update({ is_active: isActive })
+        .eq('id', productId);
+
+      if (error) throw error;
+
+      const { data: fullProduct, error: fullError } = await supabase
+        .from('products')
+        .select('*, product_shades(name,color), product_finishes(name)')
+        .eq('id', productId)
+        .single();
+
+      if (fullError) throw fullError;
+      return res.json(mapSupabaseProduct(fullProduct));
+    } catch (err) {
+      console.warn('Supabase archive product fallback:', err.message);
+    }
+  }
+
+  const result = db.prepare(`
+    UPDATE products
+    SET is_active = ?, updated_at = CURRENT_TIMESTAMP
+    WHERE id = ?
+  `).run(isActive ? 1 : 0, productId);
+
+  if (!result.changes) return res.status(404).json({ error: 'Produto nao encontrado' });
+
+  const row = db.prepare('SELECT * FROM products WHERE id = ?').get(productId);
+  res.json(mapProduct(row));
+});
+
+app.delete('/api/admin/products/:id', async (req, res) => {
+  const productId = Number(req.params.id);
+  if (!productId) {
+    return res.status(400).json({ error: 'Produto invalido' });
+  }
+
+  if (supabaseEnabled()) {
+    try {
+      const { error } = await supabase.from('products').delete().eq('id', productId);
+      if (error) throw error;
+      return res.status(204).send();
+    } catch (err) {
+      console.warn('Supabase delete product fallback:', err.message);
+    }
+  }
+
+  db.prepare('DELETE FROM product_shades WHERE product_id = ?').run(productId);
+  db.prepare('DELETE FROM product_finishes WHERE product_id = ?').run(productId);
+  const result = db.prepare('DELETE FROM products WHERE id = ?').run(productId);
+
+  if (!result.changes) return res.status(404).json({ error: 'Produto nao encontrado' });
+  res.status(204).send();
+});
+
+app.get('/api/admin/settings', (_req, res) => {
+  const settings = getStoreSettings();
+  res.json({
+    storeName: settings?.store_name || 'Carla Thomas Signature',
+    contactEmail: settings?.contact_email || 'info@carlathomassignature.pt',
+    description: settings?.description || '',
+    notifyOrders: !!settings?.notify_orders,
+    notifyLowStock: !!settings?.notify_low_stock,
+    notifyReturns: !!settings?.notify_returns,
+    notifyNewCustomers: !!settings?.notify_new_customers
+  });
+});
+
+app.put('/api/admin/settings', (req, res) => {
+  const payload = {
+    storeName: String(req.body.storeName || '').trim(),
+    contactEmail: String(req.body.contactEmail || '').trim(),
+    description: String(req.body.description || '').trim(),
+    notifyOrders: req.body.notifyOrders ? 1 : 0,
+    notifyLowStock: req.body.notifyLowStock ? 1 : 0,
+    notifyReturns: req.body.notifyReturns ? 1 : 0,
+    notifyNewCustomers: req.body.notifyNewCustomers ? 1 : 0
+  };
+
+  if (!payload.storeName || !payload.contactEmail) {
+    return res.status(400).json({ error: 'Nome da loja e email de contacto sao obrigatorios' });
+  }
+
+  db.prepare(`
+    UPDATE store_settings
+    SET
+      store_name = ?,
+      contact_email = ?,
+      description = ?,
+      notify_orders = ?,
+      notify_low_stock = ?,
+      notify_returns = ?,
+      notify_new_customers = ?,
+      updated_at = CURRENT_TIMESTAMP
+    WHERE id = 1
+  `).run(
+    payload.storeName,
+    payload.contactEmail,
+    payload.description,
+    payload.notifyOrders,
+    payload.notifyLowStock,
+    payload.notifyReturns,
+    payload.notifyNewCustomers
+  );
+
+  res.json(payload);
 });
 
 app.post('/api/orders', (req, res) => {

@@ -95,6 +95,27 @@ db.exec(`
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
 
+  CREATE TABLE IF NOT EXISTS order_returns (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id TEXT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+    product_name TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending',
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS store_settings (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    store_name TEXT NOT NULL,
+    contact_email TEXT NOT NULL,
+    description TEXT,
+    notify_orders INTEGER NOT NULL DEFAULT 1,
+    notify_low_stock INTEGER NOT NULL DEFAULT 1,
+    notify_returns INTEGER NOT NULL DEFAULT 1,
+    notify_new_customers INTEGER NOT NULL DEFAULT 0,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+
   CREATE TABLE IF NOT EXISTS user_accounts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     role TEXT NOT NULL CHECK (role IN ('admin', 'user')),
@@ -250,6 +271,19 @@ function seed() {
 }
 
 seed();
+
+db.prepare(`
+  INSERT INTO store_settings (
+    id, store_name, contact_email, description,
+    notify_orders, notify_low_stock, notify_returns, notify_new_customers
+  )
+  VALUES (1, ?, ?, ?, 1, 1, 1, 0)
+  ON CONFLICT(id) DO NOTHING
+`).run(
+  'Carla Thomas Signature',
+  'info@carlathomassignature.pt',
+  'Curadoria de beleza premium para quem valoriza autenticidade, qualidade e ritual.'
+);
 
 function hashPassword(password) {
   return require('crypto').createHash('sha256').update(String(password)).digest('hex');

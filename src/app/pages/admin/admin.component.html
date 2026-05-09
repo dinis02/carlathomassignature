@@ -2,7 +2,6 @@
   <div class="cursor" id="adminCursor"></div>
   <div class="cursor-ring" id="adminCursorRing"></div>
 
-  <!-- SIDEBAR -->
   <nav class="sidebar">
     <div class="sidebar-brand">
       <span class="sidebar-logo">Carla Thomas</span>
@@ -12,6 +11,7 @@
         Painel Admin
       </div>
     </div>
+
     <div class="sidebar-nav">
       <div class="nav-section-label">Principal</div>
       <button class="nav-item" [class.active]="activeView==='dashboard'" (click)="showView('dashboard')">
@@ -21,7 +21,7 @@
       <button class="nav-item" [class.active]="activeView==='orders'" (click)="showView('orders')">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
         Encomendas
-        <span class="nav-badge">12</span>
+        <span class="nav-badge">{{ orders.length }}</span>
       </button>
       <button class="nav-item" [class.active]="activeView==='products'" (click)="showView('products')">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
@@ -31,11 +31,12 @@
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         Clientes
       </button>
+
       <div class="nav-section-label">Loja</div>
       <button class="nav-item" [class.active]="activeView==='returns'" (click)="showView('returns')">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.45"/></svg>
-        Devolu&#xE7;&#xF5;es
-        <span class="nav-badge red">3</span>
+        Devolucoes
+        <span class="nav-badge red">{{ returnCounts.pending }}</span>
       </button>
       <button class="nav-item" [class.active]="activeView==='analytics'" (click)="showView('analytics')">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
@@ -43,332 +44,243 @@
       </button>
       <button class="nav-item" [class.active]="activeView==='settings'" (click)="showView('settings')">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        Defini&#xE7;&#xF5;es
+        Definicoes
       </button>
     </div>
+
     <div class="sidebar-footer">
       <div class="admin-user">
-        <div class="admin-avatar">D</div>
+        <div class="admin-avatar">{{ adminInitial }}</div>
         <div>
-          <div class="admin-name">Dinis Rosca</div>
+          <div class="admin-name">{{ adminName }}</div>
           <div class="admin-role">Super Admin</div>
         </div>
-        <button class="logout-btn" title="Terminar sess&#xE3;o" (click)="logout()">
+        <button class="logout-btn" title="Terminar sessao" (click)="logout()">
           <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         </button>
       </div>
     </div>
   </nav>
 
-  <!-- MAIN -->
   <div class="main">
     <div class="topbar">
       <span class="topbar-title">{{ getTopbarTitle() }}</span>
       <div class="topbar-search">
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" placeholder="Pesquisar...">
+        <input type="text" [placeholder]="activeSearchPlaceholder" [(ngModel)]="globalSearch" name="globalSearch">
       </div>
-      <button class="topbar-action" (click)="showToast('3 novas encomendas pendentes','success')">
+      <button class="topbar-action" (click)="refreshActiveView()" title="Actualizar vista">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         <span class="topbar-notif"></span>
       </button>
-      <button class="topbar-action">
+      <button class="topbar-action" (click)="openProductPanel('new')" title="Novo produto">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
       </button>
     </div>
 
     <div class="content">
-
-      <!-- VIEW: DASHBOARD -->
       <div class="view" [class.active]="activeView==='dashboard'">
         <div class="page-header">
           <div class="page-header-left">
-            <div class="page-eyebrow">Bom dia, Dinis</div>
-            <h1>Vis&#xE3;o geral &mdash; <em>Abril 2025</em></h1>
+            <div class="page-eyebrow">Resumo real</div>
+            <h1>Visao geral <em>da loja</em></h1>
           </div>
           <div class="page-header-actions">
-            <button class="btn btn-ghost">
-              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-              Exportar relat&#xF3;rio
-            </button>
+            <button class="btn btn-ghost" (click)="loadDashboard()">Actualizar</button>
             <button class="btn btn-primary" (click)="showView('orders')">Ver encomendas</button>
           </div>
         </div>
-        <div class="kpi-grid">
-          <div class="kpi-card">
-            <div class="kpi-label">Receita do m&#xEA;s</div>
-            <div class="kpi-value rose">4.847 &euro;</div>
-            <div class="kpi-delta up">&#8593; +18% vs m&#xEA;s anterior</div>
-            <div class="sparkline"><svg viewBox="0 0 100 40" preserveAspectRatio="none"><polyline points="0,35 12,28 24,32 36,20 48,24 60,12 72,18 84,8 100,14" fill="none" stroke="var(--rose-gold)" stroke-width="1.5" opacity="0.6"/></svg></div>
+
+        @if (dashboard) {
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-label">Receita do mes</div>
+              <div class="kpi-value rose">{{ dashboard.revenueMonth | number:'1.2-2' }} EUR</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">Encomendas do mes</div>
+              <div class="kpi-value">{{ dashboard.ordersMonth }}</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">Ticket medio</div>
+              <div class="kpi-value green">{{ dashboard.averageOrderValue | number:'1.2-2' }} EUR</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">Devolucoes pendentes</div>
+              <div class="kpi-value red">{{ dashboard.pendingReturns }}</div>
+            </div>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-label">Encomendas totais</div>
-            <div class="kpi-value">47</div>
-            <div class="kpi-delta up">&#8593; +12 vs m&#xEA;s anterior</div>
-            <div class="sparkline"><svg viewBox="0 0 100 40" preserveAspectRatio="none"><polyline points="0,30 12,25 24,28 36,18 48,22 60,10 72,14 84,6 100,10" fill="none" stroke="var(--info)" stroke-width="1.5" opacity="0.6"/></svg></div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">Valor m&#xE9;dio por encomenda</div>
-            <div class="kpi-value green">103 &euro;</div>
-            <div class="kpi-delta up">&#8593; +5% vs m&#xEA;s anterior</div>
-            <div class="sparkline"><svg viewBox="0 0 100 40" preserveAspectRatio="none"><polyline points="0,28 20,22 40,26 60,16 80,18 100,12" fill="none" stroke="var(--success)" stroke-width="1.5" opacity="0.6"/></svg></div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">Devolu&#xE7;&#xF5;es pendentes</div>
-            <div class="kpi-value red">3</div>
-            <div class="kpi-delta down">&#8593; +1 esta semana</div>
-            <div class="sparkline"><svg viewBox="0 0 100 40" preserveAspectRatio="none"><polyline points="0,20 25,18 50,22 75,16 100,20" fill="none" stroke="var(--danger)" stroke-width="1.5" opacity="0.6"/></svg></div>
-          </div>
-        </div>
-        <div class="chart-grid">
-          <div class="chart-card">
-            <div class="chart-card-title">Receita di&#xE1;ria &mdash; Abril 2025</div>
-            <div class="chart-area">
-              <div class="chart-bars">
-                <div class="chart-bar-wrap"><div class="chart-bar" style="height:40%"></div><div class="chart-bar-label">1</div></div>
-                <div class="chart-bar-wrap"><div class="chart-bar" style="height:55%"></div><div class="chart-bar-label">3</div></div>
-                <div class="chart-bar-wrap"><div class="chart-bar" style="height:35%"></div><div class="chart-bar-label">5</div></div>
-                <div class="chart-bar-wrap"><div class="chart-bar" style="height:70%"></div><div class="chart-bar-label">7</div></div>
-                <div class="chart-bar-wrap"><div class="chart-bar" style="height:50%"></div><div class="chart-bar-label">9</div></div>
-                <div class="chart-bar-wrap"><div class="chart-bar" style="height:65%"></div><div class="chart-bar-label">11</div></div>
-                <div class="chart-bar-wrap"><div class="chart-bar" style="height:80%"></div><div class="chart-bar-label">13</div></div>
-                <div class="chart-bar-wrap"><div class="chart-bar" style="height:45%"></div><div class="chart-bar-label">15</div></div>
-                <div class="chart-bar-wrap"><div class="chart-bar" style="height:90%"></div><div class="chart-bar-label">17</div></div>
-                <div class="chart-bar-wrap"><div class="chart-bar" style="height:60%"></div><div class="chart-bar-label">19</div></div>
-                <div class="chart-bar-wrap"><div class="chart-bar" style="height:75%"></div><div class="chart-bar-label">21</div></div>
-                <div class="chart-bar-wrap"><div class="chart-bar accent" style="height:100%"></div><div class="chart-bar-label">22</div></div>
+
+          <div class="chart-grid">
+            <div class="chart-card">
+              <div class="chart-card-title">Receita diaria deste mes</div>
+              <div class="chart-area">
+                <div class="chart-bars">
+                  @for (day of dashboard.dailyRevenue; track day.label) {
+                    <div class="chart-bar-wrap">
+                      <div class="chart-bar accent" [style.height]="chartHeight(day.total, dashboard.revenueMonth || 1)"></div>
+                      <div class="chart-bar-label">{{ day.label }}</div>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <div class="chart-card">
+              <div class="chart-card-title">Encomendas por estado</div>
+              <div class="donut-legend">
+                <div class="donut-legend-item"><div class="donut-legend-dot" style="background:var(--success)"></div>Entregues ({{ dashboard.statusCounts['entregue'] || 0 }})</div>
+                <div class="donut-legend-item"><div class="donut-legend-dot" style="background:var(--info)"></div>Em transito ({{ dashboard.statusCounts['em_transito'] || 0 }})</div>
+                <div class="donut-legend-item"><div class="donut-legend-dot" style="background:var(--rose-gold)"></div>Processando ({{ dashboard.statusCounts['processando'] || 0 }})</div>
+                <div class="donut-legend-item"><div class="donut-legend-dot" style="background:var(--danger)"></div>Canceladas ({{ dashboard.statusCounts['cancelada'] || 0 }})</div>
+                <div class="donut-legend-item"><div class="donut-legend-dot" style="background:var(--warning)"></div>Pagamento pendente ({{ dashboard.statusCounts['pending_payment'] || 0 }})</div>
               </div>
             </div>
           </div>
-          <div class="chart-card">
-            <div class="chart-card-title">Encomendas por estado</div>
-            <div class="donut-wrap">
-              <svg class="donut-svg" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="38" fill="none" stroke="var(--bg4)" stroke-width="12"/>
-                <circle cx="50" cy="50" r="38" fill="none" stroke="var(--success)" stroke-width="12" stroke-dasharray="95 144" stroke-dashoffset="0" transform="rotate(-90 50 50)"/>
-                <circle cx="50" cy="50" r="38" fill="none" stroke="var(--info)" stroke-width="12" stroke-dasharray="38 201" stroke-dashoffset="-95" transform="rotate(-90 50 50)"/>
-                <circle cx="50" cy="50" r="38" fill="none" stroke="var(--rose-gold)" stroke-width="12" stroke-dasharray="20 219" stroke-dashoffset="-133" transform="rotate(-90 50 50)"/>
-                <circle cx="50" cy="50" r="38" fill="none" stroke="var(--danger)" stroke-width="12" stroke-dasharray="8 231" stroke-dashoffset="-153" transform="rotate(-90 50 50)"/>
-              </svg>
-              <div class="donut-center"><div class="donut-center-val">47</div><div class="donut-center-label">total</div></div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;">
+            <div class="table-wrapper">
+              <div class="table-toolbar">
+                <span class="table-title">Encomendas recentes</span>
+                <button class="btn btn-ghost btn-sm" (click)="showView('orders')">Ver todas</button>
+              </div>
+              <table>
+                <thead><tr><th>Nr</th><th>Cliente</th><th>Total</th><th>Estado</th></tr></thead>
+                <tbody>
+                  @for (order of dashboard.recentOrders; track order.id) {
+                    <tr>
+                      <td style="font-size:11px;color:var(--muted);">{{ order.id }}</td>
+                      <td>{{ order.customerName }}</td>
+                      <td><span class="amount">{{ order.total | number:'1.2-2' }} EUR</span></td>
+                      <td><span class="badge" [class]="statusBadgeClass(order.status)"><span class="badge-dot"></span>{{ order.statusLabel }}</span></td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
             </div>
-            <div class="donut-legend">
-              <div class="donut-legend-item"><div class="donut-legend-dot" style="background:var(--success)"></div>Entregues (31)</div>
-              <div class="donut-legend-item"><div class="donut-legend-dot" style="background:var(--info)"></div>Em tr&#xE2;nsito (12)</div>
-              <div class="donut-legend-item"><div class="donut-legend-dot" style="background:var(--rose-gold)"></div>Processando (6)</div>
-              <div class="donut-legend-item"><div class="donut-legend-dot" style="background:var(--danger)"></div>Canceladas (3)</div>
-            </div>
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;">
-          <div class="table-wrapper">
-            <div class="table-toolbar">
-              <span class="table-title">Encomendas recentes</span>
-              <button class="btn btn-ghost btn-sm" (click)="showView('orders')">Ver todas</button>
-            </div>
-            <table>
-              <thead><tr><th>Nr</th><th>Cliente</th><th>Total</th><th>Estado</th></tr></thead>
-              <tbody>
-                <tr>
-                  <td style="font-size:11px;color:var(--muted);">#04817</td>
-                  <td><div class="customer-cell"><div class="customer-avatar-sm">M</div>Maria Silva</div></td>
-                  <td><span class="amount">61,60 &euro;</span></td>
-                  <td><span class="badge enviado"><span class="badge-dot"></span>Em tr&#xE2;nsito</span></td>
-                </tr>
-                <tr>
-                  <td style="font-size:11px;color:var(--muted);">#05001</td>
-                  <td><div class="customer-cell"><div class="customer-avatar-sm">A</div>Ana Costa</div></td>
-                  <td><span class="amount">93,99 &euro;</span></td>
-                  <td><span class="badge processando"><span class="badge-dot"></span>Processando</span></td>
-                </tr>
-                <tr>
-                  <td style="font-size:11px;color:var(--muted);">#04950</td>
-                  <td><div class="customer-cell"><div class="customer-avatar-sm">J</div>Jo&#xE3;o Pereira</div></td>
-                  <td><span class="amount">189,99 &euro;</span></td>
-                  <td><span class="badge enviado"><span class="badge-dot"></span>Em tr&#xE2;nsito</span></td>
-                </tr>
-                <tr>
-                  <td style="font-size:11px;color:var(--muted);">#04920</td>
-                  <td><div class="customer-cell"><div class="customer-avatar-sm">S</div>Sofia Matos</div></td>
-                  <td><span class="amount">36,00 &euro;</span></td>
-                  <td><span class="badge entregue"><span class="badge-dot"></span>Entregue</span></td>
-                </tr>
-                <tr>
-                  <td style="font-size:11px;color:var(--muted);">#04891</td>
-                  <td><div class="customer-cell"><div class="customer-avatar-sm">C</div>Carla Nunes</div></td>
-                  <td><span class="amount">44,00 &euro;</span></td>
-                  <td><span class="badge entregue"><span class="badge-dot"></span>Entregue</span></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="chart-card">
-            <div class="chart-card-title">Actividade recente</div>
-            <div class="activity-list">
-              <div class="activity-item">
-                <div class="activity-icon order"><svg width="13" height="13" fill="none" stroke="var(--rose-gold)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/></svg></div>
-                <div class="activity-text"><div class="activity-main">Nova encomenda <strong>#05001</strong> &mdash; Ana Costa &mdash; 93,99 &euro;</div><div class="activity-time">h&#xE1; 12 minutos</div></div>
-              </div>
-              <div class="activity-item">
-                <div class="activity-icon return"><svg width="13" height="13" fill="none" stroke="var(--danger)" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.45"/></svg></div>
-                <div class="activity-text"><div class="activity-main">Pedido de devolu&#xE7;&#xE3;o &mdash; <strong>#04203</strong> &mdash; Matte Revolution</div><div class="activity-time">h&#xE1; 45 minutos</div></div>
-              </div>
-              <div class="activity-item">
-                <div class="activity-icon product"><svg width="13" height="13" fill="none" stroke="var(--info)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/></svg></div>
-                <div class="activity-text"><div class="activity-main">Stock baixo &mdash; <strong>Rose Glow Lip Gloss</strong> &mdash; 3 unidades</div><div class="activity-time">h&#xE1; 1 hora</div></div>
-              </div>
-              <div class="activity-item">
-                <div class="activity-icon client"><svg width="13" height="13" fill="none" stroke="var(--success)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
-                <div class="activity-text"><div class="activity-main">Novo cliente &mdash; <strong>Beatriz Ferreira</strong></div><div class="activity-time">h&#xE1; 2 horas</div></div>
-              </div>
-              <div class="activity-item">
-                <div class="activity-icon order"><svg width="13" height="13" fill="none" stroke="var(--rose-gold)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/></svg></div>
-                <div class="activity-text"><div class="activity-main">Encomenda <strong>#04950</strong> expedida &mdash; PT924991011PT</div><div class="activity-time">h&#xE1; 3 horas</div></div>
+
+            <div class="chart-card">
+              <div class="chart-card-title">Actividade recente</div>
+              <div class="activity-list">
+                @for (activity of dashboard.recentActivity; track activity.message) {
+                  <div class="activity-item">
+                    <div class="activity-icon" [class]="activityIconClass(activity.type)">
+                      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path *ngIf="activity.type === 'order'" d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                        <path *ngIf="activity.type === 'return'" d="M3.51 15a9 9 0 1 0 .49-4.45"/><polyline *ngIf="activity.type === 'return'" points="1 4 1 10 7 10"/>
+                        <path *ngIf="activity.type === 'product'" d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+                        <path *ngIf="activity.type === 'customer'" d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle *ngIf="activity.type === 'customer'" cx="9" cy="7" r="4"/>
+                      </svg>
+                    </div>
+                    <div class="activity-text">
+                      <div class="activity-main">{{ activity.message }}</div>
+                      <div class="activity-time">{{ activity.timeLabel }}</div>
+                    </div>
+                  </div>
+                }
               </div>
             </div>
           </div>
-        </div>
+        }
       </div>
 
-      <!-- VIEW: ORDERS -->
       <div class="view" [class.active]="activeView==='orders'">
         <div class="page-header">
-          <div class="page-header-left"><div class="page-eyebrow">Gest&#xE3;o</div><h1>Encomendas</h1></div>
+          <div class="page-header-left"><div class="page-eyebrow">Gestao</div><h1>Encomendas</h1></div>
           <div class="page-header-actions">
-            <button class="btn btn-ghost" (click)="showToast('CSV exportado','success')">
-              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-              Exportar CSV
-            </button>
+            <button class="btn btn-ghost" (click)="loadOrders()">Actualizar</button>
           </div>
         </div>
+
         <div class="kpi-grid" style="grid-template-columns:repeat(5,1fr);">
-          <div class="kpi-card"><div class="kpi-label">Total</div><div class="kpi-value" style="font-size:32px;">47</div></div>
-          <div class="kpi-card"><div class="kpi-label">Processando</div><div class="kpi-value rose" style="font-size:32px;">6</div></div>
-          <div class="kpi-card"><div class="kpi-label">Em tr&#xE2;nsito</div><div class="kpi-value blue" style="font-size:32px;">12</div></div>
-          <div class="kpi-card"><div class="kpi-label">Entregues</div><div class="kpi-value green" style="font-size:32px;">31</div></div>
-          <div class="kpi-card"><div class="kpi-label">Canceladas</div><div class="kpi-value red" style="font-size:32px;">3</div></div>
+          <div class="kpi-card"><div class="kpi-label">Total</div><div class="kpi-value" style="font-size:32px;">{{ orderCounts.total }}</div></div>
+          <div class="kpi-card"><div class="kpi-label">Processando</div><div class="kpi-value rose" style="font-size:32px;">{{ orderCounts.processando }}</div></div>
+          <div class="kpi-card"><div class="kpi-label">Em transito</div><div class="kpi-value blue" style="font-size:32px;">{{ orderCounts.emTransito }}</div></div>
+          <div class="kpi-card"><div class="kpi-label">Entregues</div><div class="kpi-value green" style="font-size:32px;">{{ orderCounts.entregues }}</div></div>
+          <div class="kpi-card"><div class="kpi-label">Canceladas</div><div class="kpi-value red" style="font-size:32px;">{{ orderCounts.canceladas }}</div></div>
         </div>
+
         <div class="table-wrapper">
           <div class="table-toolbar">
             <span class="table-title">Todas as encomendas</span>
             <div class="table-search">
               <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
-              <input type="text" placeholder="Pesquisar..." (input)="filterTable('ordersTable', $any($event.target).value)">
+              <input type="text" placeholder="Pesquisar..." [(ngModel)]="orderSearch" name="orderSearch">
             </div>
-            <select class="filter-select" (change)="filterTableByCol('ordersTable', 5, $any($event.target).value)">
+            <select class="filter-select" [(ngModel)]="orderStatusFilter" name="orderStatusFilter">
               <option value="">Todos os estados</option>
-              <option value="Processando">Processando</option>
-              <option value="Em transito">Em tr&#xE2;nsito</option>
-              <option value="Entregue">Entregue</option>
-              <option value="Cancelada">Cancelada</option>
+              <option value="processando">Processando</option>
+              <option value="em_transito">Em transito</option>
+              <option value="entregue">Entregue</option>
+              <option value="cancelada">Cancelada</option>
+              <option value="pending_payment">Pagamento pendente</option>
             </select>
-            <select class="filter-select"><option>Abril 2025</option><option>Mar&#xE7;o 2025</option></select>
           </div>
           <table id="ordersTable">
             <thead>
               <tr>
-                <th><input type="checkbox" style="accent-color:var(--rose-gold)"></th>
-                <th>Nr Encomenda</th><th>Data</th><th>Cliente</th><th>Artigos</th><th>Estado</th><th>Envio</th><th>Total</th><th>Ac&#xE7;&#xF5;es</th>
+                <th>Nr Encomenda</th><th>Data</th><th>Cliente</th><th>Artigos</th><th>Estado</th><th>Envio</th><th>Total</th><th>Accoes</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td><input type="checkbox" style="accent-color:var(--rose-gold)"></td>
-                <td style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;">#CTS-2025-05001</td>
-                <td style="color:var(--muted);font-size:11px;">21 Abr 2025</td>
-                <td><div class="customer-cell"><div class="customer-avatar-sm">A</div><div><div style="font-size:12px;">Ana Costa</div><div style="font-size:10px;color:var(--muted);">ana&#64;email.com</div></div></div></td>
-                <td style="color:var(--muted);font-size:11px;">1 artigo</td>
-                <td><span class="badge processando"><span class="badge-dot"></span>Processando</span></td>
-                <td style="font-size:11px;color:var(--muted);">CTT Urgente</td>
-                <td><span class="amount">93,99 &euro;</span></td>
-                <td><div class="row-actions"><button class="row-btn" (click)="openOrderPanel('05001')"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button><button class="row-btn" (click)="openOrderPanel('05001')"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button></div></td>
-              </tr>
-              <tr>
-                <td><input type="checkbox" style="accent-color:var(--rose-gold)"></td>
-                <td style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;">#CTS-2025-04950</td>
-                <td style="color:var(--muted);font-size:11px;">20 Abr 2025</td>
-                <td><div class="customer-cell"><div class="customer-avatar-sm">J</div><div><div style="font-size:12px;">Jo&#xE3;o Pereira</div><div style="font-size:10px;color:var(--muted);">joao&#64;email.com</div></div></div></td>
-                <td style="color:var(--muted);font-size:11px;">1 artigo</td>
-                <td><span class="badge enviado"><span class="badge-dot"></span>Em tr&#xE2;nsito</span></td>
-                <td style="font-size:11px;color:var(--muted);">CTT Urgente</td>
-                <td><span class="amount">189,99 &euro;</span></td>
-                <td><div class="row-actions"><button class="row-btn" (click)="openOrderPanel('04950')"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></td>
-              </tr>
-              <tr>
-                <td><input type="checkbox" style="accent-color:var(--rose-gold)"></td>
-                <td style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;">#CTS-2025-04817</td>
-                <td style="color:var(--muted);font-size:11px;">18 Abr 2025</td>
-                <td><div class="customer-cell"><div class="customer-avatar-sm">M</div><div><div style="font-size:12px;">Maria Silva</div><div style="font-size:10px;color:var(--muted);">maria&#64;email.com</div></div></div></td>
-                <td style="color:var(--muted);font-size:11px;">2 artigos</td>
-                <td><span class="badge enviado"><span class="badge-dot"></span>Em tr&#xE2;nsito</span></td>
-                <td style="font-size:11px;color:var(--muted);">CTT Standard</td>
-                <td><span class="amount">61,60 &euro;</span></td>
-                <td><div class="row-actions"><button class="row-btn" (click)="openOrderPanel('04817')"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></td>
-              </tr>
-              <tr>
-                <td><input type="checkbox" style="accent-color:var(--rose-gold)"></td>
-                <td style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;">#CTS-2025-04203</td>
-                <td style="color:var(--muted);font-size:11px;">22 Mar 2025</td>
-                <td><div class="customer-cell"><div class="customer-avatar-sm">M</div><div><div style="font-size:12px;">Maria Silva</div></div></div></td>
-                <td style="color:var(--muted);font-size:11px;">1 artigo</td>
-                <td><span class="badge entregue"><span class="badge-dot"></span>Entregue</span></td>
-                <td style="font-size:11px;color:var(--muted);">CTT Standard</td>
-                <td><span class="amount">44,00 &euro;</span></td>
-                <td><div class="row-actions"><button class="row-btn" (click)="openOrderPanel('04203')"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></td>
-              </tr>
-              <tr>
-                <td><input type="checkbox" style="accent-color:var(--rose-gold)"></td>
-                <td style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;">#CTS-2024-01244</td>
-                <td style="color:var(--muted);font-size:11px;">3 Ago 2024</td>
-                <td><div class="customer-cell"><div class="customer-avatar-sm">R</div><div><div style="font-size:12px;">Rita Alves</div></div></div></td>
-                <td style="color:var(--muted);font-size:11px;">2 artigos</td>
-                <td><span class="badge cancelado"><span class="badge-dot"></span>Cancelada</span></td>
-                <td style="font-size:11px;color:var(--muted);">&mdash;</td>
-                <td><span class="amount" style="color:var(--muted);text-decoration:line-through;">62,00 &euro;</span></td>
-                <td><div class="row-actions"><button class="row-btn" (click)="openOrderPanel('01244')"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></td>
-              </tr>
+              @for (order of filteredOrders; track order.id) {
+                <tr>
+                  <td style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;">{{ order.id }}</td>
+                  <td style="color:var(--muted);font-size:11px;">{{ order.dateLabel }}</td>
+                  <td><div class="customer-cell"><div class="customer-avatar-sm">{{ order.customerName.charAt(0) }}</div><div><div style="font-size:12px;">{{ order.customerName }}</div><div style="font-size:10px;color:var(--muted);">{{ order.customerEmail }}</div></div></div></td>
+                  <td style="color:var(--muted);font-size:11px;">{{ order.itemCount }} artigo(s)</td>
+                  <td><span class="badge" [class]="statusBadgeClass(order.status)"><span class="badge-dot"></span>{{ order.statusLabel }}</span></td>
+                  <td style="font-size:11px;color:var(--muted);">{{ order.shippingMethod }}</td>
+                  <td><span class="amount">{{ order.total | number:'1.2-2' }} EUR</span></td>
+                  <td><div class="row-actions"><button class="row-btn" (click)="openOrderPanel(order.id)"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></td>
+                </tr>
+              }
             </tbody>
           </table>
-          <div class="pagination">
-            <span class="pagination-info">Mostrando 1&ndash;5 de 47 encomendas</span>
-            <div class="pagination-btns">
-              <button class="page-btn">&#8249;</button>
-              <button class="page-btn active">1</button>
-              <button class="page-btn">2</button>
-              <button class="page-btn">3</button>
-              <span style="color:var(--muted);padding:0 6px;font-size:12px;">&#8230;</span>
-              <button class="page-btn">10</button>
-              <button class="page-btn">&#8250;</button>
-            </div>
-          </div>
         </div>
       </div>
 
-      <!-- VIEW: PRODUCTS -->
       <div class="view" [class.active]="activeView==='products'">
         <div class="page-header">
-          <div class="page-header-left"><div class="page-eyebrow">Cat&#xE1;logo</div><h1>Produtos</h1></div>
+          <div class="page-header-left"><div class="page-eyebrow">Catalogo</div><h1>Produtos</h1></div>
           <div class="page-header-actions">
-            <button class="btn btn-ghost" (click)="showToast('CSV exportado','success')">Exportar</button>
+            <button class="btn btn-ghost" (click)="loadProducts()">Actualizar</button>
             <button class="btn btn-primary" (click)="openProductPanel('new')">
               <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               Novo produto
             </button>
           </div>
         </div>
+
         <div class="table-wrapper" style="margin-bottom:2px;">
           <div class="table-toolbar">
             <div class="table-search">
               <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
-              <input type="text" placeholder="Pesquisar produtos..." (input)="filterTable('productsTable', $any($event.target).value)">
+              <input type="text" placeholder="Pesquisar produtos..." [(ngModel)]="productSearch" name="productSearch">
             </div>
-            <select class="filter-select"><option>Todas as categorias</option><option>L&#xE1;bios</option><option>Rosto</option><option>Olhos</option><option>Corpo</option></select>
-            <select class="filter-select"><option>Todas as marcas</option><option>Charlotte Tilbury</option><option>NARS</option><option>La Mer</option><option>Carla Thomas</option></select>
-            <span class="table-title" style="margin-left:auto;">{{ adminProducts.length }} produtos</span>
+            <select class="filter-select" [(ngModel)]="productCategoryFilter" name="productCategoryFilter">
+              <option value="">Todas as categorias</option>
+              @for (category of productCategories; track category) {
+                <option [value]="category">{{ category }}</option>
+              }
+            </select>
+            <select class="filter-select" [(ngModel)]="productBrandFilter" name="productBrandFilter">
+              <option value="">Todas as marcas</option>
+              @for (brand of productBrands; track brand) {
+                <option [value]="brand">{{ brand }}</option>
+              }
+            </select>
+            <select class="filter-select" [(ngModel)]="productStatusFilter" name="productStatusFilter">
+              <option value="">Todos os estados</option>
+              <option value="active">Activos</option>
+              <option value="archived">Arquivados</option>
+            </select>
+            <span class="table-title" style="margin-left:auto;">{{ filteredProducts.length }} produtos</span>
           </div>
         </div>
+
         <div class="products-admin-grid" id="productsTable">
-          @for (product of adminProducts; track product.id) {
+          @for (product of filteredProducts; track product.id) {
             <div class="product-admin-card" (click)="openProductPanel('' + product.id)">
               <div class="product-admin-img" [style.background]="product.image ? 'none' : 'linear-gradient(145deg,' + product.gradientFrom + ',' + product.gradientTo + ')'">
                 @if (product.image) {
@@ -377,14 +289,18 @@
                 <div class="product-admin-overlay"></div>
                 <div class="product-admin-actions">
                   <button class="btn btn-primary btn-sm" (click)="$event.stopPropagation();openProductPanel('' + product.id)">Editar</button>
+                  <button class="btn btn-ghost btn-sm" (click)="$event.stopPropagation();archiveProduct(product, product.isActive === false)">
+                    {{ product.isActive === false ? 'Reactivar' : 'Arquivar' }}
+                  </button>
+                  <button class="btn btn-ghost btn-sm danger" (click)="$event.stopPropagation();deleteProduct(product)">Apagar</button>
                 </div>
               </div>
               <div class="product-admin-body">
                 <div class="product-admin-brand">{{ product.brand }}</div>
                 <div class="product-admin-name">{{ product.name }}</div>
                 <div class="product-admin-footer">
-                  <span class="product-admin-price">{{ product.price | number:'1.2-2' }} &euro;</span>
-                  <span class="badge" [class.ativo]="(product.stock || 0) > 0" [class.esgotado]="(product.stock || 0) === 0"><span class="badge-dot"></span>{{ (product.stock || 0) > 0 ? 'Activo' : 'Esgotado' }}</span>
+                  <span class="product-admin-price">{{ product.price | number:'1.2-2' }} EUR</span>
+                  <span class="badge" [class.ativo]="product.isActive !== false && (product.stock || 0) > 0" [class.esgotado]="product.isActive === false || (product.stock || 0) === 0"><span class="badge-dot"></span>{{ product.isActive === false ? 'Arquivado' : ((product.stock || 0) > 0 ? 'Activo' : 'Esgotado') }}</span>
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--border2);font-size:10px;color:var(--muted);">
                   <span>Stock: {{ product.stock || 0 }} un.</span><span>{{ product.category }}</span>
@@ -394,7 +310,7 @@
           }
         </div>
       </div>
-      <!-- VIEW: CUSTOMERS -->
+
       <div class="view" [class.active]="activeView==='customers'">
         <div class="page-header"><div class="page-header-left"><div class="page-eyebrow">Base de dados</div><h1>Clientes</h1></div></div>
         <div class="table-wrapper">
@@ -402,165 +318,185 @@
             <span class="table-title">Todos os clientes</span>
             <div class="table-search">
               <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
-              <input type="text" placeholder="Pesquisar clientes...">
+              <input type="text" placeholder="Pesquisar clientes..." [(ngModel)]="customerSearch" name="customerSearch">
             </div>
           </div>
           <table>
             <thead><tr><th>Cliente</th><th>Email</th><th>Encomendas</th><th>Total gasto</th><th>Estado</th></tr></thead>
             <tbody>
-              <tr><td><div class="customer-cell"><div class="customer-avatar-sm">A</div>Ana Costa</div></td><td style="font-size:11px;color:var(--muted);">ana&#64;email.com</td><td style="font-size:11px;color:var(--muted);">3</td><td><span class="amount">287,98 &euro;</span></td><td><span class="badge ativo"><span class="badge-dot"></span>Activo</span></td></tr>
-              <tr><td><div class="customer-cell"><div class="customer-avatar-sm">M</div>Maria Silva</div></td><td style="font-size:11px;color:var(--muted);">maria&#64;email.com</td><td style="font-size:11px;color:var(--muted);">8</td><td><span class="amount">612,40 &euro;</span></td><td><span class="badge ativo"><span class="badge-dot"></span>Activo</span></td></tr>
-              <tr><td><div class="customer-cell"><div class="customer-avatar-sm">J</div>Jo&#xE3;o Pereira</div></td><td style="font-size:11px;color:var(--muted);">joao&#64;email.com</td><td style="font-size:11px;color:var(--muted);">2</td><td><span class="amount">379,98 &euro;</span></td><td><span class="badge ativo"><span class="badge-dot"></span>Activo</span></td></tr>
-              <tr><td><div class="customer-cell"><div class="customer-avatar-sm">R</div>Rita Alves</div></td><td style="font-size:11px;color:var(--muted);">rita&#64;email.com</td><td style="font-size:11px;color:var(--muted);">4</td><td><span class="amount">198,00 &euro;</span></td><td><span class="badge inativo"><span class="badge-dot"></span>Inactivo</span></td></tr>
+              @for (customer of filteredCustomers; track customer.id) {
+                <tr>
+                  <td><div class="customer-cell"><div class="customer-avatar-sm">{{ customer.name.charAt(0) }}</div>{{ customer.name }}</div></td>
+                  <td style="font-size:11px;color:var(--muted);">{{ customer.email }}</td>
+                  <td style="font-size:11px;color:var(--muted);">{{ customer.ordersCount }}</td>
+                  <td><span class="amount">{{ customer.totalSpent | number:'1.2-2' }} EUR</span></td>
+                  <td><span class="badge" [class.ativo]="customer.status === 'active'" [class.inativo]="customer.status !== 'active'"><span class="badge-dot"></span>{{ customer.statusLabel }}</span></td>
+                </tr>
+              }
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- VIEW: RETURNS -->
       <div class="view" [class.active]="activeView==='returns'">
-        <div class="page-header"><div class="page-header-left"><div class="page-eyebrow">P&#xF3;s-venda</div><h1>Devolu&#xE7;&#xF5;es</h1></div></div>
+        <div class="page-header"><div class="page-header-left"><div class="page-eyebrow">Pos-venda</div><h1>Devolucoes</h1></div></div>
         <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);">
-          <div class="kpi-card"><div class="kpi-label">Pendentes</div><div class="kpi-value red" style="font-size:32px;">3</div></div>
-          <div class="kpi-card"><div class="kpi-label">Em processamento</div><div class="kpi-value rose" style="font-size:32px;">1</div></div>
-          <div class="kpi-card"><div class="kpi-label">Resolvidas</div><div class="kpi-value green" style="font-size:32px;">7</div></div>
+          <div class="kpi-card"><div class="kpi-label">Pendentes</div><div class="kpi-value red" style="font-size:32px;">{{ returnCounts.pending }}</div></div>
+          <div class="kpi-card"><div class="kpi-label">Em processamento</div><div class="kpi-value rose" style="font-size:32px;">{{ returnCounts.processing }}</div></div>
+          <div class="kpi-card"><div class="kpi-label">Resolvidas</div><div class="kpi-value green" style="font-size:32px;">{{ returnCounts.resolved }}</div></div>
         </div>
         <div class="table-wrapper">
-          <div class="table-toolbar"><span class="table-title">Pedidos de devolu&#xE7;&#xE3;o</span></div>
+          <div class="table-toolbar">
+            <span class="table-title">Pedidos de devolucao</span>
+            <div class="table-search">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="text" placeholder="Pesquisar devolucoes..." [(ngModel)]="returnSearch" name="returnSearch">
+            </div>
+          </div>
           <table>
             <thead><tr><th>Encomenda</th><th>Cliente</th><th>Produto</th><th>Motivo</th><th>Estado</th></tr></thead>
             <tbody>
-              <tr>
-                <td style="font-family:'Cormorant Garamond',serif;font-style:italic;">#CTS-2025-04203</td>
-                <td>Maria Silva</td>
-                <td style="font-size:11px;color:var(--muted);">Matte Revolution Lipstick</td>
-                <td style="font-size:11px;color:var(--muted);">Produto com defeito</td>
-                <td><span class="badge processando"><span class="badge-dot"></span>Pendente</span></td>
-              </tr>
-              <tr>
-                <td style="font-family:'Cormorant Garamond',serif;font-style:italic;">#CTS-2024-01200</td>
-                <td>Ana Costa</td>
-                <td style="font-size:11px;color:var(--muted);">Rose Glow Lip Gloss</td>
-                <td style="font-size:11px;color:var(--muted);">Tamanho errado</td>
-                <td><span class="badge processando"><span class="badge-dot"></span>Pendente</span></td>
-              </tr>
+              @if (filteredReturns.length === 0) {
+                <tr><td colspan="5" style="text-align:center;color:var(--muted);padding:28px;">Ainda nao existem devolucoes registadas.</td></tr>
+              } @else {
+                @for (entry of filteredReturns; track entry.id) {
+                  <tr>
+                    <td style="font-family:'Cormorant Garamond',serif;font-style:italic;">{{ entry.orderId }}</td>
+                    <td>{{ entry.customerName }}</td>
+                    <td style="font-size:11px;color:var(--muted);">{{ entry.productName }}</td>
+                    <td style="font-size:11px;color:var(--muted);">{{ entry.reason }}</td>
+                    <td><span class="badge" [class]="returnBadgeClass(entry.status)"><span class="badge-dot"></span>{{ entry.statusLabel }}</span></td>
+                  </tr>
+                }
+              }
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- VIEW: ANALYTICS -->
       <div class="view" [class.active]="activeView==='analytics'">
-        <div class="page-header"><div class="page-header-left"><div class="page-eyebrow">Relat&#xF3;rios</div><h1>Analytics</h1></div></div>
-        <div class="kpi-grid">
-          <div class="kpi-card"><div class="kpi-label">Visitas este m&#xEA;s</div><div class="kpi-value blue" style="font-size:32px;">2.841</div><div class="kpi-delta up">&#8593; +22%</div></div>
-          <div class="kpi-card"><div class="kpi-label">Taxa de convers&#xE3;o</div><div class="kpi-value green" style="font-size:32px;">1,6%</div><div class="kpi-delta up">&#8593; +0,3%</div></div>
-          <div class="kpi-card"><div class="kpi-label">Carrinho abandonado</div><div class="kpi-value red" style="font-size:32px;">68%</div><div class="kpi-delta down">&#8595; &minus;2%</div></div>
-          <div class="kpi-card"><div class="kpi-label">Ticket m&#xE9;dio</div><div class="kpi-value rose" style="font-size:32px;">103 &euro;</div><div class="kpi-delta up">&#8593; +5%</div></div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-card-title">Receita mensal &mdash; 2025</div>
-          <div class="chart-area">
-            <div class="chart-bars">
-              <div class="chart-bar-wrap"><div class="chart-bar" style="height:55%"></div><div class="chart-bar-label">Jan</div></div>
-              <div class="chart-bar-wrap"><div class="chart-bar" style="height:45%"></div><div class="chart-bar-label">Fev</div></div>
-              <div class="chart-bar-wrap"><div class="chart-bar" style="height:70%"></div><div class="chart-bar-label">Mar</div></div>
-              <div class="chart-bar-wrap"><div class="chart-bar accent" style="height:100%"></div><div class="chart-bar-label">Abr</div></div>
+        <div class="page-header"><div class="page-header-left"><div class="page-eyebrow">Relatorios</div><h1>Analytics</h1></div></div>
+        @if (analytics) {
+          <div class="kpi-grid">
+            <div class="kpi-card"><div class="kpi-label">Receita total</div><div class="kpi-value blue" style="font-size:32px;">{{ analytics.totalRevenue | number:'1.2-2' }} EUR</div></div>
+            <div class="kpi-card"><div class="kpi-label">Encomendas totais</div><div class="kpi-value green" style="font-size:32px;">{{ analytics.totalOrders }}</div></div>
+            <div class="kpi-card"><div class="kpi-label">Ticket medio</div><div class="kpi-value red" style="font-size:32px;">{{ analytics.averageOrderValue | number:'1.2-2' }} EUR</div></div>
+            <div class="kpi-card"><div class="kpi-label">Newsletter</div><div class="kpi-value rose" style="font-size:32px;">{{ analytics.newsletterSubscribers }}</div></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card-title">Receita mensal</div>
+            <div class="chart-area">
+              <div class="chart-bars">
+                @for (month of analytics.monthlyRevenue; track month.label) {
+                  <div class="chart-bar-wrap">
+                    <div class="chart-bar accent" [style.height]="chartHeight(month.total, monthlyRevenueMax)"></div>
+                    <div class="chart-bar-label">{{ month.label }}</div>
+                  </div>
+                }
+              </div>
             </div>
           </div>
-        </div>
+        }
       </div>
 
-      <!-- VIEW: SETTINGS -->
       <div class="view" [class.active]="activeView==='settings'">
-        <div class="page-header"><div class="page-header-left"><div class="page-eyebrow">Configura&#xE7;&#xE3;o</div><h1>Defini&#xE7;&#xF5;es</h1></div></div>
+        <div class="page-header"><div class="page-header-left"><div class="page-eyebrow">Configuracao</div><h1>Definicoes</h1></div></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;">
           <div class="chart-card">
             <div class="chart-card-title">Loja</div>
             <div class="form-section">
               <div class="form-grid">
-                <div class="form-field"><label>Nome da loja</label><input type="text" value="Carla Thomas Signature"></div>
-                <div class="form-field"><label>Email de contacto</label><input type="text" value="info&#64;carlathomas.pt"></div>
-                <div class="form-field span2"><label>Descri&#xE7;&#xE3;o</label><textarea>Cosm&#xE9;ticos de luxo curados com elega&#xE2;ncia.</textarea></div>
+                <div class="form-field"><label>Nome da loja</label><input type="text" [(ngModel)]="settings.storeName" name="storeName"></div>
+                <div class="form-field"><label>Email de contacto</label><input type="text" [(ngModel)]="settings.contactEmail" name="contactEmail"></div>
+                <div class="form-field span2"><label>Descricao</label><textarea [(ngModel)]="settings.description" name="storeDescription"></textarea></div>
               </div>
             </div>
-            <button class="btn btn-primary" (click)="showToast('Defini&#xE7;&#xF5;es guardadas','success')">Guardar altera&#xE7;&#xF5;es</button>
+            <button class="btn btn-primary" (click)="saveSettings()" [disabled]="savingSettings">{{ savingSettings ? 'A guardar...' : 'Guardar alteracoes' }}</button>
           </div>
           <div class="chart-card">
-            <div class="chart-card-title">Notifica&#xE7;&#xF5;es</div>
+            <div class="chart-card-title">Notificacoes</div>
             <div class="activity-list">
-              <div class="activity-item" style="padding:12px 0;"><div class="activity-text"><div class="activity-main">Novas encomendas</div></div><div class="toggle-wrap"><div class="toggle on"><div class="toggle-knob"></div></div></div></div>
-              <div class="activity-item" style="padding:12px 0;"><div class="activity-text"><div class="activity-main">Stock baixo</div></div><div class="toggle-wrap"><div class="toggle on"><div class="toggle-knob"></div></div></div></div>
-              <div class="activity-item" style="padding:12px 0;"><div class="activity-text"><div class="activity-main">Pedidos de devolu&#xE7;&#xE3;o</div></div><div class="toggle-wrap"><div class="toggle on"><div class="toggle-knob"></div></div></div></div>
-              <div class="activity-item" style="padding:12px 0;"><div class="activity-text"><div class="activity-main">Novos clientes</div></div><div class="toggle-wrap"><div class="toggle"><div class="toggle-knob"></div></div></div></div>
+              <div class="activity-item" style="padding:12px 0;"><div class="activity-text"><div class="activity-main">Novas encomendas</div></div><div class="toggle-wrap"><div class="toggle" [class.on]="settings.notifyOrders" (click)="settings.notifyOrders = !settings.notifyOrders"><div class="toggle-knob"></div></div></div></div>
+              <div class="activity-item" style="padding:12px 0;"><div class="activity-text"><div class="activity-main">Stock baixo</div></div><div class="toggle-wrap"><div class="toggle" [class.on]="settings.notifyLowStock" (click)="settings.notifyLowStock = !settings.notifyLowStock"><div class="toggle-knob"></div></div></div></div>
+              <div class="activity-item" style="padding:12px 0;"><div class="activity-text"><div class="activity-main">Pedidos de devolucao</div></div><div class="toggle-wrap"><div class="toggle" [class.on]="settings.notifyReturns" (click)="settings.notifyReturns = !settings.notifyReturns"><div class="toggle-knob"></div></div></div></div>
+              <div class="activity-item" style="padding:12px 0;"><div class="activity-text"><div class="activity-main">Novos clientes</div></div><div class="toggle-wrap"><div class="toggle" [class.on]="settings.notifyNewCustomers" (click)="settings.notifyNewCustomers = !settings.notifyNewCustomers"><div class="toggle-knob"></div></div></div></div>
             </div>
           </div>
         </div>
-      </div>
-
-    </div><!-- /content -->
-  </div><!-- /main -->
-
-  <!-- ORDER DETAIL PANEL -->
-  <div class="side-panel-overlay" [class.open]="orderPanelOpen" (click)="closeOrderPanel()">
-    <div class="side-panel" (click)="$event.stopPropagation()">
-      <div class="side-panel-header">
-        <div>
-          <div class="side-panel-title">Encomenda #{{ currentOrderId }}</div>
-          <div class="side-panel-sub">Detalhe e gest&#xE3;o de estado</div>
-        </div>
-        <button class="panel-close" (click)="closeOrderPanel()">&#215;</button>
-      </div>
-      <div class="side-panel-body">
-        <div class="order-detail-timeline">
-          <div class="ot-step done"><div class="ot-node"><svg width="12" height="12" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ot-label">Recebida</div></div>
-          <div class="ot-step done"><div class="ot-node"><svg width="12" height="12" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ot-label">Processada</div></div>
-          <div class="ot-step active"><div class="ot-node"><svg width="12" height="12" fill="none" stroke="var(--rose-gold)" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/></svg></div><div class="ot-label">Em tr&#xE2;nsito</div></div>
-          <div class="ot-step"><div class="ot-node"></div><div class="ot-label">Entregue</div></div>
-        </div>
-        <div class="status-change">
-          <span class="status-change-label">Alterar estado</span>
-          <select><option>Processando</option><option>Em tr&#xE2;nsito</option><option selected>Entregue</option><option>Cancelada</option></select>
-          <button class="btn btn-primary btn-sm" (click)="showToast('Estado actualizado','success')">Actualizar</button>
-        </div>
-        <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);font-weight:300;margin:20px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--border);">Artigos</div>
-        <div class="mini-item-row">
-          <div class="mini-thumb" style="background:linear-gradient(145deg,#C9A08A,#A07050);"></div>
-          <div class="mini-item-info">
-            <div class="mini-item-brand">Charlotte Tilbury</div>
-            <div class="mini-item-name">Pillow Talk Lipstick</div>
-            <div class="mini-item-meta">Qty: 1</div>
-          </div>
-          <div class="mini-item-price">33,60 &euro;</div>
-        </div>
-        <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);font-weight:300;margin:20px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--border);">Resumo</div>
-        <div class="info-row"><span class="lbl">Subtotal</span><span class="val">33,60 &euro;</span></div>
-        <div class="info-row"><span class="lbl">Envio</span><span class="val">5,90 &euro;</span></div>
-        <div class="info-row"><span class="lbl">Total</span><span class="val rose">39,50 &euro;</span></div>
-        <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);font-weight:300;margin:20px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--border);">Entrega</div>
-        <div class="info-row"><span class="lbl">Transportadora</span><span class="val">CTT Urgente</span></div>
-        <div class="info-row"><span class="lbl">Tracking</span><span class="val" style="font-family:'Cormorant Garamond',serif;font-style:italic;">PT924991011PT</span></div>
-      </div>
-      <div class="side-panel-footer">
-        <button class="btn btn-ghost" (click)="closeOrderPanel()">Fechar</button>
-        <button class="btn btn-primary" (click)="showToast('Encomenda actualizada','success')">Guardar</button>
       </div>
     </div>
   </div>
 
-  <!-- PRODUCT EDIT PANEL -->
-  <div class="side-panel-overlay" [class.open]="productPanelOpen" (click)="closeProductPanel()">
+  <div class="side-panel-overlay" [class.open]="orderPanelOpen" (click)="closeOrderPanel()">
+    <div class="side-panel" (click)="$event.stopPropagation()">
+      <div class="side-panel-header">
+        <div>
+          <div class="side-panel-title">Encomenda {{ currentOrder?.id || currentOrderId }}</div>
+          <div class="side-panel-sub">Detalhe e gestao de estado</div>
+        </div>
+        <button class="panel-close" (click)="closeOrderPanel()">X</button>
+      </div>
+      <div class="side-panel-body">
+        @if (currentOrder) {
+          <div class="status-change">
+            <span class="status-change-label">Alterar estado</span>
+            <select [(ngModel)]="orderStatusDraft" name="orderStatusDraft">
+              <option value="processando">Processando</option>
+              <option value="em_transito">Em transito</option>
+              <option value="entregue">Entregue</option>
+              <option value="cancelada">Cancelada</option>
+              <option value="pending_payment">Pagamento pendente</option>
+            </select>
+            <button class="btn btn-primary btn-sm" (click)="saveOrderStatus()" [disabled]="savingOrder">{{ savingOrder ? 'A guardar...' : 'Actualizar' }}</button>
+          </div>
+
+          <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);font-weight:300;margin:20px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--border);">Artigos</div>
+          @for (item of currentOrder.items; track item.productId + '-' + item.productName) {
+            <div class="mini-item-row">
+              <div class="mini-thumb" style="background:linear-gradient(145deg,#C9A08A,#A07050);"></div>
+              <div class="mini-item-info">
+                <div class="mini-item-brand">{{ item.productBrand }}</div>
+                <div class="mini-item-name">{{ item.productName }}</div>
+                <div class="mini-item-meta">Qty: {{ item.quantity }}</div>
+              </div>
+              <div class="mini-item-price">{{ item.unitPrice | number:'1.2-2' }} EUR</div>
+            </div>
+          }
+
+          <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);font-weight:300;margin:20px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--border);">Resumo</div>
+          <div class="info-row"><span class="lbl">Subtotal</span><span class="val">{{ currentOrder.subtotal | number:'1.2-2' }} EUR</span></div>
+          <div class="info-row"><span class="lbl">Envio</span><span class="val">{{ currentOrder.shipping | number:'1.2-2' }} EUR</span></div>
+          <div class="info-row"><span class="lbl">Desconto</span><span class="val">{{ currentOrder.discount | number:'1.2-2' }} EUR</span></div>
+          <div class="info-row"><span class="lbl">Total</span><span class="val rose">{{ currentOrder.total | number:'1.2-2' }} EUR</span></div>
+
+          <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);font-weight:300;margin:20px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--border);">Cliente</div>
+          <div class="info-row"><span class="lbl">Nome</span><span class="val">{{ currentOrder.customerName }}</span></div>
+          <div class="info-row"><span class="lbl">Email</span><span class="val">{{ currentOrder.customerEmail }}</span></div>
+          <div class="info-row"><span class="lbl">Telefone</span><span class="val">{{ currentOrder.customerPhone || '-' }}</span></div>
+          <div class="info-row"><span class="lbl">Morada</span><span class="val">{{ currentOrder.customerAddress || '-' }}</span></div>
+          <div class="info-row"><span class="lbl">Cidade</span><span class="val">{{ currentOrder.customerPostcode || '' }} {{ currentOrder.customerCity || '' }}</span></div>
+        } @else {
+          <div style="color:var(--muted);">A carregar detalhe da encomenda...</div>
+        }
+      </div>
+      <div class="side-panel-footer">
+        <button class="btn btn-ghost" (click)="closeOrderPanel()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+      <div class="side-panel-overlay" [class.open]="productPanelOpen" (click)="closeProductPanel()">
     <div class="side-panel" (click)="$event.stopPropagation()">
       <div class="side-panel-header">
         <div>
           <div class="side-panel-title">{{ currentProductId === 'new' ? 'Novo produto' : 'Editar produto' }}</div>
-          <div class="side-panel-sub">Informa&#xE7;&#xE3;o e stock</div>
+          <div class="side-panel-sub">Informacao e stock</div>
         </div>
-        <button class="panel-close" (click)="closeProductPanel()">&#215;</button>
+        <button class="panel-close" (click)="closeProductPanel()">X</button>
       </div>
       <div class="side-panel-body">
         <div class="form-section">
-          <div class="form-section-title">Informa&#xE7;&#xE3;o geral</div>
+          <div class="form-section-title">Informacao geral</div>
           <div class="form-grid cols2">
             <div class="form-field span2">
               <label>Fotografia do produto</label>
@@ -573,36 +509,37 @@
                 <input type="file" accept="image/*" (change)="onProductImageSelected($event)">
               </label>
             </div>
-            <div class="form-field span2"><label>Nome do produto</label><input type="text" placeholder="Ex: Pillow Talk Lipstick" [(ngModel)]="productForm.name" name="productName"></div>
-            <div class="form-field"><label>Marca</label><input type="text" placeholder="Ex: Charlotte Tilbury" [(ngModel)]="productForm.brand" name="productBrand"></div>
-            <div class="form-field"><label>Categoria</label><select [(ngModel)]="productForm.category" name="productCategory"><option>Lábios</option><option>Rosto</option><option>Olhos</option><option>Corpo</option><option>Acessórios</option></select></div>
-            <div class="form-field"><label>Pre&#xE7;o (EUR)</label><input type="number" placeholder="0.00" [(ngModel)]="productForm.price" name="productPrice"></div>
-            <div class="form-field"><label>Pre&#xE7;o promocional</label><input type="number" placeholder="0.00" [(ngModel)]="productForm.originalPrice" name="productOriginalPrice"></div>
-            <div class="form-field span2"><label>Descri&#xE7;&#xE3;o</label><textarea placeholder="Descri&#xE7;&#xE3;o do produto..." [(ngModel)]="productForm.description" name="productDescription"></textarea></div>
+            <div class="form-field span2"><label>Nome do produto</label><input type="text" [(ngModel)]="productForm.name" name="productName"></div>
+            <div class="form-field"><label>Marca</label><input type="text" [(ngModel)]="productForm.brand" name="productBrand"></div>
+            <div class="form-field"><label>Categoria</label><select [(ngModel)]="productForm.category" name="productCategory"><option>Labios</option><option>Rosto</option><option>Olhos</option><option>Corpo</option><option>Acessorios</option></select></div>
+            <div class="form-field"><label>Preco (EUR)</label><input type="number" [(ngModel)]="productForm.price" name="productPrice"></div>
+            <div class="form-field"><label>Preco promocional</label><input type="number" [(ngModel)]="productForm.originalPrice" name="productOriginalPrice"></div>
+            <div class="form-field span2"><label>Descricao</label><textarea [(ngModel)]="productForm.description" name="productDescription"></textarea></div>
           </div>
         </div>
         <div class="form-section">
           <div class="form-section-title">Stock e visibilidade</div>
           <div class="form-grid cols3">
-            <div class="form-field"><label>Stock</label><input type="number" placeholder="0" [(ngModel)]="productForm.stock" name="productStock"></div>
-            <div class="form-field"><label>Etiqueta</label><input type="text" placeholder="Novo" [(ngModel)]="productForm.badge" name="productBadge"></div>
-            <div class="form-field"><label>Acabamentos</label><input type="text" placeholder="Matte, Brilhante" [(ngModel)]="productForm.finishes" name="productFinishes"></div>
-            <div class="form-field span2"><label>Tons</label><input type="text" placeholder="Pillow Talk, Rose, Nude" [(ngModel)]="productForm.shades" name="productShades"></div>
+            <div class="form-field"><label>Stock</label><input type="number" [(ngModel)]="productForm.stock" name="productStock"></div>
+            <div class="form-field"><label>Etiqueta</label><input type="text" [(ngModel)]="productForm.badge" name="productBadge"></div>
+            <div class="form-field"><label>Acabamentos</label><input type="text" [(ngModel)]="productForm.finishes" name="productFinishes"></div>
+            <div class="form-field span2"><label>Tons</label><input type="text" [(ngModel)]="productForm.shades" name="productShades"></div>
           </div>
         </div>
       </div>
       <div class="side-panel-footer">
+        @if (currentProductId !== 'new') {
+          <button class="btn btn-ghost danger" (click)="deleteCurrentProduct()">Apagar</button>
+        }
         <button class="btn btn-ghost" (click)="closeProductPanel()">Cancelar</button>
         <button class="btn btn-primary" [disabled]="savingProduct" (click)="saveProduct()">{{ savingProduct ? 'A guardar...' : 'Guardar produto' }}</button>
       </div>
     </div>
   </div>
 
-  <!-- TOAST -->
   <div class="toast" [class.success]="toastType==='success'" [class.error]="toastType==='error'" *ngIf="toastVisible">
     <svg *ngIf="toastType==='success'" width="14" height="14" fill="none" stroke="var(--success)" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
     <svg *ngIf="toastType==='error'" width="14" height="14" fill="none" stroke="var(--danger)" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
     {{ toastMessage }}
   </div>
-
 </div>
