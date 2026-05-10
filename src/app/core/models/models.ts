@@ -17,6 +17,7 @@ export interface Product {
   howToApply?: string;
   ingredients?: string;
   image?: string;
+  galleryImages?: string[];
   stock?: number;
   isActive?: boolean;
 }

@@ -140,95 +140,23 @@ ensureColumn('orders', 'stripe_payment_intent_id', 'TEXT');
 
 const seedProducts = [
   {
-    id: 1, brand: 'Charlotte Tilbury', name: 'Pillow Talk Lipstick',
-    price: 33.60, originalPrice: 42.00, badge: '-20%', badgeDark: true,
-    gradientFrom: '#C9A08A', gradientTo: '#A07050',
-    rating: 4.2, reviewCount: 184, category: 'Labios', stock: 32,
-    shades: [
-      { name: 'Pillow Talk', color: '#C9956A' },
-      { name: 'Coral Bliss', color: '#D4806A' },
-      { name: 'Berry Kiss', color: '#8B3A5A' },
-      { name: 'Rouge Red', color: '#B02A2A' },
-      { name: 'Mocha Rose', color: '#7A4A3A' },
-      { name: 'Dusty Pink', color: '#D4A0A8' }
-    ],
-    finishes: ['Matte', 'Acetinado', 'Brilhante'],
-    description: 'O batom mais iconico da Charlotte Tilbury, numa tonalidade nude-rosa universal.',
-    howToApply: 'Aplique do centro para o exterior dos labios e finalize com liner para maior definicao.',
-    ingredients: 'Ricinus Communis Seed Oil, Ozokerite, Candelilla Cera, Tocopheryl Acetate, Hyaluronic Acid.',
-    image: 'assets/produtos/pillow-talk-lipstick.jpg'
-  },
-  {
-    id: 2, brand: 'Charlotte Tilbury', name: 'Pillow Talk Lip Liner',
-    price: 18.00, gradientFrom: '#2A2220', gradientTo: '#1A1714',
-    rating: 4.8, reviewCount: 248, category: 'Labios', badge: 'Novo', stock: 42,
-    shades: [{ name: 'Pillow Talk', color: '#C9956A' }, { name: 'Medium', color: '#A07050' }],
-    finishes: ['Classico'], description: 'Lapis de labios nude-rosa para definir e preencher.'
-  },
-  {
-    id: 3, brand: 'Carla Thomas', name: 'Rose Glow Lip Gloss',
-    price: 28.00, badge: 'Exclusivo', gradientFrom: '#E8D0C0', gradientTo: '#D4B8A8',
-    rating: 5.0, reviewCount: 312, category: 'Labios', stock: 24,
-    shades: [{ name: 'Rose Gold', color: '#C9956A' }, { name: 'Champagne', color: '#E8C4A8' }],
-    finishes: ['Brilhante'], description: 'Gloss exclusivo com efeito volume e brilho rose dourado.'
-  },
-  {
-    id: 4, brand: 'NARS', name: 'Afterglow Lip Balm',
-    price: 26.00, gradientFrom: '#D4C4B5', gradientTo: '#C4B0A0',
-    rating: 4.1, reviewCount: 97, category: 'Labios', stock: 18,
-    shades: [{ name: 'Nude', color: '#C9956A' }, { name: 'Rosa', color: '#E8B4B8' }],
-    finishes: ['Hidratante'], description: 'Balsamo nutritivo com cor subtil e brilho natural.'
-  },
-  {
-    id: 5, brand: 'La Mer', name: 'Creme de la Mer',
-    price: 185.00, gradientFrom: '#C4B0A0', gradientTo: '#B09080',
-    rating: 4.6, reviewCount: 203, category: 'Rosto', stock: 8,
-    description: 'Creme lendario de skincare de luxo.'
-  },
-  {
-    id: 6, brand: 'Dior Beauty', name: 'Rouge Dior Satin',
-    price: 39.00, gradientFrom: '#3A302C', gradientTo: '#2A2220',
-    rating: 4.3, reviewCount: 156, category: 'Labios', stock: 26,
-    shades: [{ name: 'Rouge', color: '#B02A2A' }, { name: 'Rose', color: '#D4A0A8' }],
-    finishes: ['Acetinado'], description: 'Textura sedosa com acabamento acetinado.'
-  },
-  {
-    id: 7, brand: 'Armani Beauty', name: 'Lip Maestro Velvet',
-    price: 38.00, gradientFrom: '#B8A898', gradientTo: '#A09080',
-    rating: 3.9, reviewCount: 67, category: 'Labios', stock: 0,
-    description: 'Batom liquido de acabamento aveludado.'
-  },
-  {
-    id: 8, brand: 'Charlotte Tilbury', name: 'Matte Revolution',
-    price: 44.00, badge: 'Novo', gradientFrom: '#E8C4B0', gradientTo: '#D4A890',
-    rating: 4.9, reviewCount: 89, category: 'Labios', stock: 15,
-    shades: [{ name: 'Pillow Talk', color: '#C9956A' }, { name: 'Very Victoria', color: '#D4806A' }],
-    finishes: ['Matte'], description: 'Formula matte com acido hialuronico.'
-  },
-  {
-    id: 9, brand: 'NARS', name: 'Velvet Lip Glide',
-    price: 27.20, originalPrice: 32.00, badge: '-15%', badgeDark: true,
-    gradientFrom: '#4A3030', gradientTo: '#3A2020',
-    rating: 3.7, reviewCount: 43, category: 'Labios', stock: 14,
-    description: 'Acabamento liquido sedoso e cor pigmentada.'
-  },
-  {
-    id: 10, brand: 'Charlotte Tilbury', name: 'Glowgasm Lips',
-    price: 36.00, gradientFrom: '#F0E8E0', gradientTo: '#E0D4C4',
-    rating: 4.8, reviewCount: 201, category: 'Labios', stock: 22,
-    description: 'Brilho multidimensional para labios luminosos.'
-  },
-  {
-    id: 11, brand: 'Sana Jardin', name: 'Jaipur Chant No. 8',
-    price: 89.00, gradientFrom: '#2A2418', gradientTo: '#1A1810',
-    rating: 4.5, reviewCount: 128, category: 'Acessorios', stock: 11,
-    description: 'Eau de Parfum com especiarias e jasmim.'
-  },
-  {
-    id: 12, brand: 'Armani Beauty', name: 'Luminous Silk Foundation',
-    price: 62.00, gradientFrom: '#D4C0A8', gradientTo: '#C4B098',
-    rating: 4.7, reviewCount: 345, category: 'Rosto', stock: 19,
-    description: 'Base sedosa de cobertura luminosa.'
+    id: 1,
+    brand: 'Debi',
+    name: 'Debi Velvet Lip Cloud',
+    price: 24.90,
+    badge: 'Novo',
+    gradientFrom: '#E4C6BD',
+    gradientTo: '#A85D5A',
+    rating: 5.0,
+    reviewCount: 12,
+    category: 'Labios',
+    stock: 18,
+    shades: [{ name: 'Rosewood Muse', color: '#A55258' }],
+    finishes: ['Velvet', 'Longa duração'],
+    description: 'Batom liquido com cor rosewood elegante, cobertura uniforme e acabamento aveludado confortavel.',
+    howToApply: 'Aplique uma camada fina no centro dos labios e esbata para o contorno. Para maior intensidade, repita apos alguns segundos.',
+    ingredients: 'Isododecane, Dimethicone, Trimethylsiloxysilicate, Silica, Synthetic Fluorphlogopite, Tocopherol, Aroma.',
+    image: 'assets/produtos/debi-101.jpg'
   }
 ];
 
