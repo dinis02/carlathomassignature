@@ -43,7 +43,10 @@ async function sendTransactionalEmail({ to, subject, html, text }) {
     host: config.host,
     port: config.port,
     secure: config.secure,
-    auth: config.auth
+    auth: config.auth,
+    connectionTimeout: Number(process.env.SMTP_CONNECTION_TIMEOUT || 15000),
+    greetingTimeout: Number(process.env.SMTP_GREETING_TIMEOUT || 15000),
+    socketTimeout: Number(process.env.SMTP_SOCKET_TIMEOUT || 20000)
   });
 
   await transporter.sendMail({
