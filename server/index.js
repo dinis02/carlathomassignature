@@ -1433,7 +1433,10 @@ app.post('/api/products', uploadProductImages, async (req, res) => {
       if (fullError) throw fullError;
       return res.status(201).json(mapSupabaseProduct(fullProduct));
     } catch (err) {
-      console.warn('Supabase create product fallback:', err.message);
+      console.warn('Supabase create product failed:', err.message);
+      return res.status(500).json({
+        error: err.message || 'Nao foi possivel guardar o produto na base de dados'
+      });
     }
   }
 
@@ -1567,7 +1570,10 @@ app.put('/api/products/:id', uploadProductImages, async (req, res) => {
       if (fullError) throw fullError;
       return res.json(mapSupabaseProduct(fullProduct));
     } catch (err) {
-      console.warn('Supabase update product fallback:', err.message);
+      console.warn('Supabase update product failed:', err.message);
+      return res.status(500).json({
+        error: err.message || 'Nao foi possivel atualizar o produto na base de dados'
+      });
     }
   }
 

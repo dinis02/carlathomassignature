@@ -27,10 +27,80 @@ import { LoginModalComponent } from '../login-modal.component';
             <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
           </svg>
         </button>
-        <nav class="nav-left">
-          <a routerLink="/produtos" [queryParams]="{cat:'Maquilhagem'}" class="nav-link" routerLinkActive="active">Maquilhagem</a>
-          <a routerLink="/produtos" [queryParams]="{cat:'Cabelo'}" class="nav-link">Cabelo</a>
-          <a routerLink="/produtos" [queryParams]="{cat:'Rosto'}" class="nav-link">Rosto</a>
+        <nav class="nav-left mega-nav">
+          <div class="nav-item" (pointerenter)="setMegaMenu('maquilhagem')" (mouseover)="setMegaMenu('maquilhagem')" (mouseleave)="clearMegaMenu()" [class.mega-open]="activeMegaMenu === 'maquilhagem'">
+            <a routerLink="/produtos" [queryParams]="{cat:'Maquilhagem'}" class="nav-link" routerLinkActive="active">Maquilhagem</a>
+            <div class="mega-menu">
+              <div class="mega-inner">
+                <div class="mega-feature">
+                  <span>Nova colecao</span>
+                  <strong>Maquilhagem de assinatura</strong>
+                  <p>Batom, bases, blush e essenciais para acabamento luminoso.</p>
+                </div>
+                <div class="mega-col">
+                  <h4>Categoria</h4>
+                  <a routerLink="/produtos" [queryParams]="{cat:'Maquilhagem'}">Ver maquilhagem</a>
+                  <a routerLink="/produtos" [queryParams]="{cat:'Labios'}">Labios</a>
+                  <a routerLink="/produtos" [queryParams]="{cat:'Rosto'}">Rosto</a>
+                  <a routerLink="/produtos" [queryParams]="{cat:'Olhos'}">Olhos</a>
+                </div>
+                <div class="mega-col">
+                  <h4>Edicao</h4>
+                  <a routerLink="/produtos" [queryParams]="{q:'Debi'}">Debi</a>
+                  <a routerLink="/produtos" [queryParams]="{q:'batom'}">Batons</a>
+                  <a routerLink="/produtos" [queryParams]="{q:'novo'}">Novidades</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="nav-item" (pointerenter)="setMegaMenu('cabelo')" (mouseover)="setMegaMenu('cabelo')" (mouseleave)="clearMegaMenu()" [class.mega-open]="activeMegaMenu === 'cabelo'">
+            <a routerLink="/produtos" [queryParams]="{cat:'Cabelo'}" class="nav-link">Cabelo</a>
+            <div class="mega-menu">
+              <div class="mega-inner">
+                <div class="mega-feature">
+                  <span>Ritual capilar</span>
+                  <strong>Cuidado suave e sofisticado</strong>
+                  <p>Produtos e acessorios para cabelo com acabamento elegante.</p>
+                </div>
+                <div class="mega-col">
+                  <h4>Cabelo</h4>
+                  <a routerLink="/produtos" [queryParams]="{cat:'Cabelo'}">Ver tudo</a>
+                  <a routerLink="/produtos" [queryParams]="{q:'escova'}">Escovas</a>
+                  <a routerLink="/produtos" [queryParams]="{q:'serum'}">Seruns</a>
+                </div>
+                <div class="mega-col">
+                  <h4>Rotina</h4>
+                  <a routerLink="/produtos" [queryParams]="{q:'brilho'}">Brilho</a>
+                  <a routerLink="/produtos" [queryParams]="{q:'hidratacao'}">Hidratacao</a>
+                  <a routerLink="/produtos" [queryParams]="{q:'penteado'}">Finalizacao</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="nav-item" (pointerenter)="setMegaMenu('rosto')" (mouseover)="setMegaMenu('rosto')" (mouseleave)="clearMegaMenu()" [class.mega-open]="activeMegaMenu === 'rosto'">
+            <a routerLink="/produtos" [queryParams]="{cat:'Rosto'}" class="nav-link">Rosto</a>
+            <div class="mega-menu">
+              <div class="mega-inner">
+                <div class="mega-feature">
+                  <span>Skincare</span>
+                  <strong>Pele luminosa todos os dias</strong>
+                  <p>Curadoria para limpeza, hidratacao e acabamento natural.</p>
+                </div>
+                <div class="mega-col">
+                  <h4>Rosto</h4>
+                  <a routerLink="/produtos" [queryParams]="{cat:'Rosto'}">Ver tudo</a>
+                  <a routerLink="/produtos" [queryParams]="{q:'creme'}">Cremes</a>
+                  <a routerLink="/produtos" [queryParams]="{q:'serum'}">Seruns</a>
+                </div>
+                <div class="mega-col">
+                  <h4>Necessidade</h4>
+                  <a routerLink="/produtos" [queryParams]="{q:'luminosidade'}">Luminosidade</a>
+                  <a routerLink="/produtos" [queryParams]="{q:'hidratacao'}">Hidratacao</a>
+                  <a routerLink="/produtos" [queryParams]="{q:'anti idade'}">Anti-idade</a>
+                </div>
+              </div>
+            </div>
+          </div>
         </nav>
 
         <a routerLink="/" class="logo">
@@ -38,17 +108,110 @@ import { LoginModalComponent } from '../login-modal.component';
         </a>
 
         <div class="nav-right">
-          <nav style="display:flex;gap:36px;">
-            <a routerLink="/produtos" [queryParams]="{cat:'Corpo'}" class="nav-link">Corpo</a>
-            <a routerLink="/produtos" [queryParams]="{cat:'Acessórios'}" class="nav-link">Acessórios</a>
-            <a routerLink="/produtos" class="nav-link">Marcas</a>
+          <nav class="mega-nav nav-right-links">
+            <div class="nav-item" (pointerenter)="setMegaMenu('corpo')" (mouseover)="setMegaMenu('corpo')" (mouseleave)="clearMegaMenu()" [class.mega-open]="activeMegaMenu === 'corpo'">
+              <a routerLink="/produtos" [queryParams]="{cat:'Corpo'}" class="nav-link">Corpo</a>
+              <div class="mega-menu">
+                <div class="mega-inner">
+                  <div class="mega-feature">
+                    <span>Corpo</span>
+                    <strong>Texturas ricas para um ritual completo</strong>
+                    <p>Hidratantes, cremes e cuidados corporais com acabamento premium.</p>
+                  </div>
+                  <div class="mega-col">
+                    <h4>Comprar</h4>
+                    <a routerLink="/produtos" [queryParams]="{cat:'Corpo'}">Ver corpo</a>
+                    <a routerLink="/produtos" [queryParams]="{q:'body cream'}">Body cream</a>
+                    <a routerLink="/produtos" [queryParams]="{q:'hidratante'}">Hidratantes</a>
+                  </div>
+                  <div class="mega-col">
+                    <h4>Destaques</h4>
+                    <a routerLink="/produtos" [queryParams]="{q:'novo'}">Novidades</a>
+                    <a routerLink="/produtos" [queryParams]="{q:'premium'}">Premium</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="nav-item" (pointerenter)="setMegaMenu('acessorios')" (mouseover)="setMegaMenu('acessorios')" (mouseleave)="clearMegaMenu()" [class.mega-open]="activeMegaMenu === 'acessorios'">
+              <a routerLink="/produtos" [queryParams]="{cat:'Acessórios'}" class="nav-link">Acessórios</a>
+              <div class="mega-menu">
+                <div class="mega-inner">
+                  <div class="mega-feature">
+                    <span>Acessorios</span>
+                    <strong>Ferramentas bonitas para a rotina</strong>
+                    <p>Espelhos, pincéis e detalhes que completam a experiencia de beleza.</p>
+                  </div>
+                  <div class="mega-col">
+                    <h4>Comprar</h4>
+                    <a routerLink="/produtos" [queryParams]="{cat:'Acessórios'}">Ver acessorios</a>
+                    <a routerLink="/produtos" [queryParams]="{q:'pincel'}">Pinceis</a>
+                    <a routerLink="/produtos" [queryParams]="{q:'espelho'}">Espelhos</a>
+                  </div>
+                  <div class="mega-col">
+                    <h4>Essenciais</h4>
+                    <a routerLink="/produtos" [queryParams]="{q:'organizador'}">Organizadores</a>
+                    <a routerLink="/produtos" [queryParams]="{q:'kit'}">Kits</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="nav-item" (pointerenter)="setMegaMenu('marcas')" (mouseover)="setMegaMenu('marcas')" (mouseleave)="clearMegaMenu()" [class.mega-open]="activeMegaMenu === 'marcas'">
+              <a routerLink="/produtos" class="nav-link">Marcas</a>
+              <div class="mega-menu">
+                <div class="mega-inner">
+                  <div class="mega-feature">
+                    <span>Marcas</span>
+                    <strong>Curadoria de nomes selecionados</strong>
+                    <p>Explore Debi, Dior, Chanel, Boca Rosa e outras escolhas da loja.</p>
+                  </div>
+                  <div class="mega-col">
+                    <h4>Marcas</h4>
+                    <a routerLink="/produtos" [queryParams]="{q:'Debi'}">Debi</a>
+                    <a routerLink="/produtos" [queryParams]="{q:'Dior'}">Dior</a>
+                    <a routerLink="/produtos" [queryParams]="{q:'Chanel'}">Chanel</a>
+                    <a routerLink="/produtos" [queryParams]="{q:'Boca Rosa'}">Boca Rosa</a>
+                  </div>
+                  <div class="mega-col">
+                    <h4>Comprar</h4>
+                    <a routerLink="/produtos">Todas as marcas</a>
+                    <a routerLink="/produtos" [queryParams]="{q:'novo'}">Novidades</a>
+                  </div>
+                </div>
+              </div>
+            </div>
           </nav>
           <div class="header-icons">
-            <button class="icon-btn" title="Pesquisar" aria-label="Pesquisar" (click)="toggleSearch()">
-              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/>
-              </svg>
-            </button>
+            <div class="nav-item search-trigger" (pointerenter)="openSearchMenu()" (mouseover)="openSearchMenu()" (mouseleave)="closeSearchMenu()" [class.mega-open]="activeMegaMenu === 'search' || searchOpen">
+              <button class="icon-btn" title="Pesquisar" aria-label="Pesquisar" (click)="toggleSearch($event)">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/>
+                </svg>
+              </button>
+              <form class="mega-menu search-mega" (submit)="submitSearch($event)">
+                <div class="mega-inner search-inner">
+                  <div class="mega-feature">
+                    <span>Pesquisa</span>
+                    <strong>Encontre o produto certo</strong>
+                    <p>Procure por produto, categoria ou marca e continue diretamente para a loja.</p>
+                  </div>
+                  <div class="search-field">
+                    <label class="search-label" for="headerSearch">Pesquisar</label>
+                    <input
+                      id="headerSearch"
+                      class="header-search-input"
+                      name="headerSearch"
+                      [(ngModel)]="searchTerm"
+                      type="search"
+                      autocomplete="off"
+                      placeholder="Produto, marca ou categoria"
+                      (keydown.escape)="closeSearch()">
+                  </div>
+                  <div class="search-actions">
+                    <button class="search-submit" type="submit">Pesquisar</button>
+                  </div>
+                </div>
+              </form>
+            </div>
             <button class="icon-btn" [title]="auth.session() ? 'A minha conta' : 'Conta'" aria-label="Conta" (click)="handleAccountClick()">
               <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
@@ -84,23 +247,6 @@ import { LoginModalComponent } from '../login-modal.component';
         </div>
       </div>
     </header>
-    @if (searchOpen) {
-      <div class="search-backdrop" (click)="closeSearch()"></div>
-      <form class="header-search-panel" (submit)="submitSearch($event)">
-        <label class="search-label" for="headerSearch">Pesquisar</label>
-        <input
-          id="headerSearch"
-          class="header-search-input"
-          name="headerSearch"
-          [(ngModel)]="searchTerm"
-          type="search"
-          autocomplete="off"
-          placeholder="Produto, marca ou categoria"
-          (keydown.escape)="closeSearch()">
-        <button class="search-submit" type="submit">Pesquisar</button>
-        <button class="search-close" type="button" aria-label="Fechar pesquisa" (click)="closeSearch()">Fechar</button>
-      </form>
-    }
     <div class="mobile-menu-backdrop" *ngIf="mobileMenuOpen" (click)="closeMobileMenu()"></div>
     <nav class="mobile-menu" [class.open]="mobileMenuOpen" aria-label="Menu mobile">
       <div class="mobile-menu-head">
@@ -131,16 +277,26 @@ import { LoginModalComponent } from '../login-modal.component';
     <app-admin-modal *ngIf="shouldShowAdminModal"></app-admin-modal>
   `,
   styles: [`
+    :host {
+      display: block;
+      height: 107px;
+    }
+
     .announcement {
       background: var(--noir); color: var(--creme);
       text-align: center; padding: 10px 20px;
       font-size: 11px; letter-spacing: 2.5px;
       text-transform: uppercase; font-weight: 200;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 130;
     }
     .announcement span { color: var(--rose-gold); }
 
     header {
-      position: sticky; top: 0; z-index: 100;
+      position: fixed; top: 35px; left: 0; right: 0; z-index: 129;
       background: rgba(247,244,240,0.92);
       backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border);
@@ -156,6 +312,103 @@ import { LoginModalComponent } from '../login-modal.component';
       display: flex; gap: 36px; align-items: center;
     }
     .nav-right { justify-content: flex-end; }
+    .mega-nav {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+    }
+    .nav-right-links {
+      gap: 36px;
+    }
+    .nav-item {
+      position: static;
+      height: 72px;
+      display: flex;
+      align-items: center;
+    }
+    .nav-item > .nav-link {
+      height: 72px;
+      display: flex;
+      align-items: center;
+    }
+    .mega-menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      z-index: 120;
+      background: rgba(247, 244, 240, 0.98);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 24px 60px rgba(20, 16, 13, 0.12);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 180ms ease, visibility 180ms ease;
+    }
+    .nav-item:hover .mega-menu,
+    .nav-item:focus-within .mega-menu,
+    .nav-item.mega-open .mega-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .mega-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 34px 48px 38px;
+      display: grid;
+      grid-template-columns: minmax(280px, 1.2fr) minmax(180px, 0.7fr) minmax(180px, 0.7fr);
+      gap: 54px;
+    }
+    .mega-feature span,
+    .mega-col h4 {
+      display: block;
+      margin: 0 0 14px;
+      color: var(--rose-gold);
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      font-weight: 300;
+    }
+    .mega-feature strong {
+      display: block;
+      color: var(--noir);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(30px, 3vw, 44px);
+      line-height: 0.95;
+      font-weight: 300;
+      max-width: 420px;
+    }
+    .mega-feature p {
+      margin: 16px 0 0;
+      max-width: 430px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.9;
+      font-weight: 300;
+    }
+    .mega-col {
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+      padding-top: 5px;
+    }
+    .mega-col a {
+      color: var(--noir);
+      font-size: 13px;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      text-decoration: none;
+      font-weight: 300;
+      transition: color 160ms ease, transform 160ms ease;
+    }
+    .mega-col a:hover {
+      color: var(--rose-gold);
+      transform: translateX(4px);
+    }
 
     .logo {
       text-align: center; color: var(--noir); cursor: none;
@@ -206,27 +459,29 @@ import { LoginModalComponent } from '../login-modal.component';
       font-weight: 400;
     }
 
-    .search-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(26,23,20,0.22);
-      z-index: 98;
+    .search-trigger {
+      height: 72px;
     }
 
-    .header-search-panel {
-      position: fixed;
-      top: 72px;
-      left: 0;
-      right: 0;
-      z-index: 101;
-      background: rgba(247,244,240,0.98);
-      border-bottom: 1px solid var(--border);
-      box-shadow: 0 18px 48px rgba(26,23,20,0.10);
-      padding: 18px 48px;
+    .search-mega {
+      cursor: default;
+    }
+
+    .search-inner {
       display: grid;
-      grid-template-columns: auto minmax(180px, 1fr) auto auto;
-      align-items: center;
-      gap: 16px;
+      grid-template-columns: minmax(260px, 0.85fr) minmax(320px, 1fr) auto;
+      align-items: end;
+      gap: 42px;
+    }
+
+    .search-field {
+      display: grid;
+      gap: 12px;
+    }
+
+    .search-actions {
+      display: flex;
+      gap: 10px;
     }
 
     .search-label {
@@ -239,10 +494,10 @@ import { LoginModalComponent } from '../login-modal.component';
     .header-search-input {
       width: 100%;
       border: 1px solid var(--border);
-      background: transparent;
+      background: rgba(255,255,255,0.42);
       color: var(--noir);
-      height: 46px;
-      padding: 0 16px;
+      height: 52px;
+      padding: 0 18px;
       font-family: inherit;
       font-size: 15px;
       outline: none;
@@ -252,10 +507,9 @@ import { LoginModalComponent } from '../login-modal.component';
       border-color: var(--rose-gold);
     }
 
-    .search-submit,
-    .search-close {
+    .search-submit {
       border: 1px solid var(--noir);
-      height: 46px;
+      height: 52px;
       padding: 0 22px;
       background: var(--noir);
       color: var(--creme);
@@ -263,12 +517,6 @@ import { LoginModalComponent } from '../login-modal.component';
       letter-spacing: 2px;
       text-transform: uppercase;
       cursor: none;
-    }
-
-    .search-close {
-      background: transparent;
-      color: var(--noir);
-      border-color: var(--border);
     }
 
     .mobile-menu-backdrop {
@@ -376,6 +624,10 @@ import { LoginModalComponent } from '../login-modal.component';
     }
 
     @media (max-width: 640px) {
+      :host {
+        height: 108px;
+      }
+
       .announcement {
         padding: 8px 14px;
         font-size: 9px;
@@ -388,6 +640,10 @@ import { LoginModalComponent } from '../login-modal.component';
         padding: 0 14px;
         display: flex;
         justify-content: space-between;
+      }
+
+      header {
+        top: 44px;
       }
 
       .logo-img {
@@ -407,19 +663,22 @@ import { LoginModalComponent } from '../login-modal.component';
         display: none;
       }
 
-      .header-search-panel {
-        top: 64px;
-        padding: 16px 14px;
+      .search-trigger {
+        position: static;
+        height: 64px;
+      }
+
+      .search-inner {
+        padding: 18px 14px;
         grid-template-columns: 1fr;
-        gap: 10px;
+        gap: 14px;
       }
 
       .search-label {
         display: none;
       }
 
-      .search-submit,
-      .search-close {
+      .search-submit {
         width: 100%;
       }
     }
@@ -437,6 +696,7 @@ export class HeaderComponent {
   mobileMenuOpen = false;
   searchOpen = false;
   searchTerm = '';
+  activeMegaMenu = '';
 
   toggleMobileMenu() {
     this.mobileMenuOpen = !this.mobileMenuOpen;
@@ -444,15 +704,37 @@ export class HeaderComponent {
   closeMobileMenu() {
     this.mobileMenuOpen = false;
   }
-  toggleSearch() {
+  setMegaMenu(menu: string) {
+    this.activeMegaMenu = menu;
+  }
+  clearMegaMenu() {
+    if (!this.searchOpen) {
+      this.activeMegaMenu = '';
+    }
+  }
+  openSearchMenu() {
+    this.activeMegaMenu = 'search';
+  }
+  closeSearchMenu() {
+    if (!this.searchOpen) {
+      this.activeMegaMenu = '';
+    }
+  }
+  toggleSearch(event?: Event) {
+    event?.preventDefault();
+    event?.stopPropagation();
     this.searchOpen = !this.searchOpen;
     if (this.searchOpen) {
+      this.activeMegaMenu = 'search';
       this.closeMobileMenu();
       setTimeout(() => document.querySelector<HTMLInputElement>('.header-search-input')?.focus(), 0);
+    } else {
+      this.activeMegaMenu = '';
     }
   }
   closeSearch() {
     this.searchOpen = false;
+    this.activeMegaMenu = '';
     this.searchTerm = '';
   }
   submitSearch(event?: Event) {
@@ -460,6 +742,7 @@ export class HeaderComponent {
     const q = this.searchTerm.trim();
     if (!q) return;
     this.searchOpen = false;
+    this.activeMegaMenu = '';
     void this.router.navigate(['/produtos'], { queryParams: { q } });
   }
   openLoginModal() {

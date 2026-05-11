@@ -5,12 +5,13 @@ import { CommonModule } from '@angular/common';
 import { HeaderComponent } from './shared/components/header/header.component';
 import { FooterComponent } from './shared/components/footer/footer.component';
 import { CursorComponent } from './shared/components/cursor/cursor.component';
+import { CookieBannerComponent } from './shared/components/cookie-banner/cookie-banner.component';
 
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, HeaderComponent, FooterComponent, CursorComponent],
+  imports: [CommonModule, RouterOutlet, HeaderComponent, FooterComponent, CursorComponent, CookieBannerComponent],
   template: `
     <app-cursor />
     <ng-container *ngIf="!isAdminRoute()">
@@ -21,6 +22,7 @@ import { CursorComponent } from './shared/components/cursor/cursor.component';
     </main>
     <ng-container *ngIf="!isAdminRoute()">
       <app-footer />
+      <app-cookie-banner />
     </ng-container>
   `
 })
