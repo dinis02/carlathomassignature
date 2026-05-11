@@ -37,6 +37,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
   toastMessage = '';
   toastType = 'success';
   private toastTimer: ReturnType<typeof setTimeout> | null = null;
+  mobileSidebarOpen = false;
 
   orderPanelOpen = false;
   currentOrderId = '';
@@ -235,11 +236,20 @@ export class AdminComponent implements OnInit, AfterViewInit {
 
   showView(viewId: AdminView): void {
     this.activeView = viewId;
+    this.mobileSidebarOpen = false;
     if (viewId === 'orders' && !this.orders.length) this.loadOrders();
     if (viewId === 'customers' && !this.customers.length) this.loadCustomers();
     if (viewId === 'returns' && !this.returns.length) this.loadReturns();
     if (viewId === 'analytics' && !this.analytics) this.loadAnalytics();
     if (viewId === 'settings' && !this.settings.storeName) this.loadSettings();
+  }
+
+  toggleMobileSidebar(): void {
+    this.mobileSidebarOpen = !this.mobileSidebarOpen;
+  }
+
+  closeMobileSidebar(): void {
+    this.mobileSidebarOpen = false;
   }
 
   async logout(): Promise<void> {
