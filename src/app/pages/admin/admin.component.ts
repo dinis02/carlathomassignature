@@ -47,8 +47,8 @@ export class AdminComponent implements OnInit, AfterViewInit {
   productPanelOpen = false;
   currentProductId = '';
   adminProducts: Product[] = [];
-  selectedProductImage: File | null = null;
-  selectedProductPreview = '';
+  selectedProductImages: File[] = [];
+  selectedProductPreviews: string[] = [];
   savingProduct = false;
   productSearch = '';
   productCategoryFilter = '';
@@ -318,8 +318,10 @@ export class AdminComponent implements OnInit, AfterViewInit {
           shades: (product.shades || []).map(shade => shade.name).join(', '),
           finishes: (product.finishes || []).join(', ')
         };
-        this.selectedProductPreview = product.image || '';
-        this.selectedProductImage = null;
+        this.selectedProductPreviews = product.galleryImages?.length
+          ? [...product.galleryImages]
+          : (product.image ? [product.image] : []);
+        this.selectedProductImages = [];
       }
     }
     this.productPanelOpen = true;
@@ -467,12 +469,15 @@ export class AdminComponent implements OnInit, AfterViewInit {
     });
   }
 
-  onProductImageSelected(event: Event): void {
+  onProductImagesSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) return;
-    this.selectedProductImage = file;
-    this.selectedProductPreview = URL.createObjectURL(file);
+    const files = Array.from(input.files || []);
+    if (!files.length) return;
+    this.selectedProductImages = files;
+    this.selectedProductPreviews.forEach(preview => {
+      if (preview.startsWith('blob:')) URL.revokeObjectURL(preview);
+    });
+    this.selectedProductPreviews = files.map(file => URL.createObjectURL(file));
   }
 
   saveProduct(): void {
@@ -487,7 +492,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
     });
     formData.append('gradientFrom', '#E8D0C0');
     formData.append('gradientTo', '#C9956A');
-    if (this.selectedProductImage) formData.append('image', this.selectedProductImage);
+    this.selectedProductImages.forEach(file => formData.append('images', file));
 
     this.savingProduct = true;
 
@@ -603,7 +608,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
       shades: '',
       finishes: ''
     };
-    this.selectedProductImage = null;
-    this.selectedProductPreview = '';
+    this.selectedProductImages = [];
+    this.selectedProductPreviews = [];
   }
 }

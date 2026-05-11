@@ -7,6 +7,7 @@ const path = require('path');
 const Stripe = require('stripe');
 const multer = require('multer');
 const { supabase, bucket: supabaseBucket, isEnabled: supabaseEnabled } = require('./supabase');
+const { emailStatus, sendTransactionalEmail } = require('./email');
 
 fs.mkdirSync(path.join(__dirname, '..', 'data'), { recursive: true });
 fs.mkdirSync(path.join(__dirname, '..', 'src', 'assets', 'produtos'), { recursive: true });
@@ -24,6 +25,10 @@ const uploadProductImage = multer({
     cb(null, true);
   }
 });
+const uploadProductImages = uploadProductImage.fields([
+  { name: 'image', maxCount: 1 },
+  { name: 'images', maxCount: 8 }
+]);
 
 const allowedOrigins = [
   'http://localhost:4200',
@@ -101,6 +106,7 @@ function publicSupabaseAccount(account) {
 function mapProduct(row) {
   const shades = db.prepare('SELECT name, color FROM product_shades WHERE product_id = ?').all(row.id);
   const finishes = db.prepare('SELECT name FROM product_finishes WHERE product_id = ?').all(row.id).map(f => f.name);
+  const galleryImages = db.prepare('SELECT url FROM product_images WHERE product_id = ? ORDER BY sort_order, id').all(row.id).map(item => item.url);
   return {
     id: row.id,
     brand: row.brand,
@@ -118,6 +124,7 @@ function mapProduct(row) {
     howToApply: row.how_to_apply,
     ingredients: row.ingredients,
     image: row.image,
+    galleryImages,
     stock: row.stock,
     isActive: !!row.is_active,
     shades,
@@ -126,6 +133,10 @@ function mapProduct(row) {
 }
 
 function mapSupabaseProduct(row) {
+  const galleryImages = (row.product_images || [])
+    .slice()
+    .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+    .map(item => item.url);
   return {
     id: row.id,
     brand: row.brand,
@@ -143,6 +154,7 @@ function mapSupabaseProduct(row) {
     howToApply: row.how_to_apply,
     ingredients: row.ingredients,
     image: row.image,
+    galleryImages,
     stock: row.stock,
     isActive: !!row.is_active,
     shades: (row.product_shades || []).map(shade => ({ name: shade.name, color: shade.color })),
@@ -154,7 +166,7 @@ async function listAdminProducts() {
   if (supabaseEnabled()) {
     const { data, error } = await supabase
       .from('products')
-      .select('*, product_shades(name,color), product_finishes(name)')
+      .select('*, product_shades(name,color), product_finishes(name), product_images(url,sort_order)')
       .order('id', { ascending: true });
 
     if (!error) return data.map(mapSupabaseProduct);
@@ -185,6 +197,245 @@ function orderStatusLabel(status) {
     cancelada: 'Cancelada'
   };
   return labels[normalized] || 'Processando';
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function formatMoney(value) {
+  return `${Number(value || 0).toLocaleString('pt-PT', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  })} EUR`;
+}
+
+function orderItemsHtml(order) {
+  return (order.items || [])
+    .map(item => {
+      const details = [
+        item.selectedShade ? `Tom: ${escapeHtml(item.selectedShade)}` : '',
+        item.selectedFinish ? `Acabamento: ${escapeHtml(item.selectedFinish)}` : ''
+      ].filter(Boolean).join(' · ');
+
+      return `
+        <tr>
+          <td style="padding:14px 0;border-bottom:1px solid #eadfd6;">
+            <strong style="display:block;color:#1b1714;">${escapeHtml(item.productName)}</strong>
+            <span style="font-size:12px;color:#8a7b6c;">${escapeHtml(item.productBrand || '')}${details ? ` · ${details}` : ''}</span>
+          </td>
+          <td style="padding:14px 0;border-bottom:1px solid #eadfd6;text-align:center;color:#1b1714;">${Number(item.quantity || 0)}</td>
+          <td style="padding:14px 0;border-bottom:1px solid #eadfd6;text-align:right;color:#1b1714;">${formatMoney(Number(item.unitPrice || 0) * Number(item.quantity || 0))}</td>
+        </tr>
+      `;
+    })
+    .join('');
+}
+
+function baseEmailTemplate({ title, eyebrow, intro, body, cta }) {
+  return `
+    <div style="margin:0;background:#f7f4f0;padding:32px 16px;font-family:Arial,Helvetica,sans-serif;color:#1b1714;">
+      <div style="max-width:680px;margin:0 auto;background:#fffdfc;border:1px solid #eadfd6;">
+        <div style="padding:34px 36px 22px;text-align:center;border-bottom:1px solid #eadfd6;">
+          <div style="font-family:Georgia,serif;font-size:30px;font-style:italic;color:#1b1714;">Carla Thomas</div>
+          <div style="font-size:10px;letter-spacing:5px;text-transform:uppercase;color:#b87d54;margin-top:5px;">Signature</div>
+        </div>
+        <div style="padding:36px;">
+          <div style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#b87d54;margin-bottom:14px;">${escapeHtml(eyebrow)}</div>
+          <h1 style="font-family:Georgia,serif;font-size:36px;line-height:1.05;font-weight:400;margin:0 0 18px;color:#1b1714;">${escapeHtml(title)}</h1>
+          <p style="font-size:15px;line-height:1.8;color:#4d4037;margin:0 0 28px;">${escapeHtml(intro)}</p>
+          ${body}
+          ${cta ? `<div style="margin-top:30px;text-align:center;">${cta}</div>` : ''}
+        </div>
+        <div style="padding:22px 36px;background:#1b1714;color:#d4c5b8;font-size:12px;line-height:1.6;text-align:center;">
+          Carla Thomas Signature · Beleza que inspira confianca, elegancia que permanece.
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+async function findSupabaseAuthUserByEmail(email) {
+  if (!supabaseEnabled() || !email) return null;
+  const normalizedEmail = String(email).trim().toLowerCase();
+  for (let page = 1; page <= 20; page += 1) {
+    const { data, error } = await supabase.auth.admin.listUsers({ page, perPage: 100 });
+    if (error) {
+      console.warn('Supabase auth user lookup failed:', error.message);
+      return null;
+    }
+
+    const user = (data.users || []).find(entry => String(entry.email || '').toLowerCase() === normalizedEmail);
+    if (user) return user;
+    if (!data.nextPage) break;
+  }
+  return null;
+}
+
+function userHasPasswordProvider(user) {
+  const providers = [
+    ...(user?.app_metadata?.providers || []),
+    user?.app_metadata?.provider,
+    ...(user?.identities || []).map(identity => identity.provider)
+  ].filter(Boolean);
+  return providers.includes('email');
+}
+
+async function createPasswordSetupLink(order) {
+  if (!supabaseEnabled() || !order?.customerEmail) return null;
+
+  const email = String(order.customerEmail).trim().toLowerCase();
+  const redirectTo = `${clientUrl}/reset-password`;
+  const user = await findSupabaseAuthUserByEmail(email);
+
+  if (user && userHasPasswordProvider(user)) return null;
+
+  const linkType = user ? 'recovery' : 'invite';
+  const linkOptions = linkType === 'invite'
+    ? {
+        redirectTo,
+        data: {
+          name: order.customerName || email,
+          source: 'checkout'
+        }
+      }
+    : { redirectTo };
+
+  const { data, error } = await supabase.auth.admin.generateLink({
+    type: linkType,
+    email,
+    options: linkOptions
+  });
+
+  if (error) {
+    console.warn('Password setup link failed:', error.message);
+    return null;
+  }
+
+  return data?.properties?.action_link || null;
+}
+
+async function markConfirmationEmailSent(orderId) {
+  const now = new Date().toISOString();
+  db.prepare('UPDATE orders SET confirmation_email_sent_at = ? WHERE id = ?').run(now, orderId);
+  if (supabaseEnabled()) {
+    const { error } = await supabase
+      .from('orders')
+      .update({ confirmation_email_sent_at: now })
+      .eq('id', orderId);
+    if (error) console.warn('Supabase confirmation email mark failed:', error.message);
+  }
+}
+
+async function markStatusEmailSent(orderId, status) {
+  const now = new Date().toISOString();
+  db.prepare('UPDATE orders SET last_status_email_sent_at = ?, last_status_email_status = ? WHERE id = ?')
+    .run(now, status, orderId);
+  if (supabaseEnabled()) {
+    const { error } = await supabase
+      .from('orders')
+      .update({ last_status_email_sent_at: now, last_status_email_status: status })
+      .eq('id', orderId);
+    if (error) console.warn('Supabase status email mark failed:', error.message);
+  }
+}
+
+async function sendOrderConfirmationEmail(order) {
+  if (!order?.customerEmail || order.confirmationEmailSentAt) return;
+
+  const passwordLink = await createPasswordSetupLink(order);
+  const passwordBlock = passwordLink
+    ? `
+      <div style="margin:28px 0;padding:20px;background:#f1eae3;border-left:3px solid #b87d54;">
+        <strong style="display:block;margin-bottom:8px;color:#1b1714;">Definir password da sua conta</strong>
+        <p style="margin:0 0 14px;color:#4d4037;line-height:1.6;font-size:14px;">
+          Como a password ainda nao foi definida neste email, pode cria-la agora para acompanhar encomendas, pontos e moradas.
+        </p>
+        <a href="${escapeHtml(passwordLink)}" style="display:inline-block;background:#1b1714;color:#fffdfc;text-decoration:none;padding:12px 18px;font-size:11px;letter-spacing:2px;text-transform:uppercase;">Definir password</a>
+      </div>
+    `
+    : '';
+
+  const html = baseEmailTemplate({
+    eyebrow: 'Pagamento confirmado',
+    title: `Encomenda ${order.id}`,
+    intro: `Obrigada, ${order.customerName || 'cliente'}. O pagamento foi confirmado e a sua encomenda esta a ser preparada.`,
+    body: `
+      <table role="presentation" style="width:100%;border-collapse:collapse;margin:18px 0 26px;">
+        <tr>
+          <td style="padding:10px 0;color:#8a7b6c;">Estado</td>
+          <td style="padding:10px 0;text-align:right;color:#1b1714;">${escapeHtml(order.statusLabel)}</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 0;color:#8a7b6c;">Total</td>
+          <td style="padding:10px 0;text-align:right;color:#b87d54;font-size:18px;">${formatMoney(order.total)}</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 0;color:#8a7b6c;">Pontos ganhos</td>
+          <td style="padding:10px 0;text-align:right;color:#1b1714;">+${Number(order.rewardPoints || 0)} pontos</td>
+        </tr>
+      </table>
+      <table role="presentation" style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr>
+            <th style="text-align:left;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#8a7b6c;padding-bottom:8px;">Produto</th>
+            <th style="text-align:center;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#8a7b6c;padding-bottom:8px;">Qtd</th>
+            <th style="text-align:right;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#8a7b6c;padding-bottom:8px;">Total</th>
+          </tr>
+        </thead>
+        <tbody>${orderItemsHtml(order)}</tbody>
+      </table>
+      <div style="margin-top:24px;color:#4d4037;font-size:14px;line-height:1.7;">
+        <strong>Entrega:</strong> ${escapeHtml(order.customerAddress || '')}, ${escapeHtml(order.customerPostcode || '')} ${escapeHtml(order.customerCity || '')}, ${escapeHtml(order.customerCountry || 'Portugal')}
+      </div>
+      ${passwordBlock}
+    `,
+    cta: `<a href="${escapeHtml(clientUrl)}/minha-conta?section=orders" style="display:inline-block;background:#b87d54;color:#fffdfc;text-decoration:none;padding:14px 24px;font-size:11px;letter-spacing:2px;text-transform:uppercase;">Ver encomenda</a>`
+  });
+
+  const result = await sendTransactionalEmail({
+    to: order.customerEmail,
+    subject: `Pagamento confirmado - ${order.id}`,
+    html,
+    text: `Pagamento confirmado para a encomenda ${order.id}. Total: ${formatMoney(order.total)}.`
+  });
+
+  if (result.sent) await markConfirmationEmailSent(order.id);
+}
+
+async function sendOrderStatusEmail(order) {
+  if (!order?.customerEmail) return;
+  if (order.lastStatusEmailStatus === order.status) return;
+
+  const html = baseEmailTemplate({
+    eyebrow: 'Atualizacao da encomenda',
+    title: order.statusLabel,
+    intro: `A sua encomenda ${order.id} foi atualizada para: ${order.statusLabel}.`,
+    body: `
+      <div style="padding:22px;background:#f1eae3;margin:20px 0 28px;">
+        <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#b87d54;margin-bottom:8px;">Estado atual</div>
+        <div style="font-family:Georgia,serif;font-size:30px;color:#1b1714;">${escapeHtml(order.statusLabel)}</div>
+      </div>
+      <p style="color:#4d4037;line-height:1.7;font-size:14px;">
+        Continuamos a acompanhar a sua encomenda. Pode consultar o historico na sua area de cliente.
+      </p>
+    `,
+    cta: `<a href="${escapeHtml(clientUrl)}/minha-conta?section=orders" style="display:inline-block;background:#1b1714;color:#fffdfc;text-decoration:none;padding:14px 24px;font-size:11px;letter-spacing:2px;text-transform:uppercase;">Ver encomendas</a>`
+  });
+
+  const result = await sendTransactionalEmail({
+    to: order.customerEmail,
+    subject: `Estado da encomenda ${order.id}: ${order.statusLabel}`,
+    html,
+    text: `A encomenda ${order.id} foi atualizada para ${order.statusLabel}.`
+  });
+
+  if (result.sent) await markStatusEmailSent(order.id, order.status);
 }
 
 function returnStatusLabel(status) {
@@ -252,7 +503,7 @@ async function getFullProduct(productId, includeInactive = false) {
   if (supabaseEnabled()) {
     let query = supabase
       .from('products')
-      .select('*, product_shades(name,color), product_finishes(name)')
+      .select('*, product_shades(name,color), product_finishes(name), product_images(url,sort_order)')
       .eq('id', productId);
     if (!includeInactive) query = query.eq('is_active', true);
     const { data, error } = await query.single();
@@ -297,7 +548,10 @@ function mapSupabaseOrder(row) {
     status: normalizeOrderStatus(row.status),
     statusLabel: orderStatusLabel(row.status),
     rewardPoints: Number(row.reward_points || 0),
-    stripeSessionId: row.stripe_session_id
+    stripeSessionId: row.stripe_session_id,
+    confirmationEmailSentAt: row.confirmation_email_sent_at,
+    lastStatusEmailSentAt: row.last_status_email_sent_at,
+    lastStatusEmailStatus: row.last_status_email_status
   };
 }
 
@@ -368,7 +622,10 @@ async function loadAdminOrderDetail(orderId) {
     paymentStatus: order.payment_status,
     status: normalizeOrderStatus(order.status),
     statusLabel: orderStatusLabel(order.status),
-    stripeSessionId: order.stripe_session_id
+    stripeSessionId: order.stripe_session_id,
+    confirmationEmailSentAt: order.confirmation_email_sent_at,
+    lastStatusEmailSentAt: order.last_status_email_sent_at,
+    lastStatusEmailStatus: order.last_status_email_status
   };
 }
 
@@ -748,11 +1005,50 @@ async function uploadProductImageToSupabase(file) {
   return data.publicUrl;
 }
 
+async function uploadProductImagesToSupabase(files) {
+  const urls = [];
+  for (const file of files) {
+    const url = await uploadProductImageToSupabase(file);
+    if (url) urls.push(url);
+  }
+  return urls;
+}
+
 function saveProductImageLocally(file) {
   if (!file) return null;
   const filename = productFileName(file);
   fs.writeFileSync(path.join(__dirname, '..', 'src', 'assets', 'produtos', filename), file.buffer);
   return `assets/produtos/${filename}`;
+}
+
+function saveProductImagesLocally(files) {
+  return files.map(file => saveProductImageLocally(file)).filter(Boolean);
+}
+
+function productImageFiles(req) {
+  if (!req.files) return [];
+  return [
+    ...(req.files.image || []),
+    ...(req.files.images || [])
+  ];
+}
+
+async function replaceSupabaseProductImages(productId, imageUrls) {
+  await supabase.from('product_images').delete().eq('product_id', productId);
+  if (!imageUrls.length) return;
+  const rows = imageUrls.map((url, index) => ({
+    product_id: productId,
+    url,
+    sort_order: index
+  }));
+  const { error } = await supabase.from('product_images').insert(rows);
+  if (error) throw error;
+}
+
+function replaceLocalProductImages(productId, imageUrls) {
+  db.prepare('DELETE FROM product_images WHERE product_id = ?').run(productId);
+  const insertImage = db.prepare('INSERT INTO product_images (product_id, url, sort_order) VALUES (?, ?, ?)');
+  imageUrls.forEach((url, index) => insertImage.run(productId, url, index));
 }
 
 function validateOrderPayload(payload) {
@@ -935,21 +1231,63 @@ async function updateOrderPayment(orderId, values) {
       if (error) console.warn('Supabase order payment update failed:', error.message);
     }
   }
+
+  if (values.paymentStatus === 'paid') {
+    const order = await loadAdminOrderDetail(orderId);
+    if (order && !order.confirmationEmailSentAt) {
+      try {
+        await sendOrderConfirmationEmail(order);
+      } catch (err) {
+        console.warn('Order confirmation email failed:', err.message);
+      }
+    }
+  }
 }
 
 app.get('/api/health', (_req, res) => {
   res.json({
     ok: true,
     database: supabaseEnabled() ? 'supabase' : 'data/carla-thomas.sqlite',
-    supabase: supabaseEnabled()
+    supabase: supabaseEnabled(),
+    email: emailStatus()
   });
+});
+
+app.post('/api/admin/email/test', async (req, res) => {
+  const to = String(req.body?.to || '').trim().toLowerCase();
+  if (!to) return res.status(400).json({ error: 'Email de destino em falta' });
+
+  try {
+    const result = await sendTransactionalEmail({
+      to,
+      subject: 'Teste de email - Carla Thomas Signature',
+      html: baseEmailTemplate({
+        eyebrow: 'Teste de email',
+        title: 'Email configurado',
+        intro: 'Este email confirma que o SMTP da Carla Thomas Signature esta configurado corretamente.',
+        body: '<p style="color:#4d4037;line-height:1.7;font-size:14px;">A partir daqui, as confirmacoes de encomenda e atualizacoes de estado podem ser enviadas automaticamente.</p>'
+      }),
+      text: 'Email de teste enviado pela Carla Thomas Signature.'
+    });
+
+    if (!result.sent) {
+      return res.status(503).json({
+        error: 'SMTP nao configurado',
+        email: emailStatus()
+      });
+    }
+
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message || 'Nao foi possivel enviar email de teste' });
+  }
 });
 
 app.get('/api/products', async (_req, res) => {
   if (supabaseEnabled()) {
     const { data, error } = await supabase
       .from('products')
-      .select('*, product_shades(name,color), product_finishes(name)')
+      .select('*, product_shades(name,color), product_finishes(name), product_images(url,sort_order)')
       .eq('is_active', true)
       .order('id', { ascending: true });
 
@@ -1021,7 +1359,7 @@ app.post('/api/products/:id/reviews', async (req, res) => {
   }
 });
 
-app.post('/api/products', uploadProductImage.single('image'), async (req, res) => {
+app.post('/api/products', uploadProductImages, async (req, res) => {
   const name = String(req.body.name || '').trim();
   const brand = String(req.body.brand || '').trim();
   const category = String(req.body.category || '').trim();
@@ -1038,10 +1376,12 @@ app.post('/api/products', uploadProductImage.single('image'), async (req, res) =
   const stock = Number.isFinite(Number(req.body.stock)) ? Number(req.body.stock) : 0;
   const shades = String(req.body.shades || '').split(',').map(s => s.trim()).filter(Boolean);
   const finishes = String(req.body.finishes || '').split(',').map(s => s.trim()).filter(Boolean);
+  const imageFiles = productImageFiles(req);
 
   if (supabaseEnabled()) {
     try {
-      const image = await uploadProductImageToSupabase(req.file);
+      const galleryImages = await uploadProductImagesToSupabase(imageFiles);
+      const image = galleryImages[0] || null;
       const { data: product, error } = await supabase
         .from('products')
         .insert({
@@ -1067,6 +1407,7 @@ app.post('/api/products', uploadProductImage.single('image'), async (req, res) =
         .single();
 
       if (error) throw error;
+      await replaceSupabaseProductImages(product.id, galleryImages);
 
       if (shades.length) {
         const shadeRows = shades.map((shade, index) => ({
@@ -1086,7 +1427,7 @@ app.post('/api/products', uploadProductImage.single('image'), async (req, res) =
 
       const { data: fullProduct, error: fullError } = await supabase
         .from('products')
-        .select('*, product_shades(name,color), product_finishes(name)')
+        .select('*, product_shades(name,color), product_finishes(name), product_images(url,sort_order)')
         .eq('id', product.id)
         .single();
       if (fullError) throw fullError;
@@ -1096,7 +1437,8 @@ app.post('/api/products', uploadProductImage.single('image'), async (req, res) =
     }
   }
 
-  const image = saveProductImageLocally(req.file);
+  const galleryImages = saveProductImagesLocally(imageFiles);
+  const image = galleryImages[0] || null;
   const maxId = db.prepare('SELECT COALESCE(MAX(id), 0) + 1 AS nextId FROM products').get().nextId;
 
   db.prepare(`
@@ -1133,12 +1475,13 @@ app.post('/api/products', uploadProductImage.single('image'), async (req, res) =
   const insertFinish = db.prepare('INSERT INTO product_finishes (product_id, name) VALUES (?, ?)');
   shades.forEach((shade, index) => insertShade.run(maxId, shade, ['#C9956A', '#D4806A', '#8B3A5A', '#B02A2A'][index % 4]));
   finishes.forEach(finish => insertFinish.run(maxId, finish));
+  replaceLocalProductImages(maxId, galleryImages);
 
   const row = db.prepare('SELECT * FROM products WHERE id = ?').get(maxId);
   res.status(201).json(mapProduct(row));
 });
 
-app.put('/api/products/:id', uploadProductImage.single('image'), async (req, res) => {
+app.put('/api/products/:id', uploadProductImages, async (req, res) => {
   const productId = Number(req.params.id);
   const name = String(req.body.name || '').trim();
   const brand = String(req.body.brand || '').trim();
@@ -1156,11 +1499,23 @@ app.put('/api/products/:id', uploadProductImage.single('image'), async (req, res
   const stock = Number.isFinite(Number(req.body.stock)) ? Number(req.body.stock) : 0;
   const shades = String(req.body.shades || '').split(',').map(s => s.trim()).filter(Boolean);
   const finishes = String(req.body.finishes || '').split(',').map(s => s.trim()).filter(Boolean);
+  const imageFiles = productImageFiles(req);
 
   if (supabaseEnabled()) {
     try {
-      const existing = await supabase.from('products').select('image').eq('id', productId).single();
-      const image = req.file ? await uploadProductImageToSupabase(req.file) : existing.data?.image || null;
+      const existing = await supabase
+        .from('products')
+        .select('image, product_images(url,sort_order)')
+        .eq('id', productId)
+        .single();
+      const existingGallery = (existing.data?.product_images || [])
+        .slice()
+        .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+        .map(item => item.url);
+      const galleryImages = imageFiles.length
+        ? await uploadProductImagesToSupabase(imageFiles)
+        : existingGallery;
+      const image = galleryImages[0] || existing.data?.image || null;
 
       const { error } = await supabase
         .from('products')
@@ -1183,6 +1538,7 @@ app.put('/api/products/:id', uploadProductImage.single('image'), async (req, res
         .eq('id', productId);
 
       if (error) throw error;
+      if (imageFiles.length) await replaceSupabaseProductImages(productId, galleryImages);
 
       await supabase.from('product_shades').delete().eq('product_id', productId);
       await supabase.from('product_finishes').delete().eq('product_id', productId);
@@ -1205,7 +1561,7 @@ app.put('/api/products/:id', uploadProductImage.single('image'), async (req, res
 
       const { data: fullProduct, error: fullError } = await supabase
         .from('products')
-        .select('*, product_shades(name,color), product_finishes(name)')
+        .select('*, product_shades(name,color), product_finishes(name), product_images(url,sort_order)')
         .eq('id', productId)
         .single();
       if (fullError) throw fullError;
@@ -1218,7 +1574,9 @@ app.put('/api/products/:id', uploadProductImage.single('image'), async (req, res
   const existing = db.prepare('SELECT image FROM products WHERE id = ?').get(productId);
   if (!existing) return res.status(404).json({ error: 'Produto nao encontrado' });
 
-  const image = req.file ? saveProductImageLocally(req.file) : existing.image;
+  const existingGallery = db.prepare('SELECT url FROM product_images WHERE product_id = ? ORDER BY sort_order, id').all(productId).map(item => item.url);
+  const galleryImages = imageFiles.length ? saveProductImagesLocally(imageFiles) : existingGallery;
+  const image = galleryImages[0] || existing.image;
 
   const result = db.prepare(`
     UPDATE products
@@ -1266,6 +1624,7 @@ app.put('/api/products/:id', uploadProductImage.single('image'), async (req, res
   const insertFinish = db.prepare('INSERT INTO product_finishes (product_id, name) VALUES (?, ?)');
   shades.forEach((shade, index) => insertShade.run(productId, shade, ['#C9956A', '#D4806A', '#8B3A5A', '#B02A2A'][index % 4]));
   finishes.forEach(finish => insertFinish.run(productId, finish));
+  if (imageFiles.length) replaceLocalProductImages(productId, galleryImages);
 
   const row = db.prepare('SELECT * FROM products WHERE id = ?').get(productId);
   res.json(mapProduct(row));
@@ -1385,6 +1744,7 @@ app.patch('/api/admin/orders/:id', async (req, res) => {
     return res.status(400).json({ error: 'Estado invalido' });
   }
 
+  const previousOrder = await loadAdminOrderDetail(req.params.id);
   const result = db.prepare('UPDATE orders SET status = ? WHERE id = ?').run(nextStatus, req.params.id);
   if (supabaseEnabled()) {
     const { error } = await supabase.from('orders').update({ status: nextStatus }).eq('id', req.params.id);
@@ -1393,6 +1753,13 @@ app.patch('/api/admin/orders/:id', async (req, res) => {
   if (!result.changes && !supabaseEnabled()) return res.status(404).json({ error: 'Encomenda nao encontrada' });
 
   const order = await loadAdminOrderDetail(req.params.id);
+  if (order && previousOrder?.status !== order.status) {
+    try {
+      await sendOrderStatusEmail(order);
+    } catch (err) {
+      console.warn('Order status email failed:', err.message);
+    }
+  }
   res.json(order);
 });
 
@@ -1427,7 +1794,7 @@ app.patch('/api/admin/products/:id/archive', async (req, res) => {
 
       const { data: fullProduct, error: fullError } = await supabase
         .from('products')
-        .select('*, product_shades(name,color), product_finishes(name)')
+        .select('*, product_shades(name,color), product_finishes(name), product_images(url,sort_order)')
         .eq('id', productId)
         .single();
 

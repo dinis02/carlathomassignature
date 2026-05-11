@@ -47,6 +47,14 @@ db.exec(`
     name TEXT NOT NULL
   );
 
+  CREATE TABLE IF NOT EXISTS product_images (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    url TEXT NOT NULL,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+
   CREATE TABLE IF NOT EXISTS product_reviews (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
@@ -149,6 +157,19 @@ function ensureColumn(table, column, definition) {
 ensureColumn('orders', 'payment_status', "TEXT NOT NULL DEFAULT 'unpaid'");
 ensureColumn('orders', 'stripe_session_id', 'TEXT');
 ensureColumn('orders', 'stripe_payment_intent_id', 'TEXT');
+ensureColumn('orders', 'confirmation_email_sent_at', 'TEXT');
+ensureColumn('orders', 'last_status_email_sent_at', 'TEXT');
+ensureColumn('orders', 'last_status_email_status', 'TEXT');
+
+db.prepare(`
+  INSERT INTO product_images (product_id, url, sort_order)
+  SELECT id, image, 0
+  FROM products
+  WHERE image IS NOT NULL
+    AND NOT EXISTS (
+      SELECT 1 FROM product_images WHERE product_images.product_id = products.id
+    )
+`).run();
 
 const seedProducts = [
   {
@@ -189,6 +210,7 @@ function seed() {
   `);
   const insertShade = db.prepare('INSERT INTO product_shades (product_id, name, color) VALUES (?, ?, ?)');
   const insertFinish = db.prepare('INSERT INTO product_finishes (product_id, name) VALUES (?, ?)');
+  const insertImage = db.prepare('INSERT INTO product_images (product_id, url, sort_order) VALUES (?, ?, ?)');
 
   const tx = db.transaction((products) => {
     for (const product of products) {
@@ -204,6 +226,9 @@ function seed() {
       });
       for (const shade of product.shades ?? []) insertShade.run(product.id, shade.name, shade.color);
       for (const finish of product.finishes ?? []) insertFinish.run(product.id, finish);
+      for (const [index, image] of (product.galleryImages ?? [product.image]).filter(Boolean).entries()) {
+        insertImage.run(product.id, image, index);
+      }
     }
   });
 

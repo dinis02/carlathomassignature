@@ -138,7 +138,7 @@
             </div>
           </div>
 
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;">
+          <div class="dashboard-lower-grid">
             <div class="table-wrapper">
               <div class="table-toolbar">
                 <span class="table-title">Encomendas recentes</span>
@@ -401,7 +401,7 @@
 
       <div class="view" [class.active]="activeView==='settings'">
         <div class="page-header"><div class="page-header-left"><div class="page-eyebrow">Configuracao</div><h1>Definicoes</h1></div></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;">
+        <div class="settings-admin-grid">
           <div class="chart-card">
             <div class="chart-card-title">Loja</div>
             <div class="form-section">
@@ -499,15 +499,25 @@
           <div class="form-section-title">Informacao geral</div>
           <div class="form-grid cols2">
             <div class="form-field span2">
-              <label>Fotografia do produto</label>
+              <label>Fotografias do produto</label>
               <label class="image-upload-box">
-                @if (selectedProductPreview) {
-                  <img [src]="selectedProductPreview" alt="Preview do produto">
+                @if (selectedProductPreviews.length) {
+                  <div class="image-preview-grid">
+                    @for (preview of selectedProductPreviews; track preview; let i = $index) {
+                      <div class="image-preview-tile" [class.primary]="i === 0">
+                        <img [src]="preview" [alt]="'Preview do produto ' + (i + 1)">
+                        @if (i === 0) {
+                          <span>Principal</span>
+                        }
+                      </div>
+                    }
+                  </div>
                 } @else {
-                  <span>Carregar fotografia</span>
+                  <span>Carregar fotografias</span>
                 }
-                <input type="file" accept="image/*" (change)="onProductImageSelected($event)">
+                <input type="file" accept="image/*" multiple (change)="onProductImagesSelected($event)">
               </label>
+              <small>A primeira fotografia fica como imagem principal do produto.</small>
             </div>
             <div class="form-field span2"><label>Nome do produto</label><input type="text" [(ngModel)]="productForm.name" name="productName"></div>
             <div class="form-field"><label>Marca</label><input type="text" [(ngModel)]="productForm.brand" name="productBrand"></div>

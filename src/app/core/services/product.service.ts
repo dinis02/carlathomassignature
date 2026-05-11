@@ -119,9 +119,9 @@ export class ProductService {
     return {
       ...product,
       category,
-      galleryImages: product.galleryImages?.length
+      galleryImages: product.galleryImages && product.galleryImages.length > 1
         ? product.galleryImages
-        : (isDebi ? debiGallery : undefined)
+        : (isDebi ? debiGallery : product.galleryImages)
     };
   }
 }
