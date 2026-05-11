@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { CartService } from '../../../core/services/cart.service';
 import { AdminService } from '../../../core/services/admin.service';
 import { AccountSession, AuthService } from '../../../core/services/auth.service';
@@ -10,7 +11,7 @@ import { LoginModalComponent } from '../login-modal.component';
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, CommonModule, AdminModalComponent, LoginModalComponent],
+  imports: [RouterLink, RouterLinkActive, CommonModule, FormsModule, AdminModalComponent, LoginModalComponent],
   styleUrls: ['./header.component.scss'],
   template: `
     <div class="announcement">
@@ -43,7 +44,7 @@ import { LoginModalComponent } from '../login-modal.component';
             <a routerLink="/produtos" class="nav-link">Marcas</a>
           </nav>
           <div class="header-icons">
-            <button class="icon-btn" title="Pesquisar" aria-label="Pesquisar">
+            <button class="icon-btn" title="Pesquisar" aria-label="Pesquisar" (click)="toggleSearch()">
               <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/>
               </svg>
@@ -62,11 +63,13 @@ import { LoginModalComponent } from '../login-modal.component';
                 </svg>
               </button>
             }
-            <button class="icon-btn" title="Wishlist" aria-label="Wishlist">
-              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-              </svg>
-            </button>
+            @if (auth.session()) {
+              <button class="icon-btn wishlist-header-btn" title="Wishlist" aria-label="Wishlist" (click)="goToWishlist()">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+              </button>
+            }
             <a routerLink="/carrinho" class="icon-btn cart-icon" title="Carrinho" aria-label="Carrinho">
               <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
@@ -81,6 +84,23 @@ import { LoginModalComponent } from '../login-modal.component';
         </div>
       </div>
     </header>
+    @if (searchOpen) {
+      <div class="search-backdrop" (click)="closeSearch()"></div>
+      <form class="header-search-panel" (submit)="submitSearch($event)">
+        <label class="search-label" for="headerSearch">Pesquisar</label>
+        <input
+          id="headerSearch"
+          class="header-search-input"
+          name="headerSearch"
+          [(ngModel)]="searchTerm"
+          type="search"
+          autocomplete="off"
+          placeholder="Produto, marca ou categoria"
+          (keydown.escape)="closeSearch()">
+        <button class="search-submit" type="submit">Pesquisar</button>
+        <button class="search-close" type="button" aria-label="Fechar pesquisa" (click)="closeSearch()">Fechar</button>
+      </form>
+    }
     <div class="mobile-menu-backdrop" *ngIf="mobileMenuOpen" (click)="closeMobileMenu()"></div>
     <nav class="mobile-menu" [class.open]="mobileMenuOpen" aria-label="Menu mobile">
       <div class="mobile-menu-head">
@@ -98,6 +118,7 @@ import { LoginModalComponent } from '../login-modal.component';
       <a routerLink="/produtos" [queryParams]="{cat:'Acessórios'}" (click)="closeMobileMenu()">Acessorios</a>
       <a routerLink="/produtos" (click)="closeMobileMenu()">Marcas</a>
       @if (auth.session()) {
+        <a routerLink="/encomendas" [queryParams]="{sec:'wishlist'}" (click)="closeMobileMenu()">Wishlist</a>
         <a href="#" (click)="logout($event)">Terminar sessao</a>
       } @else {
         <a href="#" (click)="openLoginFromMenu($event)">Entrar / Criar conta</a>
@@ -183,6 +204,71 @@ import { LoginModalComponent } from '../login-modal.component';
       font-size: 8px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       font-weight: 400;
+    }
+
+    .search-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(26,23,20,0.22);
+      z-index: 98;
+    }
+
+    .header-search-panel {
+      position: fixed;
+      top: 72px;
+      left: 0;
+      right: 0;
+      z-index: 101;
+      background: rgba(247,244,240,0.98);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 18px 48px rgba(26,23,20,0.10);
+      padding: 18px 48px;
+      display: grid;
+      grid-template-columns: auto minmax(180px, 1fr) auto auto;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .search-label {
+      color: var(--text-muted);
+      font-size: 10px;
+      letter-spacing: 2.8px;
+      text-transform: uppercase;
+    }
+
+    .header-search-input {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--noir);
+      height: 46px;
+      padding: 0 16px;
+      font-family: inherit;
+      font-size: 15px;
+      outline: none;
+    }
+
+    .header-search-input:focus {
+      border-color: var(--rose-gold);
+    }
+
+    .search-submit,
+    .search-close {
+      border: 1px solid var(--noir);
+      height: 46px;
+      padding: 0 22px;
+      background: var(--noir);
+      color: var(--creme);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: none;
+    }
+
+    .search-close {
+      background: transparent;
+      color: var(--noir);
+      border-color: var(--border);
     }
 
     .mobile-menu-backdrop {
@@ -316,6 +402,26 @@ import { LoginModalComponent } from '../login-modal.component';
         width: 32px;
         height: 32px;
       }
+
+      .wishlist-header-btn {
+        display: none;
+      }
+
+      .header-search-panel {
+        top: 64px;
+        padding: 16px 14px;
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .search-label {
+        display: none;
+      }
+
+      .search-submit,
+      .search-close {
+        width: 100%;
+      }
     }
 
   `]
@@ -329,12 +435,32 @@ export class HeaderComponent {
   showLoginModal = false;
   showAdminModal = false;
   mobileMenuOpen = false;
+  searchOpen = false;
+  searchTerm = '';
 
   toggleMobileMenu() {
     this.mobileMenuOpen = !this.mobileMenuOpen;
   }
   closeMobileMenu() {
     this.mobileMenuOpen = false;
+  }
+  toggleSearch() {
+    this.searchOpen = !this.searchOpen;
+    if (this.searchOpen) {
+      this.closeMobileMenu();
+      setTimeout(() => document.querySelector<HTMLInputElement>('.header-search-input')?.focus(), 0);
+    }
+  }
+  closeSearch() {
+    this.searchOpen = false;
+    this.searchTerm = '';
+  }
+  submitSearch(event?: Event) {
+    event?.preventDefault();
+    const q = this.searchTerm.trim();
+    if (!q) return;
+    this.searchOpen = false;
+    void this.router.navigate(['/produtos'], { queryParams: { q } });
   }
   openLoginModal() {
     this.closeMobileMenu();
@@ -347,6 +473,9 @@ export class HeaderComponent {
       return;
     }
     this.router.navigate([session.role === 'admin' ? '/admin' : '/encomendas']);
+  }
+  goToWishlist() {
+    this.router.navigate(['/encomendas'], { queryParams: { sec: 'wishlist' } });
   }
   openLoginFromMenu(event: Event) {
     event.preventDefault();

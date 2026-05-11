@@ -47,6 +47,18 @@ db.exec(`
     name TEXT NOT NULL
   );
 
+  CREATE TABLE IF NOT EXISTS product_reviews (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    customer_name TEXT NOT NULL,
+    customer_email TEXT NOT NULL,
+    rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    title TEXT,
+    comment TEXT,
+    is_approved INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+
   CREATE TABLE IF NOT EXISTS customers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     first_name TEXT NOT NULL,
@@ -147,8 +159,8 @@ const seedProducts = [
     badge: 'Novo',
     gradientFrom: '#E4C6BD',
     gradientTo: '#A85D5A',
-    rating: 5.0,
-    reviewCount: 12,
+    rating: 0,
+    reviewCount: 0,
     category: 'Labios',
     stock: 18,
     shades: [{ name: 'Rosewood Muse', color: '#A55258' }],

@@ -359,6 +359,7 @@ header { position:sticky;top:0;z-index:100;background:rgba(247,244,240,0.92);bac
 /* ── Order expanded panel ── */
 .order-panel { max-height:0;overflow:hidden;transition:max-height 0.5s ease; }
 .order-card.expanded .order-panel { max-height:1200px; }
+.order-panel.static { max-height:none;overflow:visible; }
 .order-panel-inner { padding:0 28px 32px;border-top:1px solid var(--border); }
 
 /* ── Timeline ── */
@@ -395,6 +396,7 @@ header { position:sticky;top:0;z-index:100;background:rgba(247,244,240,0.92);bac
 .order-item-row { padding:20px 24px;display:grid;grid-template-columns:60px 1fr auto auto;gap:20px;align-items:center;border-bottom:1px solid var(--border); }
 .order-item-row:last-child { border-bottom:none; }
 .order-item-img { width:60px;height:76px;flex-shrink:0; }
+.order-item-img { background:linear-gradient(145deg,#d6b08f,#8f5f48); }
 /* .order-item-details intentionally left implicit */
 .order-item-brand { font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;font-weight:300; }
 .order-item-name { font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:300;font-style:italic;margin-bottom:5px; }

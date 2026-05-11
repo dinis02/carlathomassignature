@@ -40,7 +40,7 @@ app.use(cors({
   }
 }));
 
-app.post('/api/payments/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+app.post('/api/payments/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
   if (!stripe || !process.env.STRIPE_WEBHOOK_SECRET) {
     return res.status(503).json({ error: 'Stripe webhook nao configurado' });
   }
@@ -60,14 +60,12 @@ app.post('/api/payments/webhook', express.raw({ type: 'application/json' }), (re
     const session = event.data.object;
     const orderId = session.metadata?.orderId;
     if (orderId) {
-      db.prepare(`
-        UPDATE orders
-        SET status = 'processando',
-            payment_status = 'paid',
-            stripe_session_id = ?,
-            stripe_payment_intent_id = ?
-        WHERE id = ?
-      `).run(session.id, session.payment_intent || null, orderId);
+      await updateOrderPayment(orderId, {
+        status: 'processando',
+        paymentStatus: 'paid',
+        stripeSessionId: session.id,
+        stripePaymentIntentId: session.payment_intent || null
+      });
     }
   }
 
@@ -205,7 +203,116 @@ function formatDateLabel(dateValue) {
   return date.toLocaleDateString('pt-PT', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-function loadAdminOrderDetail(orderId) {
+function mapProductReview(row) {
+  return {
+    id: row.id,
+    productId: row.product_id,
+    customerName: row.customer_name,
+    rating: Number(row.rating || 0),
+    title: row.title,
+    comment: row.comment,
+    createdAt: row.created_at,
+    createdLabel: formatDateLabel(row.created_at)
+  };
+}
+
+async function listProductReviews(productId) {
+  if (supabaseEnabled()) {
+    const { data, error } = await supabase
+      .from('product_reviews')
+      .select('id, product_id, customer_name, rating, title, comment, created_at')
+      .eq('product_id', productId)
+      .eq('is_approved', true)
+      .order('created_at', { ascending: false });
+
+    if (!error) return data.map(mapProductReview);
+    console.warn('Supabase reviews fallback:', error.message);
+  }
+
+  const rows = db.prepare(`
+    SELECT id, product_id, customer_name, rating, title, comment, created_at
+    FROM product_reviews
+    WHERE product_id = ? AND is_approved = 1
+    ORDER BY datetime(created_at) DESC
+  `).all(productId);
+  return rows.map(mapProductReview);
+}
+
+function refreshLocalProductReviewTotals(productId) {
+  const totals = db.prepare(`
+    SELECT COALESCE(ROUND(AVG(rating), 1), 0) AS rating, COUNT(*) AS review_count
+    FROM product_reviews
+    WHERE product_id = ? AND is_approved = 1
+  `).get(productId);
+  db.prepare('UPDATE products SET rating = ?, review_count = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+    .run(Number(totals.rating || 0), Number(totals.review_count || 0), productId);
+}
+
+async function getFullProduct(productId, includeInactive = false) {
+  if (supabaseEnabled()) {
+    let query = supabase
+      .from('products')
+      .select('*, product_shades(name,color), product_finishes(name)')
+      .eq('id', productId);
+    if (!includeInactive) query = query.eq('is_active', true);
+    const { data, error } = await query.single();
+    if (!error && data) return mapSupabaseProduct(data);
+    console.warn('Supabase product read fallback:', error?.message);
+  }
+
+  const row = db.prepare(`SELECT * FROM products WHERE id = ? ${includeInactive ? '' : 'AND is_active = 1'}`).get(productId);
+  return row ? mapProduct(row) : null;
+}
+
+function mapSupabaseOrder(row) {
+  const items = row.order_items || [];
+  return {
+    id: row.id,
+    date: row.created_at,
+    dateLabel: formatDateLabel(row.created_at),
+    customerName: `${row.customer_first_name || ''} ${row.customer_last_name || ''}`.trim(),
+    customerEmail: row.customer_email,
+    customerPhone: row.customer_phone,
+    customerAddress: row.customer_address,
+    customerPostcode: row.customer_postcode,
+    customerCity: row.customer_city,
+    customerCountry: row.customer_country,
+    itemCount: items.reduce((sum, item) => sum + Number(item.quantity || 0), 0),
+    items: items.map(item => ({
+      productId: item.product_id,
+      productName: item.product_name,
+      productBrand: item.product_brand,
+      unitPrice: Number(item.unit_price || 0),
+      quantity: Number(item.quantity || 0),
+      selectedShade: item.selected_shade,
+      selectedFinish: item.selected_finish
+    })),
+    subtotal: Number(row.subtotal || 0),
+    discount: Number(row.discount || 0),
+    shipping: Number(row.shipping || 0),
+    total: Number(row.total || 0),
+    shippingMethod: row.shipping_method,
+    paymentMethod: row.payment_method,
+    paymentStatus: row.payment_status,
+    status: normalizeOrderStatus(row.status),
+    statusLabel: orderStatusLabel(row.status),
+    rewardPoints: Number(row.reward_points || 0),
+    stripeSessionId: row.stripe_session_id
+  };
+}
+
+async function loadAdminOrderDetail(orderId) {
+  if (supabaseEnabled()) {
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*, order_items(*)')
+      .eq('id', orderId)
+      .single();
+
+    if (!error && data) return mapSupabaseOrder(data);
+    console.warn('Supabase admin order detail fallback:', error?.message);
+  }
+
   const order = db.prepare(`
     SELECT
       o.*,
@@ -265,7 +372,101 @@ function loadAdminOrderDetail(orderId) {
   };
 }
 
-function listAdminOrders() {
+function mapCustomerOrder(order) {
+  const items = db.prepare(`
+    SELECT product_id, product_name, product_brand, unit_price, quantity, selected_shade, selected_finish
+    FROM order_items
+    WHERE order_id = ?
+    ORDER BY id ASC
+  `).all(order.id);
+
+  return {
+    id: order.id,
+    date: order.created_at,
+    dateLabel: formatDateLabel(order.created_at),
+    customerName: `${order.first_name} ${order.last_name}`.trim(),
+    customerEmail: order.email,
+    itemCount: items.reduce((sum, item) => sum + Number(item.quantity || 0), 0),
+    items: items.map(item => ({
+      productId: item.product_id,
+      productName: item.product_name,
+      productBrand: item.product_brand,
+      unitPrice: Number(item.unit_price || 0),
+      quantity: Number(item.quantity || 0),
+      selectedShade: item.selected_shade,
+      selectedFinish: item.selected_finish
+    })),
+    subtotal: Number(order.subtotal || 0),
+    discount: Number(order.discount || 0),
+    shipping: Number(order.shipping || 0),
+    total: Number(order.total || 0),
+    shippingMethod: order.shipping_method,
+    paymentMethod: order.payment_method,
+    paymentStatus: order.payment_status,
+    status: normalizeOrderStatus(order.status),
+    statusLabel: orderStatusLabel(order.status),
+    rewardPoints: Number(order.reward_points || 0)
+  };
+}
+
+async function listCustomerOrders(email) {
+  const normalizedEmail = String(email || '').trim().toLowerCase();
+  if (!normalizedEmail) return [];
+
+  if (supabaseEnabled()) {
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*, order_items(*)')
+      .eq('customer_email', normalizedEmail)
+      .order('created_at', { ascending: false });
+
+    if (!error) return data.map(mapSupabaseOrder);
+    console.warn('Supabase customer orders fallback:', error.message);
+  }
+
+  const orders = db.prepare(`
+    SELECT
+      o.*,
+      c.first_name,
+      c.last_name,
+      c.email,
+      c.phone
+    FROM orders o
+    JOIN customers c ON c.id = o.customer_id
+    WHERE lower(c.email) = ?
+    ORDER BY datetime(o.created_at) DESC
+  `).all(normalizedEmail);
+
+  return orders.map(mapCustomerOrder);
+}
+
+async function listAdminOrders() {
+  if (supabaseEnabled()) {
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*, order_items(id,quantity)')
+      .order('created_at', { ascending: false });
+
+    if (!error) {
+      return data.map(order => {
+        const mapped = mapSupabaseOrder(order);
+        return {
+          id: mapped.id,
+          date: mapped.date,
+          dateLabel: mapped.dateLabel,
+          customerName: mapped.customerName,
+          customerEmail: mapped.customerEmail,
+          itemCount: mapped.itemCount,
+          shippingMethod: mapped.shippingMethod,
+          total: mapped.total,
+          status: mapped.status,
+          statusLabel: mapped.statusLabel
+        };
+      });
+    }
+    console.warn('Supabase admin orders fallback:', error.message);
+  }
+
   const orders = db.prepare(`
     SELECT
       o.id,
@@ -360,7 +561,7 @@ function listAdminReturns() {
   }));
 }
 
-function getDashboardData() {
+async function getDashboardData() {
   const today = new Date();
   const monthStart = new Date(today.getFullYear(), today.getMonth(), 1).toISOString();
   const yearStart = new Date(today.getFullYear(), 0, 1).toISOString();
@@ -400,7 +601,7 @@ function getDashboardData() {
     if (Object.prototype.hasOwnProperty.call(statusCounts, key)) statusCounts[key] = Number(row.count || 0);
   });
 
-  const recentOrders = listAdminOrders().slice(0, 5);
+  const recentOrders = (await listAdminOrders()).slice(0, 5);
   const customers = listAdminCustomers();
   const returns = listAdminReturns();
 
@@ -564,9 +765,8 @@ function validateOrderPayload(payload) {
   return null;
 }
 
-function createOrder(payload, options = {}) {
+function createLocalOrder(payload, options = {}, orderId = `CTS-${new Date().getFullYear()}-${Math.floor(Math.random() * 900000 + 100000)}`) {
   const { customer, items, subtotal, discount, shipping, total, shippingMethod, paymentMethod, rewardPoints } = payload;
-  const orderId = `CTS-${new Date().getFullYear()}-${Math.floor(Math.random() * 900000 + 100000)}`;
   const status = options.status || 'processando';
   const paymentStatus = options.paymentStatus || 'unpaid';
 
@@ -634,6 +834,109 @@ function createOrder(payload, options = {}) {
   return orderId;
 }
 
+async function resolveSupabaseUserId(email) {
+  if (!supabaseEnabled() || !email) return null;
+  const { data } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('email', String(email).trim().toLowerCase())
+    .maybeSingle();
+  return data?.id || null;
+}
+
+async function createSupabaseOrder(payload, options = {}, orderId) {
+  const { customer, items, subtotal, discount, shipping, total, shippingMethod, paymentMethod, rewardPoints } = payload;
+  const status = options.status || 'processando';
+  const paymentStatus = options.paymentStatus || 'unpaid';
+  const normalizedEmail = String(customer.email || '').trim().toLowerCase();
+  const userId = await resolveSupabaseUserId(normalizedEmail);
+
+  const { error: orderError } = await supabase
+    .from('orders')
+    .upsert({
+      id: orderId,
+      user_id: userId,
+      customer_first_name: customer.firstName,
+      customer_last_name: customer.lastName,
+      customer_email: normalizedEmail,
+      customer_phone: customer.phone ?? null,
+      customer_address: customer.address ?? null,
+      customer_postcode: customer.postcode ?? null,
+      customer_city: customer.city ?? null,
+      customer_country: customer.country ?? 'Portugal',
+      subtotal: Number(subtotal) || 0,
+      discount: Number(discount) || 0,
+      shipping: Number(shipping) || 0,
+      total: Number(total) || 0,
+      shipping_method: shippingMethod || 'standard',
+      payment_method: paymentMethod || 'stripe',
+      reward_points: Number(rewardPoints) || 0,
+      status,
+      payment_status: paymentStatus
+    }, { onConflict: 'id' });
+
+  if (orderError) throw orderError;
+
+  await supabase.from('order_items').delete().eq('order_id', orderId);
+  const itemRows = items.map(item => ({
+    order_id: orderId,
+    product_id: item.product?.id ?? null,
+    product_name: item.product?.name || 'Produto',
+    product_brand: item.product?.brand || '',
+    unit_price: Number(item.product?.price) || 0,
+    quantity: Number(item.quantity) || 1,
+    selected_shade: item.selectedShade ?? null,
+    selected_finish: item.selectedFinish ?? null
+  }));
+
+  const { error: itemsError } = await supabase.from('order_items').insert(itemRows);
+  if (itemsError) throw itemsError;
+}
+
+async function createOrder(payload, options = {}) {
+  const orderId = `CTS-${new Date().getFullYear()}-${Math.floor(Math.random() * 900000 + 100000)}`;
+  createLocalOrder(payload, options, orderId);
+
+  if (supabaseEnabled()) {
+    try {
+      await createSupabaseOrder(payload, options, orderId);
+    } catch (err) {
+      console.warn('Supabase order insert fallback local only:', err.message);
+    }
+  }
+
+  return orderId;
+}
+
+async function updateOrderPayment(orderId, values) {
+  db.prepare(`
+    UPDATE orders
+    SET status = COALESCE(@status, status),
+        payment_status = COALESCE(@paymentStatus, payment_status),
+        stripe_session_id = COALESCE(@stripeSessionId, stripe_session_id),
+        stripe_payment_intent_id = COALESCE(@stripePaymentIntentId, stripe_payment_intent_id)
+    WHERE id = @orderId
+  `).run({
+    orderId,
+    status: values.status ?? null,
+    paymentStatus: values.paymentStatus ?? null,
+    stripeSessionId: values.stripeSessionId ?? null,
+    stripePaymentIntentId: values.stripePaymentIntentId ?? null
+  });
+
+  if (supabaseEnabled()) {
+    const patch = {};
+    if (values.status !== undefined) patch.status = values.status;
+    if (values.paymentStatus !== undefined) patch.payment_status = values.paymentStatus;
+    if (values.stripeSessionId !== undefined) patch.stripe_session_id = values.stripeSessionId;
+    if (values.stripePaymentIntentId !== undefined) patch.stripe_payment_intent_id = values.stripePaymentIntentId;
+    if (Object.keys(patch).length) {
+      const { error } = await supabase.from('orders').update(patch).eq('id', orderId);
+      if (error) console.warn('Supabase order payment update failed:', error.message);
+    }
+  }
+}
+
 app.get('/api/health', (_req, res) => {
   res.json({
     ok: true,
@@ -659,21 +962,63 @@ app.get('/api/products', async (_req, res) => {
 });
 
 app.get('/api/products/:id', async (req, res) => {
-  if (supabaseEnabled()) {
-    const { data, error } = await supabase
-      .from('products')
-      .select('*, product_shades(name,color), product_finishes(name)')
-      .eq('id', Number(req.params.id))
-      .eq('is_active', true)
-      .single();
+  const product = await getFullProduct(Number(req.params.id));
+  if (!product) return res.status(404).json({ error: 'Produto nao encontrado' });
+  res.json(product);
+});
 
-    if (!error && data) return res.json(mapSupabaseProduct(data));
-    console.warn('Supabase product fallback:', error?.message);
+app.get('/api/products/:id/reviews', async (req, res) => {
+  const productId = Number(req.params.id);
+  if (!productId) return res.status(400).json({ error: 'Produto invalido' });
+  res.json(await listProductReviews(productId));
+});
+
+app.post('/api/products/:id/reviews', async (req, res) => {
+  const productId = Number(req.params.id);
+  const customerName = String(req.body.customerName || '').trim();
+  const customerEmail = String(req.body.customerEmail || '').trim().toLowerCase();
+  const rating = Number(req.body.rating);
+  const title = String(req.body.title || '').trim();
+  const comment = String(req.body.comment || '').trim();
+
+  if (!productId || !customerName || !customerEmail || !Number.isInteger(rating) || rating < 1 || rating > 5) {
+    return res.status(400).json({ error: 'Nome, email e avaliacao de 1 a 5 sao obrigatorios' });
   }
 
-  const row = db.prepare('SELECT * FROM products WHERE id = ? AND is_active = 1').get(req.params.id);
-  if (!row) return res.status(404).json({ error: 'Produto nao encontrado' });
-  res.json(mapProduct(row));
+  try {
+    let review;
+    if (supabaseEnabled()) {
+      const userId = await resolveSupabaseUserId(customerEmail);
+      const { data, error } = await supabase
+        .from('product_reviews')
+        .insert({
+          product_id: productId,
+          user_id: userId,
+          customer_name: customerName,
+          customer_email: customerEmail,
+          rating,
+          title: title || null,
+          comment: comment || null,
+          is_approved: true
+        })
+        .select('id, product_id, customer_name, rating, title, comment, created_at')
+        .single();
+      if (error) throw error;
+      review = mapProductReview(data);
+    } else {
+      const result = db.prepare(`
+        INSERT INTO product_reviews (product_id, customer_name, customer_email, rating, title, comment)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `).run(productId, customerName, customerEmail, rating, title || null, comment || null);
+      refreshLocalProductReviewTotals(productId);
+      review = mapProductReview(db.prepare('SELECT * FROM product_reviews WHERE id = ?').get(result.lastInsertRowid));
+    }
+
+    const product = await getFullProduct(productId, true);
+    res.status(201).json({ review, product });
+  } catch (err) {
+    res.status(500).json({ error: err.message || 'Nao foi possivel guardar a avaliacao' });
+  }
 });
 
 app.post('/api/products', uploadProductImage.single('image'), async (req, res) => {
@@ -1005,35 +1350,35 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
-app.get('/api/orders', (_req, res) => {
-  const orders = db.prepare(`
-    SELECT o.*, c.first_name, c.last_name, c.email, c.phone
-    FROM orders o
-    JOIN customers c ON c.id = o.customer_id
-    ORDER BY o.created_at DESC
-  `).all();
-  res.json(orders);
+app.get('/api/orders', async (req, res) => {
+  const orders = await listCustomerOrders(req.query.email);
+  res.json({
+    orders,
+    rewardPoints: orders
+      .filter(order => order.paymentStatus === 'paid')
+      .reduce((sum, order) => sum + Number(order.rewardPoints || 0), 0)
+  });
 });
 
-app.get('/api/admin/dashboard', (_req, res) => {
-  res.json(getDashboardData());
+app.get('/api/admin/dashboard', async (_req, res) => {
+  res.json(await getDashboardData());
 });
 
 app.get('/api/admin/products', async (_req, res) => {
   res.json(await listAdminProducts());
 });
 
-app.get('/api/admin/orders', (_req, res) => {
-  res.json(listAdminOrders());
+app.get('/api/admin/orders', async (_req, res) => {
+  res.json(await listAdminOrders());
 });
 
-app.get('/api/admin/orders/:id', (req, res) => {
-  const order = loadAdminOrderDetail(req.params.id);
+app.get('/api/admin/orders/:id', async (req, res) => {
+  const order = await loadAdminOrderDetail(req.params.id);
   if (!order) return res.status(404).json({ error: 'Encomenda nao encontrada' });
   res.json(order);
 });
 
-app.patch('/api/admin/orders/:id', (req, res) => {
+app.patch('/api/admin/orders/:id', async (req, res) => {
   const allowed = ['processando', 'em_transito', 'entregue', 'cancelada', 'pending_payment'];
   const nextStatus = normalizeOrderStatus(req.body.status);
   if (!allowed.includes(nextStatus)) {
@@ -1041,9 +1386,13 @@ app.patch('/api/admin/orders/:id', (req, res) => {
   }
 
   const result = db.prepare('UPDATE orders SET status = ? WHERE id = ?').run(nextStatus, req.params.id);
-  if (!result.changes) return res.status(404).json({ error: 'Encomenda nao encontrada' });
+  if (supabaseEnabled()) {
+    const { error } = await supabase.from('orders').update({ status: nextStatus }).eq('id', req.params.id);
+    if (error) console.warn('Supabase admin status update failed:', error.message);
+  }
+  if (!result.changes && !supabaseEnabled()) return res.status(404).json({ error: 'Encomenda nao encontrada' });
 
-  const order = loadAdminOrderDetail(req.params.id);
+  const order = await loadAdminOrderDetail(req.params.id);
   res.json(order);
 });
 
@@ -1178,11 +1527,11 @@ app.put('/api/admin/settings', (req, res) => {
   res.json(payload);
 });
 
-app.post('/api/orders', (req, res) => {
+app.post('/api/orders', async (req, res) => {
   const error = validateOrderPayload(req.body);
   if (error) return res.status(400).json({ error });
 
-  const orderId = createOrder(req.body);
+  const orderId = await createOrder(req.body);
   res.status(201).json({ id: orderId });
 });
 
@@ -1206,7 +1555,7 @@ app.post('/api/payments/create-checkout-session', async (req, res) => {
       return res.status(400).json({ error: 'O total da encomenda tem de ser superior a 0.' });
     }
 
-    const orderId = createOrder(payload, {
+    const orderId = await createOrder(payload, {
       status: 'pending_payment',
       paymentStatus: 'unpaid'
     });
@@ -1248,7 +1597,7 @@ app.post('/api/payments/create-checkout-session', async (req, res) => {
       }
     });
 
-    db.prepare('UPDATE orders SET stripe_session_id = ? WHERE id = ?').run(session.id, orderId);
+    await updateOrderPayment(orderId, { stripeSessionId: session.id });
     res.status(201).json({ id: orderId, url: session.url });
   } catch (err) {
     res.status(500).json({ error: err.message || 'Nao foi possivel criar pagamento Stripe' });
@@ -1270,14 +1619,12 @@ app.get('/api/payments/session-status', async (req, res) => {
     const orderId = session.metadata?.orderId || null;
 
     if (orderId && session.payment_status === 'paid') {
-      db.prepare(`
-        UPDATE orders
-        SET status = 'processando',
-            payment_status = 'paid',
-            stripe_session_id = ?,
-            stripe_payment_intent_id = ?
-        WHERE id = ?
-      `).run(session.id, session.payment_intent || null, orderId);
+      await updateOrderPayment(orderId, {
+        status: 'processando',
+        paymentStatus: 'paid',
+        stripeSessionId: session.id,
+        stripePaymentIntentId: session.payment_intent || null
+      });
     }
 
     res.json({

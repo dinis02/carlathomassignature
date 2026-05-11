@@ -33,7 +33,7 @@
         <div class="profile-email">{{ account.email }}</div>
         <div class="rewards-chip">
           <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          Cliente autenticado
+          {{ rewardPoints }} pontos
         </div>
       </div>
 
@@ -45,7 +45,7 @@
         <button type="button" class="sidebar-menu-item" [class.active]="isActive('orders')" (click)="setSection('orders')">
           <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
           Encomendas
-          <span class="menu-badge">0</span>
+          <span class="menu-badge">{{ orderCount }}</span>
         </button>
         <button type="button" class="sidebar-menu-item" [class.active]="isActive('wishlist')" (click)="setSection('wishlist')">
           <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -80,12 +80,12 @@
         </div>
         <div class="stat-card">
           <div class="stat-label">Encomendas</div>
-          <div class="stat-value">0</div>
+          <div class="stat-value">{{ orderCount }}</div>
           <div class="stat-sub">historico real ligado a conta</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Rewards</div>
-          <div class="stat-value">0</div>
+          <div class="stat-value">{{ rewardPoints }}</div>
           <div class="stat-sub">pontos disponiveis</div>
         </div>
       </div>
@@ -107,10 +107,108 @@
             <p>Usado para login, confirmacoes de encomenda e comunicacoes da loja.</p>
           </div>
         </div>
+
+        @if (latestOrders.length > 0) {
+          <div class="account-real-card muted">
+            <div>
+              <div class="stat-label">Ultima encomenda</div>
+              <h3>{{ latestOrders[0].id }}</h3>
+              <p>{{ latestOrders[0].dateLabel }} - {{ latestOrders[0].statusLabel }} - {{ latestOrders[0].total | number:'1.2-2' }} EUR</p>
+            </div>
+            <button type="button" class="action-btn primary" (click)="setSection('orders')">Ver encomendas</button>
+          </div>
+        }
       </div>
 
       <div class="orders-list" *ngIf="isActive('orders')">
-        <div class="empty-orders">
+        <div *ngIf="ordersLoading" class="empty-orders">
+          <h3>A carregar encomendas...</h3>
+          <p>Estamos a procurar o historico ligado ao teu email.</p>
+        </div>
+
+        <div *ngIf="ordersError" class="settings-error">{{ ordersError }}</div>
+
+        @for (order of orders; track order.id) {
+          <article class="order-card">
+            <div class="order-card-header">
+              <div class="order-num">
+                <small>Encomenda</small>
+                {{ order.id }}
+              </div>
+              <div class="order-info">
+                <span class="order-date">{{ order.dateLabel }}</span>
+                <span class="order-items-count">{{ order.itemCount }} artigo(s) - {{ rewardLabel(order) }}</span>
+              </div>
+              <div class="order-total">{{ order.total | number:'1.2-2' }} EUR</div>
+              <div class="order-status">
+                <span class="status-badge" [ngClass]="statusClass(order)">
+                  <span class="status-dot"></span>
+                  {{ order.statusLabel }}
+                </span>
+              </div>
+            </div>
+
+            <div class="order-panel static">
+              <div class="order-panel-inner">
+                <div class="order-detail-grid">
+                  <div class="order-detail-box">
+                    <div class="detail-box-label">Pagamento</div>
+                    <div class="detail-box-content">
+                      <strong>{{ order.paymentStatus === 'paid' ? 'Pago' : 'A confirmar' }}</strong>
+                      {{ order.paymentMethod }}
+                    </div>
+                  </div>
+                  <div class="order-detail-box">
+                    <div class="detail-box-label">Envio</div>
+                    <div class="detail-box-content">
+                      <strong>{{ order.shippingMethod }}</strong>
+                      {{ order.shipping | number:'1.2-2' }} EUR
+                    </div>
+                  </div>
+                  <div class="order-detail-box">
+                    <div class="detail-box-label">Rewards</div>
+                    <div class="detail-box-content">
+                      <strong>{{ rewardLabel(order) }}</strong>
+                      {{ order.paymentStatus === 'paid' ? 'ganhos nesta compra' : 'ficam disponiveis apos pagamento' }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="order-items">
+                  <div class="order-items-header">
+                    <span>Produto</span>
+                    <span>Qtd.</span>
+                    <span>Total</span>
+                  </div>
+                  @for (item of order.items; track item.productId + '-' + item.selectedShade + '-' + item.selectedFinish) {
+                    <div class="order-item-row">
+                      <div class="order-item-img"></div>
+                      <div class="order-item-details">
+                        <div class="order-item-brand">{{ item.productBrand }}</div>
+                        <div class="order-item-name">{{ item.productName }}</div>
+                        <div class="order-item-meta">
+                          @if (item.selectedShade) { Tom: {{ item.selectedShade }} }
+                          @if (item.selectedFinish) { · {{ item.selectedFinish }} }
+                        </div>
+                      </div>
+                      <div class="order-item-qty">{{ item.quantity }}</div>
+                      <div class="order-item-price">{{ (item.unitPrice * item.quantity) | number:'1.2-2' }} EUR</div>
+                    </div>
+                  }
+                </div>
+
+                <div class="order-totals">
+                  <div class="totals-row"><span class="lbl">Subtotal</span><span class="val">{{ order.subtotal | number:'1.2-2' }} EUR</span></div>
+                  <div class="totals-row"><span class="lbl">Desconto</span><span class="val">-{{ order.discount | number:'1.2-2' }} EUR</span></div>
+                  <div class="totals-row"><span class="lbl">Envio</span><span class="val">{{ order.shipping | number:'1.2-2' }} EUR</span></div>
+                  <div class="totals-row total-final"><span class="lbl">Total</span><span class="val">{{ order.total | number:'1.2-2' }} EUR</span></div>
+                </div>
+              </div>
+            </div>
+          </article>
+        }
+
+        <div *ngIf="!ordersLoading && orders.length === 0" class="empty-orders">
           <svg width="54" height="54" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
           <h3>Ainda nao existem encomendas</h3>
           <p>Quando fizeres uma compra, o historico aparece aqui.</p>

@@ -1,5 +1,5 @@
 ﻿import { Component, OnInit, inject, AfterViewInit, signal, computed } from '@angular/core';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProductService } from '../../core/services/product.service';
@@ -47,8 +47,13 @@ import { Product } from '../../core/models/models';
       <!-- Sidebar -->
       <aside class="sidebar">
         <!-- Active filters -->
-        @if (activeBrands().length > 0) {
+        @if (activeBrands().length > 0 || searchTerm()) {
           <div class="active-filters">
+            @if (searchTerm()) {
+              <div class="active-filter" (click)="clearSearch()">
+                Pesquisa: {{ searchTerm() }} <span>+</span>
+              </div>
+            }
             @for (b of activeBrands(); track b) {
               <div class="active-filter" (click)="toggleBrand(b)">
                 {{ b }} <span>+</span>
@@ -193,11 +198,13 @@ export class ProductsComponent implements OnInit, AfterViewInit {
   private cartSvc    = inject(CartService);
   wishlist           = inject(WishlistService);
   private route      = inject(ActivatedRoute);
+  private router     = inject(Router);
 
   allProducts = signal<Product[]>(this.productSvc.getAll());
 
   activeCategory = signal('Todos');
   activeBrands   = signal<string[]>([]);
+  searchTerm     = signal('');
   maxPrice       = signal(200);
   showNew        = signal(false);
   showSale       = signal(false);
@@ -241,6 +248,9 @@ export class ProductsComponent implements OnInit, AfterViewInit {
   }
 
   get currentHeading(): string {
+    if (this.searchTerm()) {
+      return `Pesquisa: ${this.searchTerm()}`;
+    }
     if (this.activeBrands().length === 1 && this.activeCategory() === 'Todos') {
       return this.activeBrands()[0];
     }
@@ -270,6 +280,22 @@ export class ProductsComponent implements OnInit, AfterViewInit {
     items = items.filter(p => p.price <= this.maxPrice());
     if (this.showNew()) items = items.filter(p => p.badge === 'Novo');
     if (this.showSale()) items = items.filter(p => !!p.originalPrice);
+    const search = this.searchTerm().trim().toLowerCase();
+    if (search) {
+      items = items.filter(product =>
+        [
+          product.name,
+          product.brand,
+          product.category,
+          product.description,
+          product.badge
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase()
+          .includes(search)
+      );
+    }
     return items;
   });
 
@@ -290,6 +316,7 @@ export class ProductsComponent implements OnInit, AfterViewInit {
       this.activeCategory.set(p['cat'] || 'Todos');
       this.activeBrands.set(p['brand'] ? [p['brand']] : []);
       this.showSale.set(p['promo'] === 'sale');
+      this.searchTerm.set(String(p['q'] || '').trim());
     });
 
     this.productSvc.loadAll().subscribe(products => {
@@ -330,10 +357,25 @@ export class ProductsComponent implements OnInit, AfterViewInit {
 
   clearFilters(): void {
     this.activeBrands.set([]);
+    this.searchTerm.set('');
     this.maxPrice.set(200);
     this.showNew.set(false);
     this.showSale.set(false);
     this.activeCategory.set('Todos');
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { cat: null, brand: null, promo: null, q: null },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  clearSearch(): void {
+    this.searchTerm.set('');
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { q: null },
+      queryParamsHandling: 'merge'
+    });
   }
 
   addToCart(e: Event, product: Product): void {

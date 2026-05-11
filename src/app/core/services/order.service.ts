@@ -23,6 +23,41 @@ export interface CreateOrderPayload {
   rewardPoints: number;
 }
 
+export interface CustomerOrderItem {
+  productId: number;
+  productName: string;
+  productBrand: string;
+  unitPrice: number;
+  quantity: number;
+  selectedShade?: string | null;
+  selectedFinish?: string | null;
+}
+
+export interface CustomerOrder {
+  id: string;
+  date: string;
+  dateLabel: string;
+  customerName: string;
+  customerEmail: string;
+  itemCount: number;
+  items: CustomerOrderItem[];
+  subtotal: number;
+  discount: number;
+  shipping: number;
+  total: number;
+  shippingMethod: string;
+  paymentMethod: string;
+  paymentStatus: string;
+  status: string;
+  statusLabel: string;
+  rewardPoints: number;
+}
+
+export interface CustomerOrdersResponse {
+  orders: CustomerOrder[];
+  rewardPoints: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class OrderService {
   private http = inject(HttpClient);
@@ -36,6 +71,12 @@ export class OrderService {
     return this.http.post<{ id: string; url: string }>(
       `${this.apiUrl}/payments/create-checkout-session`,
       payload
+    );
+  }
+
+  getCustomerOrders(email: string): Observable<CustomerOrdersResponse> {
+    return this.http.get<CustomerOrdersResponse>(
+      `${this.apiUrl}/orders?email=${encodeURIComponent(email)}`
     );
   }
 

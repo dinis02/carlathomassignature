@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { Product } from '../../core/models/models';
 import { ProductService } from '../../core/services/product.service';
 import { WishlistService } from '../../core/services/wishlist.service';
+import { CustomerOrder, OrderService } from '../../core/services/order.service';
 
 type AccountSection = 'overview' | 'orders' | 'wishlist' | 'addresses' | 'settings';
 
@@ -16,10 +17,12 @@ type AccountSection = 'overview' | 'orders' | 'wishlist' | 'addresses' | 'settin
   templateUrl: './orders.component.html',
   styleUrls: ['./orders.component.scss']
 })
-export class OrdersComponent {
+export class OrdersComponent implements OnInit {
   auth = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private productSvc = inject(ProductService);
+  private orderSvc = inject(OrderService);
   wishlist = inject(WishlistService);
 
   session = this.auth.session;
@@ -48,6 +51,28 @@ export class OrdersComponent {
   allProducts: Product[] = this.productSvc.getAll();
   wishlistLoading = false;
   wishlistError = '';
+  orders: CustomerOrder[] = [];
+  ordersLoading = false;
+  ordersError = '';
+  rewardPoints = 0;
+
+  ngOnInit(): void {
+    this.auth.ready().then(() => {
+      const account = this.session();
+      if (account) {
+        this.profileName = account.name;
+        this.profileEmail = account.email;
+        this.loadOrders();
+      }
+    });
+
+    this.route.queryParamMap.subscribe(params => {
+      const section = params.get('sec') as AccountSection | null;
+      if (section && ['overview', 'orders', 'wishlist', 'addresses', 'settings'].includes(section)) {
+        this.setSection(section);
+      }
+    });
+  }
 
   get initials(): string {
     const name = this.session()?.name || 'Cliente';
@@ -73,6 +98,9 @@ export class OrdersComponent {
     }
     if (section === 'wishlist') {
       void this.loadWishlist();
+    }
+    if (section === 'orders' || section === 'overview') {
+      this.loadOrders();
     }
   }
 
@@ -105,6 +133,7 @@ export class OrdersComponent {
     }).then(() => {
       this.savingProfile = false;
       this.profileMessage = 'Dados guardados. Se mudou o email, confirme a mensagem enviada pela Supabase.';
+      this.loadOrders();
     }).catch(err => {
       this.savingProfile = false;
       this.profileError = err?.message || 'Nao foi possivel guardar os dados.';
@@ -202,6 +231,48 @@ export class OrdersComponent {
   logout(): void {
     this.auth.logout();
     this.router.navigate(['/']);
+  }
+
+  get orderCount(): number {
+    return this.orders.length;
+  }
+
+  get latestOrders(): CustomerOrder[] {
+    return this.orders.slice(0, 2);
+  }
+
+  loadOrders(): void {
+    const account = this.session();
+    if (!account?.email || this.ordersLoading) return;
+
+    this.ordersLoading = true;
+    this.ordersError = '';
+
+    this.orderSvc.getCustomerOrders(account.email).subscribe({
+      next: result => {
+        this.orders = result.orders || [];
+        this.rewardPoints = Number(result.rewardPoints || 0);
+        this.ordersLoading = false;
+      },
+      error: err => {
+        this.ordersLoading = false;
+        this.ordersError = err?.error?.error || 'Nao foi possivel carregar as encomendas.';
+      }
+    });
+  }
+
+  statusClass(order: CustomerOrder): string {
+    const status = String(order.status || '').toLowerCase();
+    if (status === 'em_transito') return 'enviado';
+    if (status === 'pending_payment') return 'aguarda';
+    if (status === 'cancelada') return 'cancelado';
+    return status || 'processando';
+  }
+
+  rewardLabel(order: CustomerOrder): string {
+    return order.paymentStatus === 'paid'
+      ? `+${order.rewardPoints} pontos`
+      : `${order.rewardPoints} pontos pendentes`;
   }
 
   get wishlistProducts(): Product[] {

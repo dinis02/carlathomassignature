@@ -22,6 +22,17 @@ export interface Product {
   isActive?: boolean;
 }
 
+export interface ProductReview {
+  id: number;
+  productId: number;
+  customerName: string;
+  rating: number;
+  title?: string;
+  comment?: string;
+  createdAt: string;
+  createdLabel: string;
+}
+
 export interface Shade {
   name: string;
   color: string;

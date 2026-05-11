@@ -1,16 +1,18 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ProductService } from '../../core/services/product.service';
 import { CartService } from '../../core/services/cart.service';
 import { WishlistService } from '../../core/services/wishlist.service';
-import { Product } from '../../core/models/models';
+import { AuthService } from '../../core/services/auth.service';
+import { Product, ProductReview } from '../../core/models/models';
 
 @Component({
   selector: 'app-product-detail',
   standalone: true,
-  imports: [RouterLink, CommonModule],
+  imports: [RouterLink, CommonModule, FormsModule],
   template: `
     @if (product) {
       <div class="breadcrumb-bar">
@@ -170,6 +172,73 @@ import { Product } from '../../core/models/models';
               </div>
             }
           </div>
+
+          <section class="reviews-panel">
+            <div class="reviews-head">
+              <div>
+                <div class="section-label">Avaliacoes reais</div>
+                <h2>Opinioes de clientes</h2>
+              </div>
+              <div class="reviews-summary">
+                <strong>{{ product.rating | number:'1.1-1' }}</strong>
+                <span>{{ product.reviewCount }} avaliacoes</span>
+              </div>
+            </div>
+
+            @if (reviewsLoading) {
+              <p class="reviews-muted">A carregar avaliacoes...</p>
+            } @else if (reviews.length) {
+              <div class="reviews-list">
+                @for (review of reviews; track review.id) {
+                  <article class="review-card">
+                    <div class="review-top">
+                      <strong>{{ review.customerName }}</strong>
+                      <span>{{ review.createdLabel }}</span>
+                    </div>
+                    <div class="stars review-stars">
+                      @for (s of starsArray(review.rating); track $index) {
+                        <svg class="star" [class.empty]="!s" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                      }
+                    </div>
+                    @if (review.title) { <h3>{{ review.title }}</h3> }
+                    @if (review.comment) { <p>{{ review.comment }}</p> }
+                  </article>
+                }
+              </div>
+            } @else {
+              <p class="reviews-muted">Ainda nao existem avaliacoes para este produto.</p>
+            }
+
+            <form class="review-form" (ngSubmit)="submitReview()">
+              <div class="section-label">Deixar avaliacao</div>
+              @if (!session()) {
+                <p class="reviews-muted">Inicia sessao para deixar uma avaliacao associada a tua conta.</p>
+              }
+              <label>
+                <span>Pontuacao</span>
+                <select name="reviewRating" [(ngModel)]="reviewRating" [disabled]="!session()">
+                  <option [ngValue]="5">5 - Excelente</option>
+                  <option [ngValue]="4">4 - Muito bom</option>
+                  <option [ngValue]="3">3 - Bom</option>
+                  <option [ngValue]="2">2 - Razoavel</option>
+                  <option [ngValue]="1">1 - Fraco</option>
+                </select>
+              </label>
+              <label>
+                <span>Titulo</span>
+                <input type="text" name="reviewTitle" [(ngModel)]="reviewTitle" [disabled]="!session()" maxlength="80">
+              </label>
+              <label>
+                <span>Comentario</span>
+                <textarea name="reviewComment" [(ngModel)]="reviewComment" [disabled]="!session()" rows="4"></textarea>
+              </label>
+              @if (reviewError) { <div class="review-error">{{ reviewError }}</div> }
+              @if (reviewMessage) { <div class="review-success">{{ reviewMessage }}</div> }
+              <button class="btn-secondary" type="submit" [disabled]="!session() || savingReview">
+                {{ savingReview ? 'A guardar...' : 'Publicar avaliacao' }}
+              </button>
+            </form>
+          </section>
         </div>
       </div>
 
@@ -215,9 +284,19 @@ export class ProductDetailComponent implements OnInit {
   private router = inject(Router);
   private sanitizer = inject(DomSanitizer);
   private wishlist = inject(WishlistService);
+  private auth = inject(AuthService);
 
   product: Product | undefined;
   related: Product[] = [];
+  reviews: ProductReview[] = [];
+  reviewsLoading = false;
+  reviewRating = 5;
+  reviewTitle = '';
+  reviewComment = '';
+  reviewMessage = '';
+  reviewError = '';
+  savingReview = false;
+  session = this.auth.session;
 
   activeThumb = signal(0);
   selectedShade = signal('');
@@ -301,6 +380,39 @@ export class ProductDetailComponent implements OnInit {
     return Array.from({ length: 5 }, (_, i) => i < Math.round(rating));
   }
 
+  submitReview(): void {
+    if (!this.product) return;
+    const account = this.session();
+    if (!account) {
+      this.reviewError = 'Inicia sessao para publicar uma avaliacao.';
+      return;
+    }
+
+    this.reviewError = '';
+    this.reviewMessage = '';
+    this.savingReview = true;
+    this.productSvc.createReview(this.product.id, {
+      customerName: account.name,
+      customerEmail: account.email,
+      rating: Number(this.reviewRating),
+      title: this.reviewTitle,
+      comment: this.reviewComment
+    }).subscribe({
+      next: result => {
+        this.product = result.product;
+        this.reviewTitle = '';
+        this.reviewComment = '';
+        this.reviewMessage = 'Avaliacao guardada com sucesso.';
+        this.savingReview = false;
+        this.loadReviews(this.product.id);
+      },
+      error: err => {
+        this.reviewError = err?.error?.error || 'Nao foi possivel guardar a avaliacao.';
+        this.savingReview = false;
+      }
+    });
+  }
+
   private setProduct(id: number): void {
     this.product = this.productSvc.getById(id);
     if (this.product) {
@@ -309,6 +421,21 @@ export class ProductDetailComponent implements OnInit {
       this.selectedFinish.set(this.product.finishes?.[0] ?? '');
       this.activeThumb.set(0);
       this.qty.set(1);
+      this.loadReviews(id);
     }
+  }
+
+  private loadReviews(productId: number): void {
+    this.reviewsLoading = true;
+    this.productSvc.getReviews(productId).subscribe({
+      next: reviews => {
+        this.reviews = reviews;
+        this.reviewsLoading = false;
+      },
+      error: () => {
+        this.reviews = [];
+        this.reviewsLoading = false;
+      }
+    });
   }
 }

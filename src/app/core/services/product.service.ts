@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, of, tap } from 'rxjs';
-import { Product } from '../models/models';
+import { Product, ProductReview } from '../models/models';
 
 @Injectable({ providedIn: 'root' })
 export class ProductService {
@@ -53,6 +53,28 @@ export class ProductService {
     return this.http.post<Product>(`${this.apiUrl}/products`, formData).pipe(
       tap(product => {
         this.products = [...this.products, this.decorateProduct(product)];
+      })
+    );
+  }
+
+  getReviews(productId: number): Observable<ProductReview[]> {
+    return this.http.get<ProductReview[]>(`${this.apiUrl}/products/${productId}/reviews`);
+  }
+
+  createReview(productId: number, payload: {
+    customerName: string;
+    customerEmail: string;
+    rating: number;
+    title?: string;
+    comment?: string;
+  }): Observable<{ review: ProductReview; product: Product }> {
+    return this.http.post<{ review: ProductReview; product: Product }>(
+      `${this.apiUrl}/products/${productId}/reviews`,
+      payload
+    ).pipe(
+      tap(result => {
+        const product = this.decorateProduct(result.product);
+        this.products = this.products.map(item => item.id === product.id ? product : item);
       })
     );
   }
