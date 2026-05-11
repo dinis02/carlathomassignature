@@ -19,7 +19,7 @@ const clientUrl = process.env.CLIENT_URL || 'http://localhost:4200';
 const stripe = process.env.STRIPE_SECRET_KEY ? Stripe(process.env.STRIPE_SECRET_KEY) : null;
 const uploadProductImage = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 },
+  limits: { fileSize: 20 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     if (!file.mimetype.startsWith('image/')) return cb(new Error('O ficheiro tem de ser uma imagem'));
     cb(null, true);
@@ -2026,6 +2026,17 @@ if (fs.existsSync(browserDist)) {
     res.sendFile(path.join(browserDist, 'index.html'));
   });
 }
+
+app.use((err, _req, res, next) => {
+  if (!err) return next();
+  if (err instanceof multer.MulterError) {
+    const message = err.code === 'LIMIT_FILE_SIZE'
+      ? 'A fotografia e demasiado grande. Use imagens ate 20MB.'
+      : err.message;
+    return res.status(400).json({ error: message });
+  }
+  return res.status(500).json({ error: err.message || 'Erro inesperado no servidor' });
+});
 
 app.listen(port, () => {
   console.log(`Carla Thomas pronta em http://localhost:${port}`);

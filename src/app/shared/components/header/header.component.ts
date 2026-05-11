@@ -27,7 +27,7 @@ import { LoginModalComponent } from '../login-modal.component';
             <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
           </svg>
         </button>
-        <nav class="nav-left mega-nav">
+        <nav class="nav-left mega-nav" (click)="closeMegaMenu()">
           <div class="nav-item" (pointerenter)="setMegaMenu('maquilhagem')" (mouseover)="setMegaMenu('maquilhagem')" (mouseleave)="clearMegaMenu()" [class.mega-open]="activeMegaMenu === 'maquilhagem'">
             <a routerLink="/produtos" [queryParams]="{cat:'Maquilhagem'}" class="nav-link" routerLinkActive="active">Maquilhagem</a>
             <div class="mega-menu">
@@ -108,7 +108,7 @@ import { LoginModalComponent } from '../login-modal.component';
         </a>
 
         <div class="nav-right">
-          <nav class="mega-nav nav-right-links">
+          <nav class="mega-nav nav-right-links" (click)="closeMegaMenu()">
             <div class="nav-item" (pointerenter)="setMegaMenu('corpo')" (mouseover)="setMegaMenu('corpo')" (mouseleave)="clearMegaMenu()" [class.mega-open]="activeMegaMenu === 'corpo'">
               <a routerLink="/produtos" [queryParams]="{cat:'Corpo'}" class="nav-link">Corpo</a>
               <div class="mega-menu">
@@ -189,11 +189,6 @@ import { LoginModalComponent } from '../login-modal.component';
               </button>
               <form class="mega-menu search-mega" (submit)="submitSearch($event)">
                 <div class="mega-inner search-inner">
-                  <div class="mega-feature">
-                    <span>Pesquisa</span>
-                    <strong>Encontre o produto certo</strong>
-                    <p>Procure por produto, categoria ou marca e continue diretamente para a loja.</p>
-                  </div>
                   <div class="search-field">
                     <label class="search-label" for="headerSearch">Pesquisar</label>
                     <input
@@ -347,8 +342,6 @@ import { LoginModalComponent } from '../login-modal.component';
       pointer-events: none;
       transition: opacity 180ms ease, transform 180ms ease, visibility 180ms ease;
     }
-    .nav-item:hover .mega-menu,
-    .nav-item:focus-within .mega-menu,
     .nav-item.mega-open .mega-menu {
       opacity: 1;
       visibility: visible;
@@ -358,7 +351,7 @@ import { LoginModalComponent } from '../login-modal.component';
     .mega-inner {
       max-width: 1400px;
       margin: 0 auto;
-      padding: 34px 48px 38px;
+      padding: 28px 48px 32px;
       display: grid;
       grid-template-columns: minmax(280px, 1.2fr) minmax(180px, 0.7fr) minmax(180px, 0.7fr);
       gap: 54px;
@@ -469,9 +462,11 @@ import { LoginModalComponent } from '../login-modal.component';
 
     .search-inner {
       display: grid;
-      grid-template-columns: minmax(260px, 0.85fr) minmax(320px, 1fr) auto;
-      align-items: end;
-      gap: 42px;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 16px;
+      padding-top: 18px;
+      padding-bottom: 18px;
     }
 
     .search-field {
@@ -482,6 +477,7 @@ import { LoginModalComponent } from '../login-modal.component';
     .search-actions {
       display: flex;
       gap: 10px;
+      align-self: end;
     }
 
     .search-label {
@@ -499,7 +495,7 @@ import { LoginModalComponent } from '../login-modal.component';
       height: 52px;
       padding: 0 18px;
       font-family: inherit;
-      font-size: 15px;
+      font-size: 16px;
       outline: none;
     }
 
@@ -510,7 +506,8 @@ import { LoginModalComponent } from '../login-modal.component';
     .search-submit {
       border: 1px solid var(--noir);
       height: 52px;
-      padding: 0 22px;
+      min-width: 160px;
+      padding: 0 28px;
       background: var(--noir);
       color: var(--creme);
       font-size: 10px;
@@ -711,6 +708,10 @@ export class HeaderComponent {
     if (!this.searchOpen) {
       this.activeMegaMenu = '';
     }
+  }
+  closeMegaMenu() {
+    this.activeMegaMenu = '';
+    this.searchOpen = false;
   }
   openSearchMenu() {
     this.activeMegaMenu = 'search';
