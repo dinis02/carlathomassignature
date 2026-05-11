@@ -37,6 +37,21 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/reset-password/reset-password.component').then(m => m.ResetPasswordComponent)
   },
   {
+    path: 'politica-privacidade',
+    data: { page: 'privacy' },
+    loadComponent: () => import('./pages/legal/legal.component').then(m => m.LegalComponent)
+  },
+  {
+    path: 'politica-cookies',
+    data: { page: 'cookies' },
+    loadComponent: () => import('./pages/legal/legal.component').then(m => m.LegalComponent)
+  },
+  {
+    path: 'termos-condicoes',
+    data: { page: 'terms' },
+    loadComponent: () => import('./pages/legal/legal.component').then(m => m.LegalComponent)
+  },
+  {
     path: 'encomendas',
     canActivate: [accountGuard],
     loadComponent: () => import('./pages/orders/orders.component').then(m => m.OrdersComponent)
