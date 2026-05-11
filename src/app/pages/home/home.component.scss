@@ -174,7 +174,7 @@
   &:hover .product-actions { opacity: 1; transform: translateX(0); }
 }
 .product-image {
-  aspect-ratio: 3/4; overflow: hidden; background: var(--creme-dark); position: relative;
+  aspect-ratio: 3/4; overflow: hidden; background: linear-gradient(145deg, #fbfaf8 0%, #f3eee8 100%); position: relative;
 }
 .product-photo {
   width: 100%;

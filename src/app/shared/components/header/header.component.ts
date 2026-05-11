@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, HostListener, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -14,13 +14,13 @@ import { LoginModalComponent } from '../login-modal.component';
   imports: [RouterLink, RouterLinkActive, CommonModule, FormsModule, AdminModalComponent, LoginModalComponent],
   styleUrls: ['./header.component.scss'],
   template: `
-    <div class="announcement">
+    <div class="announcement" [class.hidden]="scrolledPastTop">
       Entrega grátis a partir de <span>19€</span> &nbsp;·&nbsp;
       Nova coleção primavera &nbsp;·&nbsp;
       <span>★ Makeup Rewards</span>
     </div>
 
-    <header>
+    <header [class.compact]="scrolledPastTop">
       <div class="header-inner">
         <button class="mobile-menu-btn" title="Menu" aria-label="Menu" (click)="toggleMobileMenu()">
           <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -287,6 +287,13 @@ import { LoginModalComponent } from '../login-modal.component';
       left: 0;
       right: 0;
       z-index: 130;
+      transform: translateY(0);
+      transition: transform 220ms ease, opacity 220ms ease;
+    }
+    .announcement.hidden {
+      opacity: 0;
+      transform: translateY(-100%);
+      pointer-events: none;
     }
     .announcement span { color: var(--rose-gold); }
 
@@ -295,6 +302,11 @@ import { LoginModalComponent } from '../login-modal.component';
       background: rgba(247,244,240,0.92);
       backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border);
+      transition: top 220ms ease, box-shadow 220ms ease;
+    }
+    header.compact {
+      top: 0;
+      box-shadow: 0 8px 30px rgba(20, 16, 13, 0.08);
     }
     .header-inner {
       max-width: 1400px; margin: 0 auto;
@@ -408,7 +420,9 @@ import { LoginModalComponent } from '../login-modal.component';
     }
     .logo-img {
       display: block;
-      transform: scale(0.93);
+      width: 132px;
+      height: auto;
+      transform: scale(0.84);
       transform-origin: center;
     }
     .logo-main {
@@ -616,7 +630,7 @@ import { LoginModalComponent } from '../login-modal.component';
       }
 
       .logo-img {
-        width: 132px;
+        width: 118px;
       }
     }
 
@@ -643,8 +657,12 @@ import { LoginModalComponent } from '../login-modal.component';
         top: 44px;
       }
 
+      header.compact {
+        top: 0;
+      }
+
       .logo-img {
-        width: 112px;
+        width: 100px;
       }
 
       .header-icons {
@@ -694,6 +712,12 @@ export class HeaderComponent {
   searchOpen = false;
   searchTerm = '';
   activeMegaMenu = '';
+  scrolledPastTop = false;
+
+  @HostListener('window:scroll')
+  onWindowScroll() {
+    this.scrolledPastTop = window.scrollY > 24;
+  }
 
   toggleMobileMenu() {
     this.mobileMenuOpen = !this.mobileMenuOpen;

@@ -312,7 +312,7 @@ body {
 .product-image {
   aspect-ratio: 3/4;
   overflow: hidden;
-  background: var(--creme-dark);
+  background: linear-gradient(145deg, #fbfaf8 0%, #f3eee8 100%);
   position: relative;
   display: flex;
   align-items: stretch;
