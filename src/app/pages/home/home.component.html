@@ -119,9 +119,9 @@
           <ng-container *ngIf="product.image; else featuredGradient">
             <img class="product-photo" [src]="product.image" [alt]="product.name">
           </ng-container>
-          <ng-templateé #featuredGradient>
+          <ng-template #featuredGradient>
             <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;" [style.background]="'linear-gradient(145deg,' + (product.gradientFrom||'#EDE0D4') + ',' + (product.gradientTo||'#D4C4B5') + ')'"></div>
-          </ng-templateé>
+          </ng-template>
           <span *ngIf="product.badge" class="product-badge">{{ product.badge }}</span>
           <div class="product-actions">
             <button

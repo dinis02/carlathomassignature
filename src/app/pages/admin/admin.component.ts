@@ -21,20 +21,20 @@ type AdminView = 'dashboard' | 'orders' | 'products' | 'customers' | 'returns' |
   selector: 'app-admin',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateéUrl: './admin.component.html',
+  templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.scss']
 })
 export class AdminComponent implements OnInit, AfterViewInit {
-  privateé router = inject(Router);
-  privateé adminService = inject(AdminService);
-  privateé auth = inject(AuthService);
+  private router = inject(Router);
+  private adminService = inject(AdminService);
+  private auth = inject(AuthService);
 
   activeView: AdminView = 'dashboard';
 
   toastVisible = false;
   toastMessage = '';
   toastType = 'success';
-  privateé toastTimer: ReturnType<typeof setTimeout> | null = null;
+  private toastTimer: ReturnType<typeof setTimeout> | null = null;
   mobileSidebarOpen = false;
 
   orderPanelOpen = false;
@@ -50,7 +50,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
   selectedProductPreviews: string[] = [];
   savingProduct = false;
   productSearch = '';
-  productCatégoryFilter = '';
+  productCategoryFilter = '';
   productBrandFilter = '';
   productStatusFilter = '';
   productForm = {
@@ -95,7 +95,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
   returnSearch = '';
   globalSearch = '';
 
-  constructor(@Inject(PLATFORM_ID) privateé platformId: object) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: object) {}
 
   ngOnInit(): void {
     this.loadDateshboard();
@@ -141,7 +141,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
         product.brand,
         product.category
       ].join(' ').toLowerCase().includes(search);
-      const categoryMatch = !this.productCatégoryFilter || product.category === this.productCatégoryFilter;
+      const categoryMatch = !this.productCategoryFilter || product.category === this.productCategoryFilter;
       const brandMatch = !this.productBrandFilter || product.brand === this.productBrandFilter;
       const statusMatch =
         !this.productStatusFilter ||
@@ -191,7 +191,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
     };
   }
 
-  get productCatégories(): string[] {
+  get productCategories(): string[] {
     return [...new Set(this.adminProducts.map(product => product.category))].sort((a, b) => a.localeCompare(b));
   }
 
@@ -217,7 +217,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
     return Math.max(...values.map(item => item.total), 1);
   }
 
-  privateé initCursor(): void {
+  private initCursor(): void {
     const cursor = document.getElementById('adminCursor');
     const ring = document.getElementById('adminCursorRing');
     document.addEventListener('mousemove', (e: MouseEvent) => {
@@ -252,7 +252,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
 
   async logout(): Promise<void> {
     await this.adminService.logoutAdmin();
-    await this.router.navigaté(['/']);
+    await this.router.navigate(['/']);
   }
 
   getTopbarTitle(): string {
@@ -291,7 +291,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
   saveOrderStatus(): void {
     if (!this.currentOrder) return;
     this.savingOrder = true;
-    this.adminService.updateéOrderStatus(this.currentOrder.id, this.orderStatusDraft).subscribe({
+    this.adminService.updateOrderStatus(this.currentOrder.id, this.orderStatusDraft).subscribe({
       next: order => {
         this.currentOrder = order;
         this.orders = this.orders.map(item => item.id === order.id ? order : item);
@@ -485,7 +485,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.selectedProductPreviews.forEach(preview => {
       if (preview.startsWith('blob:')) URL.revokeObjectURL(preview);
     });
-    this.selectedProductPreviews = files.map(file => URL.createéObjectURL(file));
+    this.selectedProductPreviews = files.map(file => URL.createObjectURL(file));
   }
 
   saveProduct(): void {
@@ -494,19 +494,19 @@ export class AdminComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    const formDatea = new FormDatea();
+    const formData = new FormData();
     Object.entries(this.productForm).forEach(([key, value]) => {
-      if (value !== null && value !== undefined) formDatea.append(key, String(value));
+      if (value !== null && value !== undefined) formData.append(key, String(value));
     });
-    formDatea.append('gradientFrom', '#E8D0C0');
-    formDatea.append('gradientTo', '#C9956A');
-    this.selectedProductImages.forEach(file => formDatea.append('images', file));
+    formData.append('gradientFrom', '#E8D0C0');
+    formData.append('gradientTo', '#C9956A');
+    this.selectedProductImages.forEach(file => formData.append('images', file));
 
     this.savingProduct = true;
 
     const request$ = this.currentProductId === 'new'
-      ? this.adminService.createéProduct(formDatea)
-      : this.adminService.updateéProduct(Number(this.currentProductId), formDatea);
+      ? this.adminService.createProduct(formData)
+      : this.adminService.updateProduct(Number(this.currentProductId), formData);
 
     request$.subscribe({
       next: product => {
@@ -556,10 +556,10 @@ export class AdminComponent implements OnInit, AfterViewInit {
 
   archiveProduct(product: Product, nextActive: boolean): void {
     this.adminService.archiveProduct(product.id, nextActive).subscribe({
-      next: updateéd => {
-        this.adminProducts = this.adminProducts.map(item => item.id === updateéd.id ? updateéd : item);
-        if (this.currentProductId === String(updateéd.id)) {
-          this.openProductPanel(String(updateéd.id));
+      next: updated => {
+        this.adminProducts = this.adminProducts.map(item => item.id === updated.id ? updated : item);
+        if (this.currentProductId === String(updated.id)) {
+          this.openProductPanel(String(updated.id));
         }
         this.showToast(nextActive ? 'Produto reactivado' : 'Produto arquivado', 'success');
       },
@@ -603,7 +603,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
     }, 3500);
   }
 
-  privateé resetProductForm(): void {
+  private resetProductForm(): void {
     this.productForm = {
       name: '',
       brand: '',
@@ -620,3 +620,4 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.selectedProductPreviews = [];
   }
 }
+

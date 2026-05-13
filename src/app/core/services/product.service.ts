@@ -5,10 +5,10 @@ import { Product, ProductReview } from '../models/models';
 
 @Injectable({ providedIn: 'root' })
 export class ProductService {
-  privateé http = inject(HttpClient);
-  privateé apiUrl = '/api';
+  private http = inject(HttpClient);
+  private apiUrl = '/api';
 
-  privateé products: Product[] = [
+  private products: Product[] = [
     {
       id: 1,
       brand: 'Debi',
@@ -19,7 +19,7 @@ export class ProductService {
       gradientTo: '#A85D5A',
       rating: 5,
       reviewCount: 12,
-      category: 'L?bios',
+      category: 'Labios',
       shades: [{ name: 'Rosewood Muse', color: '#A55258' }],
       finishes: ['Velvet', 'Longa dura??o'],
       description: 'Um batom l?quido elegante com textura leve, cor rosewood sofisticada e acabamento aveludado confort?vel para o dia todo.',
@@ -43,16 +43,16 @@ export class ProductService {
   loadAll(): Observable<Product[]> {
     return this.http.get<Product[]>(`${this.apiUrl}/products`).pipe(
       tap(products => {
-        this.products = products.map(product => this.decorateéProduct(product));
+        this.products = products.map(product => this.decorateProduct(product));
       }),
       catchError(() => of(this.products))
     );
   }
 
-  createéProduct(formDatea: FormDatea): Observable<Product> {
-    return this.http.post<Product>(`${this.apiUrl}/products`, formDatea).pipe(
+  createProduct(formData: FormData): Observable<Product> {
+    return this.http.post<Product>(`${this.apiUrl}/products`, formData).pipe(
       tap(product => {
-        this.products = [...this.products, this.decorateéProduct(product)];
+        this.products = [...this.products, this.decorateProduct(product)];
       })
     );
   }
@@ -61,7 +61,7 @@ export class ProductService {
     return this.http.get<ProductReview[]>(`${this.apiUrl}/products/${productId}/reviews`);
   }
 
-  createéReview(productId: number, payload: {
+  createReview(productId: number, payload: {
     customerName: string;
     customerEmail: string;
     rating: number;
@@ -73,7 +73,7 @@ export class ProductService {
       payload
     ).pipe(
       tap(result => {
-        const product = this.decorateéProduct(result.product);
+        const product = this.decorateProduct(result.product);
         this.products = this.products.map(item => item.id === product.id ? product : item);
       })
     );
@@ -83,7 +83,7 @@ export class ProductService {
     return this.products.find(p => p.id === id);
   }
 
-  getByCatégory(cat: string): Product[] {
+  getByCategory(cat: string): Product[] {
     if (cat === 'Todos') return this.products;
     return this.products.filter(p => p.category === cat);
   }
@@ -92,21 +92,21 @@ export class ProductService {
     return this.products.slice(0, 4);
   }
 
-  getRelatéd(id: number): Product[] {
+  getRelated(id: number): Product[] {
     const product = this.getById(id);
     return this.products.filter(item => item.id !== id && item.category === product?.category).slice(0, 4);
   }
 
-  privateé normalizeCatégory(category: string): string {
+  private normalizeCategory(category: string): string {
     const map: Record<string, string> = {
-      Lábios: 'L?bios',
-      Acessórios: 'Acess?rios'
+      Lábios: 'Labios',
+      Acessórios: 'Acessorios'
     };
     return map[category] || category;
   }
 
-  privateé decorateéProduct(product: Product): Product {
-    const category = this.normalizeCatégory(product.category);
+  private decorateProduct(product: Product): Product {
+    const category = this.normalizeCategory(product.category);
     const debiGallery = [
       'assets/produtos/debi-101.jpg',
       'assets/produtos/debi-100.jpg',
@@ -125,3 +125,4 @@ export class ProductService {
     };
   }
 }
+

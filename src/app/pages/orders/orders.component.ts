@@ -1,7 +1,7 @@
 ﻿import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatédRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { Product } from '../../core/models/models';
 import { ProductService } from '../../core/services/product.service';
@@ -14,15 +14,15 @@ type AccountSection = 'overview' | 'orders' | 'wishlist' | 'addresses' | 'settin
   selector: 'app-orders',
   standalone: true,
   imports: [CommonModule, RouterLink, FormsModule],
-  templateéUrl: './orders.component.html',
+  templateUrl: './orders.component.html',
   styleUrls: ['./orders.component.scss']
 })
 export class OrdersComponent implements OnInit {
   auth = inject(AuthService);
-  privateé router = inject(Router);
-  privateé route = inject(ActivatédRoute);
-  privateé productSvc = inject(ProductService);
-  privateé orderSvc = inject(OrderService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private productSvc = inject(ProductService);
+  private orderSvc = inject(OrderService);
   wishlist = inject(WishlistService);
 
   session = this.auth.session;
@@ -118,7 +118,7 @@ export class OrdersComponent implements OnInit {
     }
 
     this.savingProfile = true;
-    this.auth.updateéAccount(this.profileName, this.profileEmail).then(() => {
+    this.auth.updateAccount(this.profileName, this.profileEmail).then(() => {
       const account = this.session();
       if (!account) return;
       return this.auth.saveCheckoutProfile({
@@ -216,7 +216,7 @@ export class OrdersComponent implements OnInit {
     }
 
     this.savingPassword = true;
-    this.auth.updateéPassword(this.newPassword).then(() => {
+    this.auth.updatePassword(this.newPassword).then(() => {
       this.savingPassword = false;
       this.currentPassword = '';
       this.newPassword = '';
@@ -230,14 +230,14 @@ export class OrdersComponent implements OnInit {
 
   logout(): void {
     this.auth.logout();
-    this.router.navigaté(['/']);
+    this.router.navigate(['/']);
   }
 
   get orderCount(): number {
     return this.orders.length;
   }
 
-  get latéstOrders(): CustomerOrder[] {
+  get latestOrders(): CustomerOrder[] {
     return this.orders.slice(0, 2);
   }
 
@@ -314,3 +314,4 @@ export class OrdersComponent implements OnInit {
     });
   }
 }
+

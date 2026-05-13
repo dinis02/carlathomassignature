@@ -11,12 +11,12 @@ import { Product } from '../../core/models/models';
   selector: 'app-home',
   standalone: true,
   imports: [RouterLink, CommonModule, FormsModule],
-  templateéUrl: './home.component.html',
+  templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements AfterViewInit {
-  privateé productSvc = inject(ProductService);
-  privateé cartSvc = inject(CartService);
+  private productSvc = inject(ProductService);
+  private cartSvc = inject(CartService);
   wishlist = inject(WishlistService);
 
   email = '';
@@ -37,7 +37,7 @@ export class HomeComponent implements AfterViewInit {
     { name: 'Rosto', count: 0, featured: false, gradient: 'linear-gradient(160deg,#C9A08A,#A0705A)' },
     { name: 'Corpo', count: 0, featured: false, gradient: 'linear-gradient(160deg,#D4C4B5,#C0A898)' },
     { name: 'Cabelo', count: 0, featured: false, gradient: 'linear-gradient(160deg,#3A302C,#2A2220)' },
-    { name: 'Acess?rios', count: 0, featured: false, gradient: 'linear-gradient(160deg,#E8D4C0,#D4C0A8)' }
+    { name: 'Acessorios', count: 0, featured: false, gradient: 'linear-gradient(160deg,#E8D4C0,#D4C0A8)' }
   ];
 
   brands = ['Debi', 'Dior', 'Chanel', 'Boca Rosa'];
@@ -64,7 +64,7 @@ export class HomeComponent implements AfterViewInit {
           image: 'assets/produtos/debi-101.jpg',
           rating: 5,
           reviewCount: 12,
-          category: 'L?bios'
+          category: 'Labios'
         } as Product
       ];
     }
@@ -101,3 +101,4 @@ export class HomeComponent implements AfterViewInit {
     }
   }
 }
+

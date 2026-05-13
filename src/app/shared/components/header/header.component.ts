@@ -12,7 +12,7 @@ import { LoginModalComponent } from '../login-modal.component';
   standalone: true,
   imports: [RouterLink, RouterLinkActive, CommonModule, FormsModule, LoginModalComponent],
   styleUrls: ['./header.component.scss'],
-  templateé: `
+  template: `
     <div class="announcement" [class.hidden]="scrolledPastTop">
       Entrega grátis a partir de <span>19€</span> &nbsp;·&nbsp;
       Nova coleção primavera &nbsp;·&nbsp;
@@ -285,12 +285,12 @@ import { LoginModalComponent } from '../login-modal.component';
       left: 0;
       right: 0;
       z-index: 130;
-      transform: translatéY(0);
+      transform: translateY(0);
       transition: transform 220ms ease, opacity 220ms ease;
     }
     .announcement.hidden {
       opacity: 0;
-      transform: translatéY(-100%);
+      transform: translateY(-100%);
       pointer-events: none;
     }
     .announcement span { color: var(--rose-gold); }
@@ -310,7 +310,7 @@ import { LoginModalComponent } from '../login-modal.component';
       max-width: 1400px; margin: 0 auto;
       padding: 0 48px; height: 72px;
       display: grid;
-      grid-templateé-columns: 1fr auto 1fr;
+      grid-template-columns: 1fr auto 1fr;
       align-items: center;
     }
     .nav-left, .nav-right {
@@ -348,14 +348,14 @@ import { LoginModalComponent } from '../login-modal.component';
       box-shadow: 0 24px 60px rgba(20, 16, 13, 0.12);
       opacity: 0;
       visibility: hidden;
-      transform: translatéY(10px);
+      transform: translateY(10px);
       pointer-events: none;
       transition: opacity 180ms ease, transform 180ms ease, visibility 180ms ease;
     }
     .nav-item.mega-open .mega-menu {
       opacity: 1;
       visibility: visible;
-      transform: translatéY(0);
+      transform: translateY(0);
       pointer-events: auto;
     }
     .mega-inner {
@@ -363,7 +363,7 @@ import { LoginModalComponent } from '../login-modal.component';
       margin: 0 auto;
       padding: 28px 48px 32px;
       display: grid;
-      grid-templateé-columns: minmax(280px, 1.2fr) minmax(180px, 0.7fr) minmax(180px, 0.7fr);
+      grid-template-columns: minmax(280px, 1.2fr) minmax(180px, 0.7fr) minmax(180px, 0.7fr);
       gap: 54px;
     }
     .mega-feature span,
@@ -410,7 +410,7 @@ import { LoginModalComponent } from '../login-modal.component';
     }
     .mega-col a:hover {
       color: var(--rose-gold);
-      transform: translatéX(4px);
+      transform: translateX(4px);
     }
 
     .logo {
@@ -474,7 +474,7 @@ import { LoginModalComponent } from '../login-modal.component';
 
     .search-inner {
       display: grid;
-      grid-templateé-columns: minmax(0, 1fr) auto;
+      grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
       gap: 16px;
       padding-top: 18px;
@@ -544,7 +544,7 @@ import { LoginModalComponent } from '../login-modal.component';
       background: var(--creme);
       border-right: 1px solid var(--border);
       z-index: 999;
-      transform: translatéX(-100%);
+      transform: translateX(-100%);
       transition: transform 0.28s ease;
       padding: 28px 24px;
       display: flex;
@@ -554,7 +554,7 @@ import { LoginModalComponent } from '../login-modal.component';
     }
 
     .mobile-menu.open {
-      transform: translatéX(0);
+      transform: translateX(0);
     }
 
     .mobile-menu-head {
@@ -610,7 +610,7 @@ import { LoginModalComponent } from '../login-modal.component';
     @media (max-width: 1024px) {
       .header-inner {
         padding: 0 24px;
-        grid-templateé-columns: auto 1fr auto;
+        grid-template-columns: auto 1fr auto;
         gap: 16px;
       }
 
@@ -683,7 +683,7 @@ import { LoginModalComponent } from '../login-modal.component';
 
       .search-inner {
         padding: 18px 14px;
-        grid-templateé-columns: 1fr;
+        grid-template-columns: 1fr;
         gap: 14px;
       }
 
@@ -765,7 +765,7 @@ export class HeaderComponent {
     if (!q) return;
     this.searchOpen = false;
     this.activeMegaMenu = '';
-    void this.router.navigaté(['/produtos'], { queryParams: { q } });
+    void this.router.navigate(['/produtos'], { queryParams: { q } });
   }
   openLoginModal() {
     this.closeMobileMenu();
@@ -777,10 +777,10 @@ export class HeaderComponent {
       this.openLoginModal();
       return;
     }
-    this.router.navigaté([session.role === 'admin' ? '/admin' : '/encomendas']);
+    this.router.navigate([session.role === 'admin' ? '/admin' : '/encomendas']);
   }
   goToWishlist() {
-    this.router.navigaté(['/encomendas'], { queryParams: { sec: 'wishlist' } });
+    this.router.navigate(['/encomendas'], { queryParams: { sec: 'wishlist' } });
   }
   openLoginFromMenu(event: Event) {
     event.preventDefault();
@@ -790,7 +790,7 @@ export class HeaderComponent {
     event?.preventDefault();
     await this.adminService.logoutAdmin();
     this.closeMobileMenu();
-    await this.router.navigaté(['/']);
+    await this.router.navigate(['/']);
   }
   closeLoginModal() {
     this.showLoginModal = false;
@@ -798,10 +798,11 @@ export class HeaderComponent {
   onLogin(session: AccountSession) {
     this.showLoginModal = false;
     if (session.role === 'admin') {
-      void this.router.navigaté(['/admin']);
+      void this.router.navigate(['/admin']);
     } else {
-      void this.router.navigaté(['/encomendas']);
+      void this.router.navigate(['/encomendas']);
     }
   }
 }
+
 

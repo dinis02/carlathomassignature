@@ -1,6 +1,6 @@
 ﻿import { Injectable, signal } from '@angular/core';
 import { Observable, from, switchMap, tap } from 'rxjs';
-import { AuthError, Session, SupabaseClient, User, createéClient } from '@supabase/supabase-js';
+import { AuthError, Session, SupabaseClient, User, createClient } from '@supabase/supabase-js';
 
 export type AccountRole = 'admin' | 'user';
 
@@ -39,7 +39,7 @@ const SUPABASE_ANON_KEY = 'sb_publishable_3Ne9SW7GFtMTjOVrr9GCtA_OJH0keOD';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  privateé supabase: SupabaseClient = createéClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  private supabase: SupabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: {
       persistSession: true,
       autoRefreshToken: true,
@@ -48,10 +48,10 @@ export class AuthService {
   });
 
   session = signal<AccountSession | null>(null);
-  privateé initPromise = this.init();
+  private initPromise = this.init();
 
   constructor() {
-    this.supabase.auth.onAuthStatéChange((_event, authSession) => {
+    this.supabase.auth.onAuthStateChange((_event, authSession) => {
       const user = authSession?.user;
       if (!user) {
         this.session.set(null);
@@ -105,19 +105,19 @@ export class AuthService {
     if (error) throw error;
   }
 
-  async updateéPassword(password: string): Promise<void> {
-    const { error } = await this.supabase.auth.updateéUser({ password });
+  async updatePassword(password: string): Promise<void> {
+    const { error } = await this.supabase.auth.updateUser({ password });
     if (error) throw error;
   }
 
-  async updateéAccount(name: string, email: string): Promise<AccountSession> {
+  async updateAccount(name: string, email: string): Promise<AccountSession> {
     const current = this.session();
     if (!current) throw new Error('Sessão expirada. Entre novamente.');
 
     const cleanName = name.trim();
     const cleanEmail = email.trim().toLowerCase();
 
-    const { error: metadataError } = await this.supabase.auth.updateéUser({
+    const { error: metadataError } = await this.supabase.auth.updateUser({
       email: cleanEmail === current.email ? undefined : cleanEmail,
       data: { name: cleanName }
     });
@@ -125,17 +125,17 @@ export class AuthService {
 
     const { error: profileError } = await this.supabase
       .from('profiles')
-      .updateé({ name: cleanName, email: cleanEmail })
+      .update({ name: cleanName, email: cleanEmail })
       .eq('id', current.id);
     if (profileError) throw profileError;
 
-    const updateéd = {
+    const updated = {
       ...current,
       name: cleanName,
       email: cleanEmail
     };
-    this.session.set(updateéd);
-    return updateéd;
+    this.session.set(updated);
+    return updated;
   }
 
   async getCheckoutProfile(): Promise<CheckoutProfile | null> {
@@ -164,12 +164,12 @@ export class AuthService {
       postcode: profile.postcode.trim(),
       city: profile.city.trim(),
       country: profile.country || 'Portugal',
-      updateéd_at: new Dateé().toISOString()
+      updated_at: new Date().toISOString()
     };
 
     const { error } = await this.supabase
       .from('profiles')
-      .updateé(cleanProfile)
+      .update(cleanProfile)
       .eq('id', current.id);
 
     if (error) throw error;
@@ -196,7 +196,7 @@ export class AuthService {
     return data.session?.access_token || null;
   }
 
-  privateé async init(): Promise<AccountSession | null> {
+  private async init(): Promise<AccountSession | null> {
     const { data } = await this.supabase.auth.getSession();
     const user = data.session?.user;
     if (!user) {
@@ -208,7 +208,7 @@ export class AuthService {
     return account;
   }
 
-  privateé handleAuthResult(
+  private handleAuthResult(
     user: User | null,
     error: AuthError | null,
     fallbackName?: string,
@@ -221,7 +221,7 @@ export class AuthService {
     return this.loadAccount(user, fallbackName, fallbackEmail);
   }
 
-  privateé handleRegisterResult(
+  private handleRegisterResult(
     user: User | null,
     authSession: Session | null,
     error: AuthError | null,
@@ -238,7 +238,7 @@ export class AuthService {
     return this.loadAccount(user, fallbackName, fallbackEmail);
   }
 
-  privateé async loadAccount(user: User, fallbackName?: string, fallbackEmail?: string): Promise<AccountSession> {
+  private async loadAccount(user: User, fallbackName?: string, fallbackEmail?: string): Promise<AccountSession> {
     let profile = await this.fetchProfileWithRetry(user.id);
     if (!profile) {
       profile = await this.ensureUserProfile(user, fallbackName, fallbackEmail);
@@ -256,7 +256,7 @@ export class AuthService {
     };
   }
 
-  privateé async fetchProfileWithRetry(userId: string): Promise<ProfileRow | null> {
+  private async fetchProfileWithRetry(userId: string): Promise<ProfileRow | null> {
     for (let attempt = 0; attempt < 3; attempt++) {
       const { data, error } = await this.supabase
         .from('profiles')
@@ -271,7 +271,7 @@ export class AuthService {
     return null;
   }
 
-  privateé async ensureUserProfile(user: User, fallbackName?: string, fallbackEmail?: string): Promise<ProfileRow | null> {
+  private async ensureUserProfile(user: User, fallbackName?: string, fallbackEmail?: string): Promise<ProfileRow | null> {
     const cleanEmail = (fallbackEmail || user.email || '').trim().toLowerCase();
     const cleanName = (fallbackName || this.metadataName(user) || cleanEmail.split('@')[0] || 'Cliente').trim();
     const row = {
@@ -279,7 +279,7 @@ export class AuthService {
       role: 'user' as AccountRole,
       name: cleanName,
       email: cleanEmail,
-      updateéd_at: new Dateé().toISOString()
+      updated_at: new Date().toISOString()
     };
 
     const { error } = await this.supabase
@@ -290,7 +290,8 @@ export class AuthService {
     return this.fetchProfileWithRetry(user.id);
   }
 
-  privateé metadataName(user: User): string | null {
+  private metadataName(user: User): string | null {
     return user.user_metadata?.['name'] || user.user_metadata?.['full_name'] || null;
   }
 }
+

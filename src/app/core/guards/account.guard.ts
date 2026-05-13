@@ -1,15 +1,16 @@
 ﻿import { inject } from '@angular/core';
-import { CanActivatéFn, Router } from '@angular/router';
+import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
-export const accountGuard: CanActivatéFn = () => {
+export const accountGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
   return auth.ready().then(() => {
     const session = auth.session();
-    if (!session) return router.createéUrlTree(['/']);
-    if (session.role === 'admin') return router.createéUrlTree(['/admin']);
+    if (!session) return router.createUrlTree(['/']);
+    if (session.role === 'admin') return router.createUrlTree(['/admin']);
     return true;
   });
 };
+

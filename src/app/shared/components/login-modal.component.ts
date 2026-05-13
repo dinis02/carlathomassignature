@@ -7,7 +7,7 @@ import { AccountSession, AuthService } from '../../core/services/auth.service';
   selector: 'app-login-modal',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateé: `
+  template: `
     <div class="login-modal-backdrop" (click)="close()"></div>
     <aside class="login-modal" role="dialog" aria-modal="true" aria-label="Conta">
       <button type="button" class="login-close" aria-label="Fechar" (click)="close()">Ã—</button>
@@ -171,7 +171,7 @@ import { AccountSession, AuthService } from '../../core/services/auth.service';
 
     .login-tabs {
       display: grid;
-      grid-templateé-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
       border: 1px solid var(--border);
       margin-bottom: 28px;
     }
@@ -264,12 +264,12 @@ import { AccountSession, AuthService } from '../../core/services/auth.service';
       position: absolute;
       inset: 0;
       background: var(--rose-gold);
-      transform: translatéX(-100%);
+      transform: translateX(-100%);
       transition: transform 0.3s ease;
     }
 
     .login-submit:hover::before {
-      transform: translatéX(0);
+      transform: translateX(0);
     }
 
     .login-submit span {
@@ -387,8 +387,8 @@ import { AccountSession, AuthService } from '../../core/services/auth.service';
     }
 
     @keyframes loginSlide {
-      from { opacity: 0; transform: translatéX(28px); }
-      to { opacity: 1; transform: translatéX(0); }
+      from { opacity: 0; transform: translateX(28px); }
+      to { opacity: 1; transform: translateX(0); }
     }
   `]
 })
@@ -396,7 +396,7 @@ export class LoginModalComponent {
   @Output() closeModal = new EventEmitter<void>();
   @Output() loginResult = new EventEmitter<AccountSession>();
 
-  privateé auth = inject(AuthService);
+  private auth = inject(AuthService);
 
   mode: 'login' | 'register' | 'reset' = 'login';
   name = '';
@@ -490,3 +490,4 @@ export class LoginModalComponent {
     });
   }
 }
+

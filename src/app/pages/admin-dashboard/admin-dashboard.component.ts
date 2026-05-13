@@ -3,7 +3,7 @@
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  templateé: `
+  template: `
     <div style="padding: 40px; text-align: center;">
       <h1>Bem-vindo, Admin!</h1>
       <p>Está ? a ?rea administrativa do site.</p>
@@ -12,3 +12,4 @@
   styles: []
 })
 export class AdminDateshboardComponent {}
+

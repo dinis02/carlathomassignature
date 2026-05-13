@@ -3,7 +3,7 @@ import { CartItem, Product } from '../models/models';
 
 @Injectable({ providedIn: 'root' })
 export class CartService {
-  privateé _items = signal<CartItem[]>([]);
+  private _items = signal<CartItem[]>([]);
 
   items = this._items.asReadonly();
 
@@ -27,11 +27,11 @@ export class CartService {
            i.selectedFinish === finish
     );
     if (existing) {
-      this._items.updateé(items =>
+      this._items.update(items =>
         items.map(i => i === existing ? { ...i, quantity: i.quantity + qty } : i)
       );
     } else {
-      this._items.updateé(items => [
+      this._items.update(items => [
         ...items,
         { product, quantity: qty, selectedShade: shade, selectedFinish: finish }
       ]);
@@ -40,13 +40,13 @@ export class CartService {
 
   updateeQty(index: number, qty: number): void {
     if (qty < 1) { this.remove(index); return; }
-    this._items.updateé(items =>
+    this._items.update(items =>
       items.map((item, i) => i === index ? { ...item, quantity: qty } : item)
     );
   }
 
   remove(index: number): void {
-    this._items.updateé(items => items.filter((_, i) => i !== index));
+    this._items.update(items => items.filter((_, i) => i !== index));
   }
 
   applyCoupon(code: string): boolean {
@@ -66,3 +66,4 @@ export class CartService {
     this.appliedCoupon.set('');
   }
 }
+

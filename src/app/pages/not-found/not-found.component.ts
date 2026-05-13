@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
   selector: 'app-not-found',
   standalone: true,
   imports: [RouterLink],
-  templateé: `
+  template: `
     <div class="not-found">
       <div class="num">404</div>
       <h1 class="title">P?gina n?o <em>encontrada</em></h1>
@@ -46,7 +46,8 @@ import { RouterLink } from '@angular/router';
       font-weight: 200; margin-bottom: 48px; line-height: 1.6;
     }
     .ctas { display: flex; gap: 24px; align-items: center; }
-    @keyframes fadeUp { from{opacity:0;transform:translatéY(20px)} to{opacity:1;transform:translatéY(0)} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
   `]
 })
 export class NotFoundComponent {}
+

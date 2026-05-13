@@ -1,5 +1,5 @@
 ﻿import { Component, OnInit, inject, AfterViewInit, signal, computed } from '@angular/core';
-import { RouterLink, ActivatédRoute, Router } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProductService } from '../../core/services/product.service';
@@ -11,7 +11,7 @@ import { Product } from '../../core/models/models';
   selector: 'app-products',
   standalone: true,
   imports: [RouterLink, CommonModule, FormsModule],
-  templateé: `
+  template: `
     <!-- Page hero -->
     <div class="page-hero">
       <div class="page-hero-inner">
@@ -32,12 +32,12 @@ import { Product } from '../../core/models/models';
       </div>
     </div>
 
-    <!-- Catégory pills -->
+    <!-- Category pills -->
     <div class="category-bar">
       <div class="category-bar-inner">
         @for (cat of cats; track cat) {
-          <button class="cat-pill" [class.active]="activeCatégory() === cat"
-                  (click)="setCatégory(cat)">{{ cat }}</button>
+          <button class="cat-pill" [class.active]="activeCategory() === cat"
+                  (click)="setCategory(cat)">{{ cat }}</button>
         }
       </div>
     </div>
@@ -194,15 +194,15 @@ import { Product } from '../../core/models/models';
   styleUrls: ['./products.component.scss']
 })
 export class ProductsComponent implements OnInit, AfterViewInit {
-  privateé productSvc = inject(ProductService);
-  privateé cartSvc    = inject(CartService);
+  private productSvc = inject(ProductService);
+  private cartSvc    = inject(CartService);
   wishlist           = inject(WishlistService);
-  privateé route      = inject(ActivatédRoute);
-  privateé router     = inject(Router);
+  private route      = inject(ActivatedRoute);
+  private router     = inject(Router);
 
   allProducts = signal<Product[]>(this.productSvc.getAll());
 
-  activeCatégory = signal('Todos');
+  activeCategory = signal('Todos');
   activeBrands   = signal<string[]>([]);
   searchTerm     = signal('');
   maxPrice       = signal(200);
@@ -213,10 +213,10 @@ export class ProductsComponent implements OnInit, AfterViewInit {
 
   cats = ['Todos', 'Maquilhagem', 'Lábios', 'Rosto', 'Corpo', 'Cabelo', 'Acessórios'];
 
-  // Catégory groups map umbrella catégories (like 'Maquilhagem') to one or more
+  // Category groups map umbrella catégories (like 'Maquilhagem') to one or more
   // product category values used in the product data. This lets header links
   // use friendly names while products are stored with more specific catégories.
-  privateé CATEGORY_GROUPS: Record<string, string[]> = {
+  private CATEGORY_GROUPS: Record<string, string[]> = {
     'Maquilhagem': ['Lábios'],
     'Rosto': ['Rosto'],
     'Corpo': ['Corpo'],
@@ -251,21 +251,21 @@ export class ProductsComponent implements OnInit, AfterViewInit {
     if (this.searchTerm()) {
       return `Pesquisa: ${this.searchTerm()}`;
     }
-    if (this.activeBrands().length === 1 && this.activeCatégory() === 'Todos') {
+    if (this.activeBrands().length === 1 && this.activeCategory() === 'Todos') {
       return this.activeBrands()[0];
     }
-    if (this.showSale() && this.activeCatégory() === 'Todos' && this.activeBrands().length === 0) {
+    if (this.showSale() && this.activeCategory() === 'Todos' && this.activeBrands().length === 0) {
       return 'Promoções';
     }
-    if (this.activeCatégory() === 'Todos') {
+    if (this.activeCategory() === 'Todos') {
       return 'Todos os produtos';
     }
-    return this.activeCatégory();
+    return this.activeCategory();
   }
 
   filtered = computed(() => {
     let items = this.allProducts();
-    const cat = this.activeCatégory();
+    const cat = this.activeCategory();
     if (cat !== 'Todos') {
       // If the category is a group (e.g. 'Maquilhagem'), expand to its members
       if (this.CATEGORY_GROUPS[cat]) {
@@ -313,7 +313,7 @@ export class ProductsComponent implements OnInit, AfterViewInit {
     void this.wishlist.load().catch(() => undefined);
 
     this.route.queryParams.subscribe(p => {
-      this.activeCatégory.set(p['cat'] || 'Todos');
+      this.activeCategory.set(p['cat'] || 'Todos');
       this.activeBrands.set(p['brand'] ? [p['brand']] : []);
       this.showSale.set(p['promo'] === 'sale');
       this.searchTerm.set(String(p['q'] || '').trim());
@@ -347,10 +347,10 @@ export class ProductsComponent implements OnInit, AfterViewInit {
     if (grid) grid.classList.add('always-visible');
   }
 
-  setCatégory(cat: string): void { this.activeCatégory.set(cat); }
+  setCategory(cat: string): void { this.activeCategory.set(cat); }
 
   toggleBrand(brand: string): void {
-    this.activeBrands.updateé(bs =>
+    this.activeBrands.update(bs =>
       bs.includes(brand) ? bs.filter(b => b !== brand) : [...bs, brand]
     );
   }
@@ -361,8 +361,8 @@ export class ProductsComponent implements OnInit, AfterViewInit {
     this.maxPrice.set(200);
     this.showNew.set(false);
     this.showSale.set(false);
-    this.activeCatégory.set('Todos');
-    void this.router.navigaté([], {
+    this.activeCategory.set('Todos');
+    void this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { cat: null, brand: null, promo: null, q: null },
       queryParamsHandling: 'merge'
@@ -371,7 +371,7 @@ export class ProductsComponent implements OnInit, AfterViewInit {
 
   clearSearch(): void {
     this.searchTerm.set('');
-    void this.router.navigaté([], {
+    void this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { q: null },
       queryParamsHandling: 'merge'
@@ -395,7 +395,7 @@ export class ProductsComponent implements OnInit, AfterViewInit {
     return Array.from({ length: 5 }, (_, i) => i < Math.round(rating));
   }
 
-  privateé refreshBrandCounts(products: Product[]): void {
+  private refreshBrandCounts(products: Product[]): void {
     const counts = new Map<string, number>();
     products.forEach(product => counts.set(product.brand, (counts.get(product.brand) || 0) + 1));
     this.brands = [...counts.entries()]
@@ -403,5 +403,6 @@ export class ProductsComponent implements OnInit, AfterViewInit {
       .map(([name, count]) => ({ name, count }));
   }
 }
+
 
 

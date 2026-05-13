@@ -232,7 +232,7 @@
               @for (order of filteredOrders; track order.id) {
                 <tr>
                   <td style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;">{{ order.id }}</td>
-                  <td style="color:var(--muted);font-size:11px;">{{ order.datéLabel }}</td>
+                  <td style="color:var(--muted);font-size:11px;">{{ order.dateLabel }}</td>
                   <td><div class="customer-cell"><div class="customer-avatar-sm">{{ order.customerName.charAt(0) }}</div><div><div style="font-size:12px;">{{ order.customerName }}</div><div style="font-size:10px;color:var(--muted);">{{ order.customerEmail }}</div></div></div></td>
                   <td style="color:var(--muted);font-size:11px;">{{ order.itemCount }} artigo(s)</td>
                   <td><span class="badge" [class]="statusBadgeClass(order.status)"><span class="badge-dot"></span>{{ order.statusLabel }}</span></td>
@@ -264,9 +264,9 @@
               <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
               <input type="text" placeholder="Pesquisar produtos..." [(ngModel)]="productSearch" name="productSearch">
             </div>
-            <select class="filter-select" [(ngModel)]="productCatégoryFilter" name="productCatégoryFilter">
+            <select class="filter-select" [(ngModel)]="productCategoryFilter" name="productCategoryFilter">
               <option value="">Todas as catégorias</option>
-              @for (category of productCatégories; track category) {
+              @for (category of productCategories; track category) {
                 <option [value]="category">{{ category }}</option>
               }
             </select>

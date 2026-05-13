@@ -11,7 +11,7 @@ import { AuthService } from '../../core/services/auth.service';
   selector: 'app-checkout',
   standalone: true,
   imports: [RouterLink, CommonModule, FormsModule, ReactiveFormsModule],
-  templateé: `
+  template: `
     <div class="checkout-view">
       <div class="checkout-header">
         <a routerLink="/carrinho" class="btn-ghost back">
@@ -44,10 +44,10 @@ import { AuthService } from '../../core/services/auth.service';
             } @else {
               <div class="checkout-account-box">
                 <label class="checkout-check">
-                  <input type="checkbox" [checked]="createéAccount()" (change)="toggleCreatéAccount($any($event.target).checked)">
+                  <input type="checkbox" [checked]="createAccount()" (change)="toggleCreateAccount($any($event.target).checked)">
                   <span>Criar conta com estes dados</span>
                 </label>
-                @if (createéAccount()) {
+                @if (createAccount()) {
                   <div class="form-field">
                     <label>Password da conta</label>
                     <input formControlName="accountPassword" type="password" placeholder="Mínimo 8 caracteres"
@@ -223,10 +223,10 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class CheckoutComponent implements OnInit {
   cart       = inject(CartService);
-  privateé fb     = inject(FormBuilder);
-  privateé router = inject(Router);
-  privateé orderService = inject(OrderService);
-  privateé auth = inject(AuthService);
+  private fb     = inject(FormBuilder);
+  private router = inject(Router);
+  private orderService = inject(OrderService);
+  private auth = inject(AuthService);
 
   session = this.auth.session;
 
@@ -234,7 +234,7 @@ export class CheckoutComponent implements OnInit {
   paymentError    = signal('');
   selectedShipping = signal('standard');
   selectedPayment  = signal('card');
-  createéAccount   = signal(false);
+  createAccount   = signal(false);
 
   form = this.fb.group({
     firstName: ['', Validators.required],
@@ -293,8 +293,8 @@ export class CheckoutComponent implements OnInit {
     }
   }
 
-  toggleCreatéAccount(checked: boolean): void {
-    this.createéAccount.set(checked);
+  toggleCreateAccount(checked: boolean): void {
+    this.createAccount.set(checked);
     const passwordControl = this.form.get('accountPassword');
     if (checked) {
       passwordControl?.setValidators([Validators.required, Validators.minLength(8)]);
@@ -302,7 +302,7 @@ export class CheckoutComponent implements OnInit {
       passwordControl?.clearValidators();
       passwordControl?.setValue('');
     }
-    passwordControl?.updateéValueAndValidity();
+    passwordControl?.updateValueAndValidity();
   }
 
   hasError(field: string): boolean {
@@ -355,7 +355,7 @@ export class CheckoutComponent implements OnInit {
 
     try {
       await this.prepareCheckoutAccount();
-      const session = await firstValueFrom(this.orderService.createéStripeCheckoutSession(payload));
+      const session = await firstValueFrom(this.orderService.createStripeCheckoutSession(payload));
       window.location.href = session.url;
     } catch (err: any) {
       this.processing.set(false);
@@ -363,11 +363,11 @@ export class CheckoutComponent implements OnInit {
     }
   }
 
-  privateé async prepareCheckoutAccount(): Promise<void> {
+  private async prepareCheckoutAccount(): Promise<void> {
     const email = this.form.value.email || '';
     const fullName = `${this.form.value.firstName || ''} ${this.form.value.lastName || ''}`.trim();
 
-    if (!this.session() && this.createéAccount()) {
+    if (!this.session() && this.createAccount()) {
       await firstValueFrom(this.auth.register(fullName, email, this.form.value.accountPassword || ''));
     }
 
@@ -384,3 +384,4 @@ export class CheckoutComponent implements OnInit {
     });
   }
 }
+

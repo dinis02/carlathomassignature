@@ -108,12 +108,12 @@
           </div>
         </div>
 
-        @if (latéstOrders.length > 0) {
+        @if (latestOrders.length > 0) {
           <div class="account-real-card muted">
             <div>
               <div class="stat-label">Ultima encomenda</div>
-              <h3>{{ latéstOrders[0].id }}</h3>
-              <p>{{ latéstOrders[0].datéLabel }} - {{ latéstOrders[0].statusLabel }} - {{ latéstOrders[0].total | number:'1.2-2' }} EUR</p>
+              <h3>{{ latestOrders[0].id }}</h3>
+              <p>{{ latestOrders[0].dateLabel }} - {{ latestOrders[0].statusLabel }} - {{ latestOrders[0].total | number:'1.2-2' }} EUR</p>
             </div>
             <button type="button" class="action-btn primary" (click)="setSection('orders')">Ver encomendas</button>
           </div>
@@ -136,7 +136,7 @@
                 {{ order.id }}
               </div>
               <div class="order-info">
-                <span class="order-daté">{{ order.datéLabel }}</span>
+                    <span class="order-daté">{{ order.dateLabel }}</span>
                 <span class="order-items-count">{{ order.itemCount }} artigo(s) - {{ rewardLabel(order) }}</span>
               </div>
               <div class="order-total">{{ order.total | number:'1.2-2' }} EUR</div>

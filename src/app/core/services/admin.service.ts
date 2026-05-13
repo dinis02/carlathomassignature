@@ -16,8 +16,8 @@ export interface AdminOrderItem {
 
 export interface AdminOrderSummary {
   id: string;
-  daté: string;
-  datéLabel: string;
+  date: string;
+  dateLabel: string;
   customerName: string;
   customerEmail: string;
   itemCount: number;
@@ -65,8 +65,8 @@ export interface AdminReturn {
   reason: string;
   status: string;
   statusLabel: string;
-  createédAt: string;
-  createédLabel: string;
+  createdAt: string;
+  createdLabel: string;
 }
 
 export interface AdminActivity {
@@ -112,9 +112,9 @@ export interface AdminSettings {
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
-  privateé auth = inject(AuthService);
-  privateé http = inject(HttpClient);
-  privateé apiUrl = '/api/admin';
+  private auth = inject(AuthService);
+  private http = inject(HttpClient);
+  private apiUrl = '/api/admin';
 
   async logoutAdmin(): Promise<void> {
     await this.auth.logout();
@@ -140,7 +140,7 @@ export class AdminService {
     return this.adminGet<AdminOrderDetail>(`${this.apiUrl}/orders/${id}`);
   }
 
-  updateéOrderStatus(id: string, status: string): Observable<AdminOrderDetail> {
+  updateOrderStatus(id: string, status: string): Observable<AdminOrderDetail> {
     return this.adminRequest<AdminOrderDetail>('patch', `${this.apiUrl}/orders/${id}`, { status });
   }
 
@@ -164,8 +164,8 @@ export class AdminService {
     return this.adminRequest<AdminSettings>('put', `${this.apiUrl}/settings`, settings);
   }
 
-  updateéProduct(id: number, formDatea: FormDatea): Observable<Product> {
-    return this.adminRequest<Product>('put', `/api/products/${id}`, formDatea);
+  updateProduct(id: number, formData: FormData): Observable<Product> {
+    return this.adminRequest<Product>('put', `/api/products/${id}`, formData);
   }
 
   archiveProduct(id: number, isActive: boolean): Observable<Product> {
@@ -176,15 +176,15 @@ export class AdminService {
     return this.adminRequest<void>('delete', `${this.apiUrl}/products/${id}`);
   }
 
-  createéProduct(formDatea: FormDatea): Observable<Product> {
-    return this.adminRequest<Product>('post', '/api/products', formDatea);
+  createProduct(formData: FormData): Observable<Product> {
+    return this.adminRequest<Product>('post', '/api/products', formData);
   }
 
-  privateé adminGet<T>(url: string): Observable<T> {
+  private adminGet<T>(url: string): Observable<T> {
     return this.adminRequest<T>('get', url);
   }
 
-  privateé adminRequest<T>(method: 'get' | 'post' | 'put' | 'patch' | 'delete', url: string, body?: unknown): Observable<T> {
+  private adminRequest<T>(method: 'get' | 'post' | 'put' | 'patch' | 'delete', url: string, body?: unknown): Observable<T> {
     return from(this.auth.accessToken()).pipe(
       switchMap(token => {
         const options = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
@@ -204,3 +204,4 @@ export class AdminService {
     );
   }
 }
+

@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
   selector: 'app-footer',
   standalone: true,
   imports: [RouterLink],
-  templateé: `
+  template: `
     <footer>
       <div class="footer-inner">
         <div class="footer-top">
@@ -74,7 +74,7 @@ import { RouterLink } from '@angular/router';
 
     .footer-top {
       display: grid;
-      grid-templateé-columns: 2fr 1fr 1fr 1fr;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
       gap: 64px;
       padding-bottom: 64px;
       border-bottom: 1px solid rgba(247,244,240,0.08);
@@ -174,14 +174,14 @@ import { RouterLink } from '@angular/router';
       }
 
       .footer-top {
-        grid-templateé-columns: 1fr 1fr;
+        grid-template-columns: 1fr 1fr;
         gap: 42px 28px;
       }
     }
 
     @media (max-width: 620px) {
       .footer-top {
-        grid-templateé-columns: 1fr;
+        grid-template-columns: 1fr;
       }
 
       .footer-bottom {
@@ -192,3 +192,4 @@ import { RouterLink } from '@angular/router';
   `]
 })
 export class FooterComponent {}
+

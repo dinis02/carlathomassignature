@@ -10,7 +10,7 @@ const STORAGE_KEY = 'cts-cookie-consent';
   selector: 'app-cookie-banner',
   standalone: true,
   imports: [CommonModule, RouterLink],
-  templateé: `
+  template: `
     <aside class="cookie-banner" *ngIf="visible()" aria-label="Aviso de cookies">
       <div class="cookie-mark">CT</div>
 
@@ -40,7 +40,7 @@ const STORAGE_KEY = 'cts-cookie-consent';
       max-width: 940px;
       margin: 0 auto;
       display: grid;
-      grid-templateé-columns: auto minmax(0, 1fr) auto;
+      grid-template-columns: auto minmax(0, 1fr) auto;
       gap: 22px;
       align-items: center;
       padding: 22px;
@@ -123,7 +123,7 @@ const STORAGE_KEY = 'cts-cookie-consent';
     }
 
     button:hover {
-      transform: translatéY(-1px);
+      transform: translateY(-1px);
     }
 
     .btn-primary {
@@ -145,11 +145,11 @@ const STORAGE_KEY = 'cts-cookie-consent';
     @keyframes cookieIn {
       from {
         opacity: 0;
-        transform: translatéY(16px);
+        transform: translateY(16px);
       }
       to {
         opacity: 1;
-        transform: translatéY(0);
+        transform: translateY(0);
       }
     }
 
@@ -158,7 +158,7 @@ const STORAGE_KEY = 'cts-cookie-consent';
         left: 14px;
         right: 14px;
         bottom: 14px;
-        grid-templateé-columns: 1fr;
+        grid-template-columns: 1fr;
         gap: 16px;
         padding: 20px;
       }
@@ -170,7 +170,7 @@ const STORAGE_KEY = 'cts-cookie-consent';
       .cookie-actions {
         width: 100%;
         display: grid;
-        grid-templateé-columns: 1fr 1fr;
+        grid-template-columns: 1fr 1fr;
       }
 
       button {
@@ -186,13 +186,13 @@ export class CookieBannerComponent {
   choose(choice: CookieChoice): void {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       choice,
-      daté: new Dateé().toISOString(),
+      date: new Date().toISOString(),
       version: 1
     }));
     this.visible.set(false);
   }
 
-  privateé shouldShow(): boolean {
+  private shouldShow(): boolean {
     try {
       return !localStorage.getItem(STORAGE_KEY);
     } catch {
@@ -200,3 +200,4 @@ export class CookieBannerComponent {
     }
   }
 }
+

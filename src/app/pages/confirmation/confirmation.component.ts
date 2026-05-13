@@ -1,5 +1,5 @@
 ﻿import { Component, OnInit, inject } from '@angular/core';
-import { ActivatédRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { firstValueFrom } from 'rxjs';
 import { OrderService } from '../../core/services/order.service';
@@ -8,7 +8,7 @@ import { OrderService } from '../../core/services/order.service';
   selector: 'app-confirmation',
   standalone: true,
   imports: [RouterLink, CommonModule],
-  templateé: `
+  template: `
     <div class="confirm-view">
       <div class="confirm-icon">
         <svg width="28" height="28" fill="none" stroke="var(--creme)" stroke-width="1.5" viewBox="0 0 24 24">
@@ -104,12 +104,12 @@ import { OrderService } from '../../core/services/order.service';
     .confirm-row .price { color: var(--rose-gold); }
     .confirm-ctas { display: flex; flex-direction: column; gap: 10px; max-width: 320px; margin: 0 auto; }
     @keyframes popIn { from{transform:scale(0);opacity:0} 60%{transform:scale(1.1)} to{transform:scale(1);opacity:1} }
-    @keyframes fadeUp { from{opacity:0;transform:translatéY(20px)} to{opacity:1;transform:translatéY(0)} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
   `]
 })
 export class ConfirmationComponent implements OnInit {
-  privateé route = inject(ActivatédRoute);
-  privateé orderService = inject(OrderService);
+  private route = inject(ActivatedRoute);
+  private orderService = inject(OrderService);
 
   orderNumber = '';
   total = '0,00';
@@ -153,8 +153,9 @@ export class ConfirmationComponent implements OnInit {
     }
   }
 
-  privateé setTotal(value: number): void {
+  private setTotal(value: number): void {
     this.total = value.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     this.rewardPoints = Math.floor(value);
   }
 }
+

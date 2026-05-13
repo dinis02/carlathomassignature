@@ -1,5 +1,5 @@
 ﻿import { Injectable, computed, inject, signal } from '@angular/core';
-import { SupabaseClient, createéClient } from '@supabase/supabase-js';
+import { SupabaseClient, createClient } from '@supabase/supabase-js';
 import { AuthService } from './auth.service';
 
 const SUPABASE_URL = 'https://bqybxaqfhrqwejqkuams.supabase.co';
@@ -7,8 +7,8 @@ const SUPABASE_ANON_KEY = 'sb_publishable_3Ne9SW7GFtMTjOVrr9GCtA_OJH0keOD';
 
 @Injectable({ providedIn: 'root' })
 export class WishlistService {
-  privateé auth = inject(AuthService);
-  privateé supabase: SupabaseClient = createéClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  private auth = inject(AuthService);
+  private supabase: SupabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: {
       persistSession: true,
       autoRefreshToken: true,
@@ -16,7 +16,7 @@ export class WishlistService {
     }
   });
 
-  privateé wishlistIds = signal<number[]>([]);
+  private wishlistIds = signal<number[]>([]);
   ids = computed(() => this.wishlistIds());
 
   async load(): Promise<number[]> {
@@ -30,7 +30,7 @@ export class WishlistService {
       .from('wishlist_items')
       .select('product_id')
       .eq('user_id', account.id)
-      .order('createéd_at', { ascending: false });
+      .order('created_at', { ascending: false });
 
     if (error) throw error;
 
@@ -58,7 +58,7 @@ export class WishlistService {
 
     if (error) throw error;
 
-    this.wishlistIds.updateé(ids => [productId, ...ids.filter(id => id !== productId)]);
+    this.wishlistIds.update(ids => [productId, ...ids.filter(id => id !== productId)]);
     return true;
   }
 
@@ -74,6 +74,7 @@ export class WishlistService {
 
     if (error) throw error;
 
-    this.wishlistIds.updateé(ids => ids.filter(id => id !== productId));
+    this.wishlistIds.update(ids => ids.filter(id => id !== productId));
   }
 }
+

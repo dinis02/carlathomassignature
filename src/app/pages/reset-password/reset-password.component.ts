@@ -8,7 +8,7 @@ import { AuthService } from '../../core/services/auth.service';
   selector: 'app-reset-password',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
-  templateé: `
+  template: `
     <main class="reset-page">
       <section class="reset-panel">
         <a routerLink="/" class="reset-brand">
@@ -193,8 +193,8 @@ import { AuthService } from '../../core/services/auth.service';
   `]
 })
 export class ResetPasswordComponent {
-  privateé auth = inject(AuthService);
-  privateé router = inject(Router);
+  private auth = inject(AuthService);
+  private router = inject(Router);
 
   password = '';
   confirmPassword = '';
@@ -217,13 +217,14 @@ export class ResetPasswordComponent {
     }
 
     this.loading = true;
-    this.auth.updateéPassword(this.password).then(() => {
+    this.auth.updatePassword(this.password).then(() => {
       this.loading = false;
       this.successMessage = 'Password guardada. Ja pode entrar com email e password.';
-      setTimeout(() => this.router.navigaté(['/encomendas']), 1200);
+      setTimeout(() => this.router.navigate(['/encomendas']), 1200);
     }).catch(err => {
       this.loading = false;
       this.errorMessage = err?.message || 'Não foi possível guardar a password.';
     });
   }
 }
+

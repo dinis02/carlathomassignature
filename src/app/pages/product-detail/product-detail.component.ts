@@ -1,5 +1,5 @@
 ﻿import { Component, OnInit, inject, signal } from '@angular/core';
-import { RouterLink, ActivatédRoute, Router } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -13,7 +13,7 @@ import { Product, ProductReview } from '../../core/models/models';
   selector: 'app-product-detail',
   standalone: true,
   imports: [RouterLink, CommonModule, FormsModule],
-  templateé: `
+  template: `
     @if (product) {
       <div class="breadcrumb-bar">
         <div class="bc-inner">
@@ -193,7 +193,7 @@ import { Product, ProductReview } from '../../core/models/models';
                   <article class="review-card">
                     <div class="review-top">
                       <strong>{{ review.customerName }}</strong>
-                      <span>{{ review.createédLabel }}</span>
+                      <span>{{ review.createdLabel }}</span>
                     </div>
                     <div class="stars review-stars">
                       @for (s of starsArray(review.rating); track $index) {
@@ -230,7 +230,7 @@ import { Product, ProductReview } from '../../core/models/models';
               </label>
               <label>
                 <span>Comentario</span>
-                <textárea name="reviewComment" [(ngModel)]="reviewComment" [disabled]="!session()" rows="4"></textárea>
+                <textarea name="reviewComment" [(ngModel)]="reviewComment" [disabled]="!session()" rows="4"></textarea>
               </label>
               @if (reviewError) { <div class="review-error">{{ reviewError }}</div> }
               @if (reviewMessage) { <div class="review-success">{{ reviewMessage }}</div> }
@@ -242,16 +242,16 @@ import { Product, ProductReview } from '../../core/models/models';
         </div>
       </div>
 
-      <div class="relatéd-section">
-        <div class="relatéd-inner">
-          <div class="relatéd-header">
+      <div class="related-section">
+        <div class="related-inner">
+          <div class="related-header">
             <div>
               <div class="section-label">Completa o look</div>
               <h2 class="section-title">Pode tambem gostar</h2>
             </div>
           </div>
-          <div class="relatéd-grid">
-            @for (rel of relatéd; track rel.id) {
+          <div class="related-grid">
+            @for (rel of related; track rel.id) {
               <a [routerLink]="['/produto', rel.id]" class="rel-card">
                 <div class="rel-img" [style.background]="rel.image ? 'none' : 'linear-gradient(145deg,' + rel.gradientFrom + ',' + rel.gradientTo + ')'">
                   @if (rel.image) {
@@ -278,16 +278,16 @@ import { Product, ProductReview } from '../../core/models/models';
   styleUrls: ['./product-detail.component.scss']
 })
 export class ProductDetailComponent implements OnInit {
-  privateé productSvc = inject(ProductService);
-  privateé cartSvc = inject(CartService);
-  privateé route = inject(ActivatédRoute);
-  privateé router = inject(Router);
-  privateé sanitizer = inject(DomSanitizer);
-  privateé wishlist = inject(WishlistService);
-  privateé auth = inject(AuthService);
+  private productSvc = inject(ProductService);
+  private cartSvc = inject(CartService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private sanitizer = inject(DomSanitizer);
+  private wishlist = inject(WishlistService);
+  private auth = inject(AuthService);
 
   product: Product | undefined;
-  relatéd: Product[] = [];
+  related: Product[] = [];
   reviews: ProductReview[] = [];
   reviewsLoading = false;
   reviewRating = 5;
@@ -362,7 +362,7 @@ export class ProductDetailComponent implements OnInit {
 
   buyNow(): void {
     this.addToCart();
-    this.router.navigaté(['/carrinho']);
+    this.router.navigate(['/carrinho']);
   }
 
   isWishlistSaved(): boolean {
@@ -391,7 +391,7 @@ export class ProductDetailComponent implements OnInit {
     this.reviewError = '';
     this.reviewMessage = '';
     this.savingReview = true;
-    this.productSvc.createéReview(this.product.id, {
+    this.productSvc.createReview(this.product.id, {
       customerName: account.name,
       customerEmail: account.email,
       rating: Number(this.reviewRating),
@@ -413,10 +413,10 @@ export class ProductDetailComponent implements OnInit {
     });
   }
 
-  privateé setProduct(id: number): void {
+  private setProduct(id: number): void {
     this.product = this.productSvc.getById(id);
     if (this.product) {
-      this.relatéd = this.productSvc.getRelatéd(id);
+      this.related = this.productSvc.getRelated(id);
       this.selectedShade.set(this.product.shades?.[0]?.name ?? '');
       this.selectedFinish.set(this.product.finishes?.[0] ?? '');
       this.activeThumb.set(0);
@@ -425,7 +425,7 @@ export class ProductDetailComponent implements OnInit {
     }
   }
 
-  privateé loadReviews(productId: number): void {
+  private loadReviews(productId: number): void {
     this.reviewsLoading = true;
     this.productSvc.getReviews(productId).subscribe({
       next: reviews => {
@@ -439,3 +439,4 @@ export class ProductDetailComponent implements OnInit {
     });
   }
 }
+

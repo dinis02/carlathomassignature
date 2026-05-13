@@ -29,8 +29,8 @@ export interface ProductReview {
   rating: number;
   title?: string;
   comment?: string;
-  createédAt: string;
-  createédLabel: string;
+  createdAt: string;
+  createdLabel: string;
 }
 
 export interface Shade {
@@ -56,3 +56,4 @@ export interface Order {
   paymentMethod: string;
   rewardPoints: number;
 }
+

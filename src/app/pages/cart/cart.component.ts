@@ -8,7 +8,7 @@ import { CartService } from '../../core/services/cart.service';
   selector: 'app-cart',
   standalone: true,
   imports: [RouterLink, CommonModule, FormsModule],
-  templateé: `
+  template: `
     <div class="cart-view">
       <div class="checkout-header">
         <a routerLink="/produtos" class="btn-ghost back">
@@ -136,7 +136,7 @@ import { CartService } from '../../core/services/cart.service';
 })
 export class CartComponent {
   cart       = inject(CartService);
-  privateé router = inject(Router);
+  private router = inject(Router);
 
   couponCode   = '';
   couponInvalid = signal(false);
@@ -148,5 +148,6 @@ export class CartComponent {
     if (ok) this.couponCode = '';
   }
 
-  proceed(): void { this.router.navigaté(['/checkout']); }
+  proceed(): void { this.router.navigate(['/checkout']); }
 }
+
