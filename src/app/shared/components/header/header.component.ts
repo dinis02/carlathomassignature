@@ -418,9 +418,9 @@ import { LoginModalComponent } from '../login-modal.component';
     }
     .logo-img {
       display: block;
-      width: 132px;
+      width: 232px;
+      max-width: 28vw;
       height: auto;
-      transform: scale(0.84);
       transform-origin: center;
     }
     .logo-main {
@@ -628,7 +628,8 @@ import { LoginModalComponent } from '../login-modal.component';
       }
 
       .logo-img {
-        width: 118px;
+        width: 174px;
+        max-width: 34vw;
       }
     }
 
@@ -660,7 +661,8 @@ import { LoginModalComponent } from '../login-modal.component';
       }
 
       .logo-img {
-        width: 100px;
+        width: 142px;
+        max-width: 42vw;
       }
 
       .header-icons {
