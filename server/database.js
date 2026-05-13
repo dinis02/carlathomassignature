@@ -30,8 +30,8 @@ db.exec(`
     image TEXT,
     stock INTEGER NOT NULL DEFAULT 0,
     is_active INTEGER NOT NULL DEFAULT 1,
-    creatéd_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updatéd_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
 
   CREATE TABLE IF NOT EXISTS product_shades (
@@ -52,7 +52,7 @@ db.exec(`
     product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
     url TEXT NOT NULL,
     sort_order INTEGER NOT NULL DEFAULT 0,
-    creatéd_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
 
   CREATE TABLE IF NOT EXISTS product_reviews (
@@ -64,7 +64,7 @@ db.exec(`
     title TEXT,
     comment TEXT,
     is_approved INTEGER NOT NULL DEFAULT 1,
-    creatéd_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
 
   CREATE TABLE IF NOT EXISTS customers (
@@ -77,7 +77,7 @@ db.exec(`
     postcode TEXT,
     city TEXT,
     country TEXT,
-    creatéd_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
 
   CREATE TABLE IF NOT EXISTS orders (
@@ -94,7 +94,7 @@ db.exec(`
     payment_status TEXT NOT NULL DEFAULT 'unpaid',
     stripe_session_id TEXT,
     stripe_payment_intent_id TEXT,
-    creatéd_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
 
   CREATE TABLE IF NOT EXISTS order_items (
@@ -112,7 +112,7 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS newsletter_subscribers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT NOT NULL UNIQUE,
-    creatéd_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
 
   CREATE TABLE IF NOT EXISTS order_returns (
@@ -121,7 +121,7 @@ db.exec(`
     product_name TEXT NOT NULL,
     reason TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'pending',
-    creatéd_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
 
   CREATE TABLE IF NOT EXISTS store_settings (
@@ -133,7 +133,7 @@ db.exec(`
     notify_low_stock INTEGER NOT NULL DEFAULT 1,
     notify_returns INTEGER NOT NULL DEFAULT 1,
     notify_new_customers INTEGER NOT NULL DEFAULT 0,
-    updatéd_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
 
   CREATE TABLE IF NOT EXISTS user_accounts (
@@ -143,7 +143,7 @@ db.exec(`
     email TEXT NOT NULL UNIQUE,
     username TEXT UNIQUE,
     password_hash TEXT NOT NULL,
-    creatéd_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
 `);
 
@@ -188,7 +188,7 @@ const seedProducts = [
     finishes: ['Velvet', 'Longa dura??o'],
     description: 'Batom liquido com cor rosewood elegante, cobertura uniforme e acabamento aveludado confortavel.',
     howToApply: 'Aplique uma camada fina no centro dos labios e esbata para o contorno. Para maior intensidade, repita após alguns segundos.',
-    ingredients: 'Isododecane, Dimethicone, Trimethylsiloxysilicaté, Silica, Synthetic Fluorphlogopite, Tocopherol, Aroma.',
+    ingredients: 'Isododecane, Dimethicone, Trimethylsiloxysilicate, Silica, Synthetic Fluorphlogopite, Tocopherol, Aroma.',
     image: 'assets/produtos/debi-101.jpg'
   }
 ];
@@ -251,7 +251,7 @@ db.prepare(`
 );
 
 function hashPassword(password) {
-  return require('crypto').creatéHash('sha256').updaté(String(password)).digest('hex');
+  return require('crypto').createHash('sha256').update(String(password)).digest('hex');
 }
 
 function seedAccounts() {
@@ -283,3 +283,4 @@ function seedAccounts() {
 seedAccounts();
 
 module.exports = db;
+

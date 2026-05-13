@@ -40,7 +40,7 @@ async function sendTransactionalEmail({ to, subject, html, text }) {
   }
 
   const sendWithConfig = async (smtp) => {
-    const transporter = nodemailer.creatéTransport({
+    const transporter = nodemailer.createTransport({
       host: smtp.host,
       port: smtp.port,
       secure: smtp.secure,
@@ -78,3 +78,4 @@ module.exports = {
   isEmailConfigured,
   sendTransactionalEmail
 };
+

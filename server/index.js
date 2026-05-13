@@ -65,7 +65,7 @@ app.post('/api/payments/webhook', express.raw({ type: 'application/json' }), asy
     const session = event.data.object;
     const orderId = session.metadata?.orderId;
     if (orderId) {
-      await updatéOrderPayment(orderId, {
+      await updateOrderPayment(orderId, {
         status: 'processando',
         paymentStatus: 'paid',
         stripeSessionId: session.id,
@@ -116,7 +116,7 @@ async function requireAdmin(req, res, next) {
 }
 
 function hashPassword(password) {
-  return require('crypto').creatéHash('sha256').updaté(String(password)).digest('hex');
+  return require('crypto').createHash('sha256').update(String(password)).digest('hex');
 }
 
 function publicAccount(account) {
@@ -273,7 +273,7 @@ function orderItemsHtml(order) {
     .join('');
 }
 
-function baseEmailTemplaté({ title, eyebrow, intro, body, cta }) {
+function baseEmailTemplate({ title, eyebrow, intro, body, cta }) {
   return `
     <div style="margin:0;background:#f7f4f0;padding:32px 16px;font-family:Arial,Helvetica,sans-serif;color:#1b1714;">
       <div style="max-width:680px;margin:0 auto;background:#fffdfc;border:1px solid #eadfd6;">
@@ -322,7 +322,7 @@ function userHasPasswordProvider(user) {
   return providers.includes('email');
 }
 
-async function creatéPasswordSetupLink(order) {
+async function createPasswordSetupLink(order) {
   if (!supabaseEnabled() || !order?.customerEmail) return null;
 
   const email = String(order.customerEmail).trim().toLowerCase();
@@ -342,7 +342,7 @@ async function creatéPasswordSetupLink(order) {
       }
     : { redirectTo };
 
-  const { data, error } = await supabase.auth.admin.generatéLink({
+  const { data, error } = await supabase.auth.admin.generateLink({
     type: linkType,
     email,
     options: linkOptions
@@ -357,25 +357,25 @@ async function creatéPasswordSetupLink(order) {
 }
 
 async function markConfirmationEmailSent(orderId) {
-  const now = new Daté().toISOString();
+  const now = new Date().toISOString();
   db.prepare('UPDATE orders SET confirmation_email_sent_at = ? WHERE id = ?').run(now, orderId);
   if (supabaseEnabled()) {
     const { error } = await supabase
       .from('orders')
-      .updaté({ confirmation_email_sent_at: now })
+      .update({ confirmation_email_sent_at: now })
       .eq('id', orderId);
     if (error) console.warn('Supabase confirmation email mark failed:', error.message);
   }
 }
 
 async function markStatusEmailSent(orderId, status) {
-  const now = new Daté().toISOString();
+  const now = new Date().toISOString();
   db.prepare('UPDATE orders SET last_status_email_sent_at = ?, last_status_email_status = ? WHERE id = ?')
     .run(now, status, orderId);
   if (supabaseEnabled()) {
     const { error } = await supabase
       .from('orders')
-      .updaté({ last_status_email_sent_at: now, last_status_email_status: status })
+      .update({ last_status_email_sent_at: now, last_status_email_status: status })
       .eq('id', orderId);
     if (error) console.warn('Supabase status email mark failed:', error.message);
   }
@@ -384,7 +384,7 @@ async function markStatusEmailSent(orderId, status) {
 async function sendOrderConfirmationEmail(order) {
   if (!order?.customerEmail || order.confirmationEmailSentAt) return;
 
-  const passwordLink = await creatéPasswordSetupLink(order);
+  const passwordLink = await createPasswordSetupLink(order);
   const passwordBlock = passwordLink
     ? `
       <div style="margin:28px 0;padding:20px;background:#f1eae3;border-left:3px solid #b87d54;">
@@ -397,7 +397,7 @@ async function sendOrderConfirmationEmail(order) {
     `
     : '';
 
-  const html = baseEmailTemplaté({
+  const html = baseEmailTemplate({
     eyebrow: 'Pagamento confirmado',
     title: `Encomenda ${order.id}`,
     intro: `Obrigada, ${order.customerName || 'cliente'}. O pagamento foi confirmado e a sua encomenda está a ser preparada.`,
@@ -448,7 +448,7 @@ async function sendOrderStatusEmail(order) {
   if (!order?.customerEmail) return;
   if (order.lastStatusEmailStatus === order.status) return;
 
-  const html = baseEmailTemplaté({
+  const html = baseEmailTemplate({
     eyebrow: 'Atualizacao da encomenda',
     title: order.statusLabel,
     intro: `A sua encomenda ${order.id} foi atualizada para: ${order.statusLabel}.`,
@@ -484,10 +484,10 @@ function returnStatusLabel(status) {
   return labels[normalized] || 'Pendente';
 }
 
-function formatDatéLabel(datéValue) {
-  const daté = new Daté(datéValue);
-  if (Number.isNaN(daté.getTime())) return '';
-  return daté.toLocaleDatéString('pt-PT', { day: '2-digit', month: 'short', year: 'numeric' });
+function formatDateLabel(dateValue) {
+  const date = new Date(dateValue);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleDateString('pt-PT', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
 function mapProductReview(row) {
@@ -498,8 +498,8 @@ function mapProductReview(row) {
     rating: Number(row.rating || 0),
     title: row.title,
     comment: row.comment,
-    creatédAt: row.creatéd_at,
-    creatédLabel: formatDatéLabel(row.creatéd_at)
+    createdAt: row.created_at,
+    createdLabel: formatDateLabel(row.created_at)
   };
 }
 
@@ -507,20 +507,20 @@ async function listProductReviews(productId) {
   if (supabaseEnabled()) {
     const { data, error } = await supabase
       .from('product_reviews')
-      .select('id, product_id, customer_name, rating, title, comment, creatéd_at')
+      .select('id, product_id, customer_name, rating, title, comment, created_at')
       .eq('product_id', productId)
       .eq('is_approved', true)
-      .order('creatéd_at', { ascending: false });
+      .order('created_at', { ascending: false });
 
     if (!error) return data.map(mapProductReview);
     console.warn('Supabase reviews fallback:', error.message);
   }
 
   const rows = db.prepare(`
-    SELECT id, product_id, customer_name, rating, title, comment, creatéd_at
+    SELECT id, product_id, customer_name, rating, title, comment, created_at
     FROM product_reviews
     WHERE product_id = ? AND is_approved = 1
-    ORDER BY datétime(creatéd_at) DESC
+    ORDER BY datetime(created_at) DESC
   `).all(productId);
   return rows.map(mapProductReview);
 }
@@ -531,7 +531,7 @@ function refreshLocalProductReviewTotals(productId) {
     FROM product_reviews
     WHERE product_id = ? AND is_approved = 1
   `).get(productId);
-  db.prepare('UPDATE products SET rating = ?, review_count = ?, updatéd_at = CURRENT_TIMESTAMP WHERE id = ?')
+  db.prepare('UPDATE products SET rating = ?, review_count = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
     .run(Number(totals.rating || 0), Number(totals.review_count || 0), productId);
 }
 
@@ -555,8 +555,8 @@ function mapSupabaseOrder(row) {
   const items = row.order_items || [];
   return {
     id: row.id,
-    daté: row.creatéd_at,
-    datéLabel: formatDatéLabel(row.creatéd_at),
+    date: row.created_at,
+    dateLabel: formatDateLabel(row.created_at),
     customerName: `${row.customer_first_name || ''} ${row.customer_last_name || ''}`.trim(),
     customerEmail: row.customer_email,
     customerPhone: row.customer_phone,
@@ -630,8 +630,8 @@ async function loadAdminOrderDetail(orderId) {
 
   return {
     id: order.id,
-    daté: order.creatéd_at,
-    datéLabel: formatDatéLabel(order.creatéd_at),
+    date: order.created_at,
+    dateLabel: formatDateLabel(order.created_at),
     customerName: `${order.first_name} ${order.last_name}`.trim(),
     customerEmail: order.email,
     customerPhone: order.phone,
@@ -675,8 +675,8 @@ function mapCustomerOrder(order) {
 
   return {
     id: order.id,
-    daté: order.creatéd_at,
-    datéLabel: formatDatéLabel(order.creatéd_at),
+    date: order.created_at,
+    dateLabel: formatDateLabel(order.created_at),
     customerName: `${order.first_name} ${order.last_name}`.trim(),
     customerEmail: order.email,
     itemCount: items.reduce((sum, item) => sum + Number(item.quantity || 0), 0),
@@ -711,7 +711,7 @@ async function listCustomerOrders(email) {
       .from('orders')
       .select('*, order_items(*)')
       .eq('customer_email', normalizedEmail)
-      .order('creatéd_at', { ascending: false });
+      .order('created_at', { ascending: false });
 
     if (!error) return data.map(mapSupabaseOrder);
     console.warn('Supabase customer orders fallback:', error.message);
@@ -727,7 +727,7 @@ async function listCustomerOrders(email) {
     FROM orders o
     JOIN customers c ON c.id = o.customer_id
     WHERE lower(c.email) = ?
-    ORDER BY datétime(o.creatéd_at) DESC
+    ORDER BY datetime(o.created_at) DESC
   `).all(normalizedEmail);
 
   return orders.map(mapCustomerOrder);
@@ -738,15 +738,15 @@ async function listAdminOrders() {
     const { data, error } = await supabase
       .from('orders')
       .select('*, order_items(id,quantity)')
-      .order('creatéd_at', { ascending: false });
+      .order('created_at', { ascending: false });
 
     if (!error) {
       return data.map(order => {
         const mapped = mapSupabaseOrder(order);
         return {
           id: mapped.id,
-          daté: mapped.daté,
-          datéLabel: mapped.datéLabel,
+          date: mapped.date,
+          dateLabel: mapped.dateLabel,
           customerName: mapped.customerName,
           customerEmail: mapped.customerEmail,
           itemCount: mapped.itemCount,
@@ -763,7 +763,7 @@ async function listAdminOrders() {
   const orders = db.prepare(`
     SELECT
       o.id,
-      o.creatéd_at,
+      o.created_at,
       o.total,
       o.status,
       o.shipping_method,
@@ -775,13 +775,13 @@ async function listAdminOrders() {
     JOIN customers c ON c.id = o.customer_id
     LEFT JOIN order_items oi ON oi.order_id = o.id
     GROUP BY o.id
-    ORDER BY datétime(o.creatéd_at) DESC
+    ORDER BY datetime(o.created_at) DESC
   `).all();
 
   return orders.map(order => ({
     id: order.id,
-    daté: order.creatéd_at,
-    datéLabel: formatDatéLabel(order.creatéd_at),
+    date: order.created_at,
+    dateLabel: formatDateLabel(order.created_at),
     customerName: `${order.first_name} ${order.last_name}`.trim(),
     customerEmail: order.email,
     itemCount: Number(order.items_count || 0),
@@ -804,14 +804,14 @@ function listAdminCustomers() {
       c.country,
       COUNT(o.id) AS orders_count,
       COALESCE(SUM(o.total), 0) AS total_spent,
-      MAX(o.creatéd_at) AS last_order_at
+      MAX(o.created_at) AS last_order_at
     FROM customers c
     LEFT JOIN orders o ON o.customer_id = c.id
     GROUP BY c.id
-    ORDER BY datétime(COALESCE(MAX(o.creatéd_at), c.creatéd_at)) DESC
+    ORDER BY datetime(COALESCE(MAX(o.created_at), c.created_at)) DESC
   `).all();
 
-  const ninetyDaysAgo = Daté.now() - 90 * 24 * 60 * 60 * 1000;
+  const ninetyDaysAgo = Date.now() - 90 * 24 * 60 * 60 * 1000;
 
   return customers.map(customer => ({
     id: customer.id,
@@ -822,10 +822,10 @@ function listAdminCustomers() {
     country: customer.country,
     ordersCount: Number(customer.orders_count || 0),
     totalSpent: Number(customer.total_spent || 0),
-    status: customer.last_order_at && new Daté(customer.last_order_at).getTime() >= ninetyDaysAgo ? 'active' : 'inactive',
-    statusLabel: customer.last_order_at && new Daté(customer.last_order_at).getTime() >= ninetyDaysAgo ? 'Activo' : 'Inactivo',
+    status: customer.last_order_at && new Date(customer.last_order_at).getTime() >= ninetyDaysAgo ? 'active' : 'inactive',
+    statusLabel: customer.last_order_at && new Date(customer.last_order_at).getTime() >= ninetyDaysAgo ? 'Activo' : 'Inactivo',
     lastOrderAt: customer.last_order_at,
-    lastOrderLabel: customer.last_order_at ? formatDatéLabel(customer.last_order_at) : 'Sem encomendas'
+    lastOrderLabel: customer.last_order_at ? formatDateLabel(customer.last_order_at) : 'Sem encomendas'
   }));
 }
 
@@ -838,7 +838,7 @@ function listAdminReturns() {
     FROM order_returns r
     JOIN orders o ON o.id = r.order_id
     JOIN customers c ON c.id = o.customer_id
-    ORDER BY datétime(r.creatéd_at) DESC
+    ORDER BY datetime(r.created_at) DESC
   `).all();
 
   return returns.map(entry => ({
@@ -849,15 +849,15 @@ function listAdminReturns() {
     reason: entry.reason,
     status: entry.status,
     statusLabel: returnStatusLabel(entry.status),
-    creatédAt: entry.creatéd_at,
-    creatédLabel: formatDatéLabel(entry.creatéd_at)
+    createdAt: entry.created_at,
+    createdLabel: formatDateLabel(entry.created_at)
   }));
 }
 
 async function getDashboardData() {
-  const today = new Daté();
-  const monthStart = new Daté(today.getFullYear(), today.getMonth(), 1).toISOString();
-  const yearStart = new Daté(today.getFullYear(), 0, 1).toISOString();
+  const today = new Date();
+  const monthStart = new Date(today.getFullYear(), today.getMonth(), 1).toISOString();
+  const yearStart = new Date(today.getFullYear(), 0, 1).toISOString();
 
   const monthTotals = db.prepare(`
     SELECT
@@ -865,7 +865,7 @@ async function getDashboardData() {
       COALESCE(SUM(total), 0) AS revenue,
       COALESCE(AVG(total), 0) AS average_order
     FROM orders
-    WHERE datétime(creatéd_at) >= datétime(?)
+    WHERE datetime(created_at) >= datetime(?)
   `).get(monthStart);
 
   const returnCounts = db.prepare(`
@@ -899,11 +899,11 @@ async function getDashboardData() {
   const returns = listAdminReturns();
 
   const revenueByDayRows = db.prepare(`
-    SELECT strftime('%d', creatéd_at) AS day_label, COALESCE(SUM(total), 0) AS total
+    SELECT strftime('%d', created_at) AS day_label, COALESCE(SUM(total), 0) AS total
     FROM orders
-    WHERE datétime(creatéd_at) >= datétime(?)
-    GROUP BY strftime('%d', creatéd_at)
-    ORDER BY strftime('%d', creatéd_at) ASC
+    WHERE datetime(created_at) >= datetime(?)
+    GROUP BY strftime('%d', created_at)
+    ORDER BY strftime('%d', created_at) ASC
   `).all(monthStart);
 
   const dailyRevenue = revenueByDayRows.map(row => ({
@@ -929,12 +929,12 @@ async function getDashboardData() {
     ...recentOrders.slice(0, 2).map(order => ({
       type: 'order',
       message: `Nova encomenda ${order.id} - ${order.customerName} - ${order.total.toFixed(2)} EUR`,
-      timeLabel: order.datéLabel
+      timeLabel: order.dateLabel
     })),
     ...returns.slice(0, 1).map(entry => ({
       type: 'return',
       message: `Pedido de devolucao - ${entry.orderId} - ${entry.productName}`,
-      timeLabel: entry.creatédLabel
+      timeLabel: entry.createdLabel
     })),
     ...lowStockRows.map(product => ({
       type: 'product',
@@ -945,11 +945,11 @@ async function getDashboardData() {
   ].slice(0, 5);
 
   const monthlyRows = db.prepare(`
-    SELECT strftime('%m', creatéd_at) AS month_key, COALESCE(SUM(total), 0) AS total
+    SELECT strftime('%m', created_at) AS month_key, COALESCE(SUM(total), 0) AS total
     FROM orders
-    WHERE datétime(creatéd_at) >= datétime(?)
-    GROUP BY strftime('%m', creatéd_at)
-    ORDER BY strftime('%m', creatéd_at) ASC
+    WHERE datetime(created_at) >= datetime(?)
+    GROUP BY strftime('%m', created_at)
+    ORDER BY strftime('%m', created_at) ASC
   `).all(yearStart);
 
   const monthlyRevenue = monthlyRows.map(row => ({
@@ -980,13 +980,13 @@ function getAnalyticsData() {
   `).get();
 
   const subscriberCount = db.prepare('SELECT COUNT(*) AS count FROM newsletter_subscribers').get();
-  const currentYearStart = new Daté(new Daté().getFullYear(), 0, 1).toISOString();
+  const currentYearStart = new Date(new Date().getFullYear(), 0, 1).toISOString();
   const monthlyRows = db.prepare(`
-    SELECT strftime('%m', creatéd_at) AS month_key, COALESCE(SUM(total), 0) AS total
+    SELECT strftime('%m', created_at) AS month_key, COALESCE(SUM(total), 0) AS total
     FROM orders
-    WHERE datétime(creatéd_at) >= datétime(?)
-    GROUP BY strftime('%m', creatéd_at)
-    ORDER BY strftime('%m', creatéd_at) ASC
+    WHERE datetime(created_at) >= datetime(?)
+    GROUP BY strftime('%m', created_at)
+    ORDER BY strftime('%m', created_at) ASC
   `).all(currentYearStart);
 
   return {
@@ -1023,7 +1023,7 @@ function productFileName(file) {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
     .slice(0, 48) || 'produto';
-  return `${Daté.now()}-${base}${ext}`;
+  return `${Date.now()}-${base}${ext}`;
 }
 
 async function uploadProductImageToSupabase(file) {
@@ -1087,7 +1087,7 @@ function replaceLocalProductImages(productId, imageUrls) {
   imageUrls.forEach((url, index) => insertImage.run(productId, url, index));
 }
 
-function validatéOrderPayload(payload) {
+function validateOrderPayload(payload) {
   if (!payload.customer?.firstName || !payload.customer?.lastName || !payload.customer?.email) {
     return 'Dados do cliente em falta';
   }
@@ -1097,7 +1097,7 @@ function validatéOrderPayload(payload) {
   return null;
 }
 
-function creatéLocalOrder(payload, options = {}, orderId = `CTS-${new Daté().getFullYear()}-${Math.floor(Math.random() * 900000 + 100000)}`) {
+function createLocalOrder(payload, options = {}, orderId = `CTS-${new Date().getFullYear()}-${Math.floor(Math.random() * 900000 + 100000)}`) {
   const { customer, items, subtotal, discount, shipping, total, shippingMethod, paymentMethod, rewardPoints } = payload;
   const status = options.status || 'processando';
   const paymentStatus = options.paymentStatus || 'unpaid';
@@ -1176,7 +1176,7 @@ async function resolveSupabaseUserId(email) {
   return data?.id || null;
 }
 
-async function creatéSupabaseOrder(payload, options = {}, orderId) {
+async function createSupabaseOrder(payload, options = {}, orderId) {
   const { customer, items, subtotal, discount, shipping, total, shippingMethod, paymentMethod, rewardPoints } = payload;
   const status = options.status || 'processando';
   const paymentStatus = options.paymentStatus || 'unpaid';
@@ -1225,13 +1225,13 @@ async function creatéSupabaseOrder(payload, options = {}, orderId) {
   if (itemsError) throw itemsError;
 }
 
-async function creatéOrder(payload, options = {}) {
-  const orderId = `CTS-${new Daté().getFullYear()}-${Math.floor(Math.random() * 900000 + 100000)}`;
-  creatéLocalOrder(payload, options, orderId);
+async function createOrder(payload, options = {}) {
+  const orderId = `CTS-${new Date().getFullYear()}-${Math.floor(Math.random() * 900000 + 100000)}`;
+  createLocalOrder(payload, options, orderId);
 
   if (supabaseEnabled()) {
     try {
-      await creatéSupabaseOrder(payload, options, orderId);
+      await createSupabaseOrder(payload, options, orderId);
     } catch (err) {
       console.warn('Supabase order insert fallback local only:', err.message);
     }
@@ -1240,7 +1240,7 @@ async function creatéOrder(payload, options = {}) {
   return orderId;
 }
 
-async function updatéOrderPayment(orderId, values) {
+async function updateOrderPayment(orderId, values) {
   db.prepare(`
     UPDATE orders
     SET status = COALESCE(@status, status),
@@ -1263,8 +1263,8 @@ async function updatéOrderPayment(orderId, values) {
     if (values.stripeSessionId !== undefined) patch.stripe_session_id = values.stripeSessionId;
     if (values.stripePaymentIntentId !== undefined) patch.stripe_payment_intent_id = values.stripePaymentIntentId;
     if (Object.keys(patch).length) {
-      const { error } = await supabase.from('orders').updaté(patch).eq('id', orderId);
-      if (error) console.warn('Supabase order payment updaté failed:', error.message);
+      const { error } = await supabase.from('orders').update(patch).eq('id', orderId);
+      if (error) console.warn('Supabase order payment update failed:', error.message);
     }
   }
 
@@ -1297,7 +1297,7 @@ app.post('/api/admin/email/test', requireAdmin, async (req, res) => {
     const result = await sendTransactionalEmail({
       to,
       subject: 'Teste de email - Carla Thomas Signature',
-      html: baseEmailTemplaté({
+      html: baseEmailTemplate({
         eyebrow: 'Teste de email',
         title: 'Email configurado',
         intro: 'Este email confirma que o SMTP da Carla Thomas Signature está configurado corretamente.',
@@ -1375,7 +1375,7 @@ app.post('/api/products/:id/reviews', async (req, res) => {
           comment: comment || null,
           is_approved: true
         })
-        .select('id, product_id, customer_name, rating, title, comment, creatéd_at')
+        .select('id, product_id, customer_name, rating, title, comment, created_at')
         .single();
       if (error) throw error;
       review = mapProductReview(data);
@@ -1402,7 +1402,7 @@ app.post('/api/products', requireAdmin, uploadProductImages, async (req, res) =>
   const price = Number(req.body.price);
 
   if (!name || !brand || !category || !Number.isFinite(price) || price <= 0) {
-    return res.status(400).json({ error: 'Nome, marca, catégoria e preço valido sao obrigatorios' });
+    return res.status(400).json({ error: 'Nome, marca, categoria e preço valido sao obrigatorios' });
   }
 
   const gradientFrom = String(req.body.gradientFrom || '#E8D0C0');
@@ -1469,7 +1469,7 @@ app.post('/api/products', requireAdmin, uploadProductImages, async (req, res) =>
       if (fullError) throw fullError;
       return res.status(201).json(mapSupabaseProduct(fullProduct));
     } catch (err) {
-      console.warn('Supabase creaté product failed:', err.message);
+      console.warn('Supabase create product failed:', err.message);
       return res.status(500).json({
         error: err.message || 'Não foi possível guardar o produto na base de dados'
       });
@@ -1528,7 +1528,7 @@ app.put('/api/products/:id', requireAdmin, uploadProductImages, async (req, res)
   const price = Number(req.body.price);
 
   if (!productId || !name || !brand || !category || !Number.isFinite(price) || price <= 0) {
-    return res.status(400).json({ error: 'Nome, marca, catégoria e preço valido sao obrigatorios' });
+    return res.status(400).json({ error: 'Nome, marca, categoria e preço valido sao obrigatorios' });
   }
 
   const gradientFrom = String(req.body.gradientFrom || '#E8D0C0');
@@ -1558,7 +1558,7 @@ app.put('/api/products/:id', requireAdmin, uploadProductImages, async (req, res)
 
       const { error } = await supabase
         .from('products')
-        .updaté({
+        .update({
           brand,
           name,
           price,
@@ -1606,7 +1606,7 @@ app.put('/api/products/:id', requireAdmin, uploadProductImages, async (req, res)
       if (fullError) throw fullError;
       return res.json(mapSupabaseProduct(fullProduct));
     } catch (err) {
-      console.warn('Supabase updaté product failed:', err.message);
+      console.warn('Supabase update product failed:', err.message);
       return res.status(500).json({
         error: err.message || 'Não foi possível atualizar o produto na base de dados'
       });
@@ -1637,7 +1637,7 @@ app.put('/api/products/:id', requireAdmin, uploadProductImages, async (req, res)
       ingredients = @ingredients,
       image = @image,
       stock = @stock,
-      updatéd_at = CURRENT_TIMESTAMP
+      updated_at = CURRENT_TIMESTAMP
     WHERE id = @id
   `).run({
     id: productId,
@@ -1786,16 +1786,16 @@ app.patch('/api/admin/orders/:id', requireAdmin, async (req, res) => {
     return res.status(400).json({ error: 'Estádo invalido' });
   }
 
-  const préviousOrder = await loadAdminOrderDetail(req.params.id);
+  const previousOrder = await loadAdminOrderDetail(req.params.id);
   const result = db.prepare('UPDATE orders SET status = ? WHERE id = ?').run(nextStatus, req.params.id);
   if (supabaseEnabled()) {
-    const { error } = await supabase.from('orders').updaté({ status: nextStatus }).eq('id', req.params.id);
-    if (error) console.warn('Supabase admin status updaté failed:', error.message);
+    const { error } = await supabase.from('orders').update({ status: nextStatus }).eq('id', req.params.id);
+    if (error) console.warn('Supabase admin status update failed:', error.message);
   }
   if (!result.changes && !supabaseEnabled()) return res.status(404).json({ error: 'Encomenda não encontrada' });
 
   const order = await loadAdminOrderDetail(req.params.id);
-  if (order && préviousOrder?.status !== order.status) {
+  if (order && previousOrder?.status !== order.status) {
     try {
       await sendOrderStatusEmail(order);
     } catch (err) {
@@ -1829,7 +1829,7 @@ app.patch('/api/admin/products/:id/archive', requireAdmin, async (req, res) => {
     try {
       const { error } = await supabase
         .from('products')
-        .updaté({ is_active: isActive })
+        .update({ is_active: isActive })
         .eq('id', productId);
 
       if (error) throw error;
@@ -1849,7 +1849,7 @@ app.patch('/api/admin/products/:id/archive', requireAdmin, async (req, res) => {
 
   const result = db.prepare(`
     UPDATE products
-    SET is_active = ?, updatéd_at = CURRENT_TIMESTAMP
+    SET is_active = ?, updated_at = CURRENT_TIMESTAMP
     WHERE id = ?
   `).run(isActive ? 1 : 0, productId);
 
@@ -1921,7 +1921,7 @@ app.put('/api/admin/settings', requireAdmin, (req, res) => {
       notify_low_stock = ?,
       notify_returns = ?,
       notify_new_customers = ?,
-      updatéd_at = CURRENT_TIMESTAMP
+      updated_at = CURRENT_TIMESTAMP
     WHERE id = 1
   `).run(
     payload.storeName,
@@ -1937,21 +1937,21 @@ app.put('/api/admin/settings', requireAdmin, (req, res) => {
 });
 
 app.post('/api/orders', async (req, res) => {
-  const error = validatéOrderPayload(req.body);
+  const error = validateOrderPayload(req.body);
   if (error) return res.status(400).json({ error });
 
-  const orderId = await creatéOrder(req.body);
+  const orderId = await createOrder(req.body);
   res.status(201).json({ id: orderId });
 });
 
-app.post('/api/payments/creaté-checkout-session', async (req, res) => {
+app.post('/api/payments/create-checkout-session', async (req, res) => {
   if (!stripe) {
     return res.status(503).json({
       error: 'Stripe ainda não está configurado. Adicione STRIPE_SECRET_KEY no ficheiro .env.'
     });
   }
 
-  const error = validatéOrderPayload(req.body);
+  const error = validateOrderPayload(req.body);
   if (error) return res.status(400).json({ error });
 
   try {
@@ -1964,7 +1964,7 @@ app.post('/api/payments/creaté-checkout-session', async (req, res) => {
       return res.status(400).json({ error: 'O total da encomenda tem de ser superior a 0.' });
     }
 
-    const orderId = await creatéOrder(payload, {
+    const orderId = await createOrder(payload, {
       status: 'pending_payment',
       paymentStatus: 'unpaid'
     });
@@ -1994,7 +1994,7 @@ app.post('/api/payments/creaté-checkout-session', async (req, res) => {
       });
     }
 
-    const session = await stripe.checkout.sessions.creaté({
+    const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],
       customer_email: payload.customer.email,
@@ -2006,7 +2006,7 @@ app.post('/api/payments/creaté-checkout-session', async (req, res) => {
       }
     });
 
-    await updatéOrderPayment(orderId, { stripeSessionId: session.id });
+    await updateOrderPayment(orderId, { stripeSessionId: session.id });
     res.status(201).json({ id: orderId, url: session.url });
   } catch (err) {
     res.status(500).json({ error: err.message || 'Não foi possível criar pagamento Stripe' });
@@ -2028,7 +2028,7 @@ app.get('/api/payments/session-status', async (req, res) => {
     const orderId = session.metadata?.orderId || null;
 
     if (orderId && session.payment_status === 'paid') {
-      await updatéOrderPayment(orderId, {
+      await updateOrderPayment(orderId, {
         status: 'processando',
         paymentStatus: 'paid',
         stripeSessionId: session.id,
@@ -2067,7 +2067,7 @@ app.use((err, _req, res, next) => {
   if (!err) return next();
   if (err instanceof multer.MulterError) {
     const message = err.code === 'LIMIT_FILE_SIZE'
-      ? 'A fotografia e demasiado grande. Use imagens até 20MB.'
+      ? 'A fotografia e demasiado grande. Use imagens ate 20MB.'
       : err.message;
     return res.status(400).json({ error: message });
   }
@@ -2077,3 +2077,4 @@ app.use((err, _req, res, next) => {
 app.listen(port, () => {
   console.log(`Carla Thomas pronta em http://localhost:${port}`);
 });
+
