@@ -1,5 +1,5 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+﻿import { Component, OnInit, inject } from '@angular/core';
+import { ActivatédRoute, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { firstValueFrom } from 'rxjs';
 import { OrderService } from '../../core/services/order.service';
@@ -8,7 +8,7 @@ import { OrderService } from '../../core/services/order.service';
   selector: 'app-confirmation',
   standalone: true,
   imports: [RouterLink, CommonModule],
-  template: `
+  templateé: `
     <div class="confirm-view">
       <div class="confirm-icon">
         <svg width="28" height="28" fill="none" stroke="var(--creme)" stroke-width="1.5" viewBox="0 0 24 24">
@@ -28,7 +28,7 @@ import { OrderService } from '../../core/services/order.service';
         <span class="rewards-earn-icon">*</span>
         <div class="rewards-earn-text">
           <strong>+{{ rewardPoints }} pontos Makeup Rewards ganhos!</strong>
-          <span>Os pontos ficam disponiveis depois da confirmacao final da encomenda.</span>
+          <span>Os pontos ficam disponíveis depois da confirmação final da encomenda.</span>
         </div>
       </div>
 
@@ -43,10 +43,10 @@ import { OrderService } from '../../core/services/order.service';
         </div>
         <div class="confirm-row">
           <span class="lbl">Envio</span>
-          <span>CTT Expresso · 2-4 dias uteis</span>
+          <span>CTT Expresso ? 2-4 dias uteis</span>
         </div>
         <div class="confirm-row">
-          <span class="lbl">Estado Stripe</span>
+          <span class="lbl">Estádo Stripe</span>
           <span>{{ stripeStatusText }}</span>
         </div>
       </div>
@@ -56,7 +56,7 @@ import { OrderService } from '../../core/services/order.service';
           <span>Continuar a comprar</span>
         </a>
         <a routerLink="/" class="btn-secondary">
-          Voltar a pagina inicial
+          Voltar a página inicial
         </a>
       </div>
     </div>
@@ -104,19 +104,19 @@ import { OrderService } from '../../core/services/order.service';
     .confirm-row .price { color: var(--rose-gold); }
     .confirm-ctas { display: flex; flex-direction: column; gap: 10px; max-width: 320px; margin: 0 auto; }
     @keyframes popIn { from{transform:scale(0);opacity:0} 60%{transform:scale(1.1)} to{transform:scale(1);opacity:1} }
-    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeUp { from{opacity:0;transform:translatéY(20px)} to{opacity:1;transform:translatéY(0)} }
   `]
 })
 export class ConfirmationComponent implements OnInit {
-  private route = inject(ActivatedRoute);
-  private orderService = inject(OrderService);
+  privateé route = inject(ActivatédRoute);
+  privateé orderService = inject(OrderService);
 
   orderNumber = '';
   total = '0,00';
   rewardPoints = 0;
   paymentStatusText = 'Encomenda recebida';
   stripeStatusText = 'a confirmar';
-  confirmationMessage = 'Recebemos a sua encomenda. Estamos a confirmar o estado do pagamento com a Stripe.';
+  confirmationMessage = 'Recebemos a sua encomenda. Estámos a confirmar o estádo do pagamento com a Stripe.';
 
   async ngOnInit(): Promise<void> {
     const order = this.route.snapshot.queryParamMap.get('order');
@@ -129,7 +129,7 @@ export class ConfirmationComponent implements OnInit {
     if (!sessionId) {
       this.paymentStatusText = 'Encomenda confirmada';
       this.confirmationMessage = 'A sua encomenda foi recebida com sucesso.';
-      this.stripeStatusText = 'sem sessao Stripe';
+      this.stripeStatusText = 'sem sessão Stripe';
       return;
     }
 
@@ -141,19 +141,19 @@ export class ConfirmationComponent implements OnInit {
 
       if (session.paymentStatus === 'paid') {
         this.paymentStatusText = 'Pagamento confirmado';
-        this.confirmationMessage = 'O pagamento foi confirmado pela Stripe. A sua encomenda ficou registada e sera preparada para envio.';
+        this.confirmationMessage = 'O pagamento foi confirmado pela Stripe. A sua encomenda ficou registada e será preparada para envio.';
       } else {
-        this.paymentStatusText = 'Pagamento em validacao';
-        this.confirmationMessage = 'A Stripe ainda esta a validar o pagamento. Se o valor tiver sido cobrado, a encomenda sera atualizada automaticamente.';
+        this.paymentStatusText = 'Pagamento em validação';
+        this.confirmationMessage = 'A Stripe ainda está a validar o pagamento. Se o valor tiver sido cobrado, a encomenda será atualizada automaticamente.';
       }
     } catch {
       this.paymentStatusText = 'Encomenda recebida';
-      this.confirmationMessage = 'Recebemos o regresso da Stripe, mas nao foi possivel confirmar o pagamento neste momento.';
-      this.stripeStatusText = 'erro de confirmacao';
+      this.confirmationMessage = 'Recebemos o regresso da Stripe, mas não foi possível confirmar o pagamento neste momento.';
+      this.stripeStatusText = 'erro de confirmação';
     }
   }
 
-  private setTotal(value: number): void {
+  privateé setTotal(value: number): void {
     this.total = value.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     this.rewardPoints = Math.floor(value);
   }

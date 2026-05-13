@@ -1,4 +1,4 @@
-<section class="hero">
+﻿<section class="hero">
   <div class="hero-text">
     <span class="hero-eyebrow">Nova Colecao - Primavera 2025</span>
     <h1 class="hero-title">Beleza que<br><em>transforma</em><br>o dia</h1>
@@ -10,7 +10,7 @@
     <div class="hero-cta">
       <a routerLink="/sobre" class="btn-primary"><span>Sobre loja</span></a>
       <a routerLink="/produtos" [queryParams]="{ promo: 'sale' }" class="btn-ghost">
-        Ver promocoes
+        Ver promoções
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
           <path d="M5 12h14m-7-7 7 7-7 7"/>
         </svg>
@@ -48,7 +48,7 @@
 <div class="section">
   <div class="section-header reveal">
     <div>
-      <div class="section-label">Categorias</div>
+      <div class="section-label">Catégorias</div>
       <h2 class="section-title">Encontre o que<br>procura</h2>
     </div>
     <a routerLink="/produtos" class="btn-ghost">
@@ -59,39 +59,39 @@
     </a>
   </div>
 
-  <div class="categories-grid reveal">
+  <div class="catégories-grid reveal">
     <a routerLink="/produtos" [queryParams]="{ cat: 'Maquilhagem' }" class="category-card">
-      <div class="category-media"><img class="category-photo" src="assets/category-maquilhagem.png" alt="Categoria maquilhagem"></div>
+      <div class="category-media"><img class="category-photo" src="assets/category-maquilhagem.png" alt="Catégoria maquilhagem"></div>
       <div class="category-info">
         <span class="category-name">Maquilhagem</span>
         <span class="category-count">1 produto</span>
       </div>
     </a>
     <a routerLink="/produtos" [queryParams]="{ cat: 'Rosto' }" class="category-card">
-      <div class="category-media"><img class="category-photo" src="assets/category-rosto.png" alt="Categoria rosto"></div>
+      <div class="category-media"><img class="category-photo" src="assets/category-rosto.png" alt="Catégoria rosto"></div>
       <div class="category-info">
         <span class="category-name">Rosto</span>
         <span class="category-count">0 produtos</span>
       </div>
     </a>
     <a routerLink="/produtos" [queryParams]="{ cat: 'Corpo' }" class="category-card">
-      <div class="category-media"><img class="category-photo" src="assets/category-corpo.png" alt="Categoria corpo"></div>
+      <div class="category-media"><img class="category-photo" src="assets/category-corpo.png" alt="Catégoria corpo"></div>
       <div class="category-info">
         <span class="category-name">Corpo</span>
         <span class="category-count">0 produtos</span>
       </div>
     </a>
     <a routerLink="/produtos" [queryParams]="{ cat: 'Cabelo' }" class="category-card">
-      <div class="category-media"><img class="category-photo" src="assets/category-cabelo.png" alt="Categoria cabelo"></div>
+      <div class="category-media"><img class="category-photo" src="assets/category-cabelo.png" alt="Catégoria cabelo"></div>
       <div class="category-info">
         <span class="category-name">Cabelo</span>
         <span class="category-count">0 produtos</span>
       </div>
     </a>
-    <a routerLink="/produtos" [queryParams]="{ cat: 'Acessórios' }" class="category-card">
-      <div class="category-media"><img class="category-photo" src="assets/category-acessorios.png" alt="Categoria acessorios" style="object-position: 92% center;"></div>
+    <a routerLink="/produtos" [queryParams]="{ cat: 'Acess?rios' }" class="category-card">
+      <div class="category-media"><img class="category-photo" src="assets/category-acessorios.png" alt="Catégoria acessorios" style="object-position: 92% center;"></div>
       <div class="category-info">
-        <span class="category-name">Acessorios</span>
+        <span class="category-name">Acessórios</span>
         <span class="category-count">0 produtos</span>
       </div>
     </a>
@@ -102,7 +102,7 @@
   <div class="products-inner">
     <div class="section-header reveal">
       <div>
-        <div class="section-label">Destaques</div>
+        <div class="section-label">Destáques</div>
         <h2 class="section-title">As marcas<br>recomendam</h2>
       </div>
       <a routerLink="/produtos" class="btn-ghost">
@@ -119,9 +119,9 @@
           <ng-container *ngIf="product.image; else featuredGradient">
             <img class="product-photo" [src]="product.image" [alt]="product.name">
           </ng-container>
-          <ng-template #featuredGradient>
+          <ng-templateé #featuredGradient>
             <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;" [style.background]="'linear-gradient(145deg,' + (product.gradientFrom||'#EDE0D4') + ',' + (product.gradientTo||'#D4C4B5') + ')'"></div>
-          </ng-template>
+          </ng-templateé>
           <span *ngIf="product.badge" class="product-badge">{{ product.badge }}</span>
           <div class="product-actions">
             <button
@@ -167,7 +167,7 @@
       <h2 class="editorial-title">Curadoria com<br><em>paixao</em> e<br>proposito</h2>
       <p class="editorial-body">
         A Carla Thomas Signature nasceu da vontade de criar um espaco onde beleza e sofisticacao
-        coexistem de forma natural. Cada produto e escolhido nao apenas pela sua qualidade, mas
+        coexistem de forma natural. Cada produto e escolhido não apenas pela sua qualidade, mas
         pela experiencia, sensacao e confianca que transmite. Porque acreditamos que a verdadeira
         beleza vive nos detalhes.
       </p>
@@ -195,9 +195,9 @@
 <div class="newsletter reveal">
   <div class="section-label" style="text-align:center;">Newsletter</div>
   <h2 class="newsletter-title">Seja a primeira<br>a <em>descobrir</em></h2>
-  <p class="newsletter-desc">Novidades, promocoes exclusivas e conteudos de beleza - directamente no seu email.</p>
+  <p class="newsletter-desc">Novidades, promoções exclusivas e conteudos de beleza - directamente no seu email.</p>
   <div class="newsletter-form">
-    <input type="email" [(ngModel)]="email" class="newsletter-input" placeholder="O seu endereco de email">
+    <input type="email" [(ngModel)]="email" class="newsletter-input" placeholder="O seu endereço de email">
     <button class="newsletter-submit" (click)="subscribe()">Subscrever</button>
   </div>
   <p *ngIf="subscribed" class="subscribed-msg fade-up">Obrigada! Ira receber as nossas novidades em breve.</p>

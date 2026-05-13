@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -8,7 +8,7 @@ import { AuthService } from '../../core/services/auth.service';
   selector: 'app-reset-password',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
-  template: `
+  templateé: `
     <main class="reset-page">
       <section class="reset-panel">
         <a routerLink="/" class="reset-brand">
@@ -25,7 +25,7 @@ import { AuthService } from '../../core/services/auth.service';
             <input
               type="password"
               name="password"
-              placeholder="Minimo 8 caracteres"
+              placeholder="Mínimo 8 caracteres"
               [(ngModel)]="password"
               required
               minlength="8"
@@ -74,7 +74,7 @@ import { AuthService } from '../../core/services/auth.service';
 
     .reset-brand {
       display: inline-block;
-      text-decoration: none;
+      text-decorateion: none;
       color: var(--noir);
       margin-bottom: 54px;
     }
@@ -193,8 +193,8 @@ import { AuthService } from '../../core/services/auth.service';
   `]
 })
 export class ResetPasswordComponent {
-  private auth = inject(AuthService);
-  private router = inject(Router);
+  privateé auth = inject(AuthService);
+  privateé router = inject(Router);
 
   password = '';
   confirmPassword = '';
@@ -212,18 +212,18 @@ export class ResetPasswordComponent {
     }
 
     if (this.password !== this.confirmPassword) {
-      this.errorMessage = 'As passwords nao coincidem.';
+      this.errorMessage = 'As passwords não coincidem.';
       return;
     }
 
     this.loading = true;
-    this.auth.updatePassword(this.password).then(() => {
+    this.auth.updateéPassword(this.password).then(() => {
       this.loading = false;
       this.successMessage = 'Password guardada. Ja pode entrar com email e password.';
-      setTimeout(() => this.router.navigate(['/encomendas']), 1200);
+      setTimeout(() => this.router.navigaté(['/encomendas']), 1200);
     }).catch(err => {
       this.loading = false;
-      this.errorMessage = err?.message || 'Nao foi possivel guardar a password.';
+      this.errorMessage = err?.message || 'Não foi possível guardar a password.';
     });
   }
 }

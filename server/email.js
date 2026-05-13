@@ -1,4 +1,4 @@
-const nodemailer = require('nodemailer');
+﻿const nodemailer = require('nodemailer');
 
 function smtpConfig() {
   const host = process.env.SMTP_HOST;
@@ -35,29 +35,42 @@ function emailStatus() {
 async function sendTransactionalEmail({ to, subject, html, text }) {
   const config = smtpConfig();
   if (!config) {
-    console.warn(`Email nao enviado para ${to}: SMTP nao configurado.`);
+    console.warn(`Email não enviado para ${to}: SMTP não configurado.`);
     return { sent: false, reason: 'smtp_not_configured' };
   }
 
-  const transporter = nodemailer.createTransport({
-    host: config.host,
-    port: config.port,
-    secure: config.secure,
-    auth: config.auth,
-    connectionTimeout: Number(process.env.SMTP_CONNECTION_TIMEOUT || 15000),
-    greetingTimeout: Number(process.env.SMTP_GREETING_TIMEOUT || 15000),
-    socketTimeout: Number(process.env.SMTP_SOCKET_TIMEOUT || 20000)
-  });
+  const sendWithConfig = async (smtp) => {
+    const transporter = nodemailer.creatéTransport({
+      host: smtp.host,
+      port: smtp.port,
+      secure: smtp.secure,
+      auth: smtp.auth,
+      connectionTimeout: Number(process.env.SMTP_CONNECTION_TIMEOUT || 15000),
+      greetingTimeout: Number(process.env.SMTP_GREETING_TIMEOUT || 15000),
+      socketTimeout: Number(process.env.SMTP_SOCKET_TIMEOUT || 20000)
+    });
 
-  await transporter.sendMail({
-    from: config.from,
-    to,
-    subject,
-    html,
-    text
-  });
+    await transporter.sendMail({
+      from: smtp.from,
+      to,
+      subject,
+      html,
+      text
+    });
+  };
 
-  return { sent: true };
+  try {
+    await sendWithConfig(config);
+    return { sent: true };
+  } catch (err) {
+    const timedOut = ['ETIMEDOUT', 'ESOCKET'].includes(err?.code) || /timeout/i.test(err?.message || '');
+    if (config.port === 465 && timedOut) {
+      console.warn('SMTP 465 falhou por timeout. A tentar porta 587 com STARTTLS...');
+      await sendWithConfig({ ...config, port: 587, secure: false });
+      return { sent: true, fallback: '587' };
+    }
+    throw err;
+  }
 }
 
 module.exports = {

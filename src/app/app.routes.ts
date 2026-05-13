@@ -1,4 +1,4 @@
-import { Routes } from '@angular/router';
+﻿import { Routes } from '@angular/router';
 import { OrdersComponent } from './pages/orders/orders.component';
 import { adminGuard } from './core/guards/admin.guard';
 import { accountGuard } from './core/guards/account.guard';
@@ -37,8 +37,8 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/reset-password/reset-password.component').then(m => m.ResetPasswordComponent)
   },
   {
-    path: 'politica-privacidade',
-    data: { page: 'privacy' },
+    path: 'politica-privatecidade',
+    data: { page: 'privatecy' },
     loadComponent: () => import('./pages/legal/legal.component').then(m => m.LegalComponent)
   },
   {

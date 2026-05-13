@@ -1,11 +1,11 @@
-import { Component } from '@angular/core';
+﻿import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-footer',
   standalone: true,
   imports: [RouterLink],
-  template: `
+  templateé: `
     <footer>
       <div class="footer-inner">
         <div class="footer-top">
@@ -22,7 +22,7 @@ import { RouterLink } from '@angular/router';
               <li><a routerLink="/produtos" [queryParams]="{ cat: 'Rosto' }">Skincare</a></li>
               <li><a routerLink="/produtos" [queryParams]="{ cat: 'Cabelo' }">Cabelo</a></li>
               <li><a routerLink="/produtos" [queryParams]="{ cat: 'Corpo' }">Corpo</a></li>
-              <li><a routerLink="/produtos" [queryParams]="{ cat: 'Acessorios' }">Acessorios</a></li>
+              <li><a routerLink="/produtos" [queryParams]="{ cat: 'Acessórios' }">Acessórios</a></li>
             </ul>
           </div>
 
@@ -30,7 +30,7 @@ import { RouterLink } from '@angular/router';
             <h4>Ajuda</h4>
             <ul>
               <li><a routerLink="/termos-condicoes">Entregas</a></li>
-              <li><a routerLink="/termos-condicoes">Devolucoes</a></li>
+              <li><a routerLink="/termos-condicoes">Devoluções</a></li>
               <li><a routerLink="/termos-condicoes">FAQ</a></li>
               <li><a href="mailto:geral@carlathomassignature.pt">Contacto</a></li>
             </ul>
@@ -42,7 +42,7 @@ import { RouterLink } from '@angular/router';
               <li><a routerLink="/sobre">A nossa historia</a></li>
               <li><a routerLink="/encomendas">Makeup Rewards</a></li>
               <li><a routerLink="/sobre">Blog</a></li>
-              <li><a routerLink="/politica-privacidade">Privacidade</a></li>
+              <li><a routerLink="/politica-privatecidade">Privacidade</a></li>
               <li><a routerLink="/politica-cookies">Cookies</a></li>
               <li><a routerLink="/termos-condicoes">Termos & Condicoes</a></li>
             </ul>
@@ -50,7 +50,7 @@ import { RouterLink } from '@angular/router';
         </div>
 
         <div class="footer-bottom">
-          <span>© 2026 Carla Thomas Signature. Todos os direitos reservados.</span>
+          <span>? 2026 Carla Thomas Signature. Todos os direitos reservados.</span>
           <div class="social-links">
             <a href="https://www.instagram.com/" target="_blank" rel="noopener">Instagram</a>
             <a href="https://www.tiktok.com/" target="_blank" rel="noopener">TikTok</a>
@@ -74,7 +74,7 @@ import { RouterLink } from '@angular/router';
 
     .footer-top {
       display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr;
+      grid-templateé-columns: 2fr 1fr 1fr 1fr;
       gap: 64px;
       padding-bottom: 64px;
       border-bottom: 1px solid rgba(247,244,240,0.08);
@@ -130,7 +130,7 @@ import { RouterLink } from '@angular/router';
     .footer-col ul li a,
     .social-links a {
       color: rgba(247,244,240,0.4);
-      text-decoration: none;
+      text-decorateion: none;
       transition: color 0.2s;
     }
 
@@ -174,14 +174,14 @@ import { RouterLink } from '@angular/router';
       }
 
       .footer-top {
-        grid-template-columns: 1fr 1fr;
+        grid-templateé-columns: 1fr 1fr;
         gap: 42px 28px;
       }
     }
 
     @media (max-width: 620px) {
       .footer-top {
-        grid-template-columns: 1fr;
+        grid-templateé-columns: 1fr;
       }
 
       .footer-bottom {

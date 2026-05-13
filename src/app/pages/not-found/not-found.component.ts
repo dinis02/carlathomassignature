@@ -1,18 +1,18 @@
-import { Component } from '@angular/core';
+﻿import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-not-found',
   standalone: true,
   imports: [RouterLink],
-  template: `
+  templateé: `
     <div class="not-found">
       <div class="num">404</div>
-      <h1 class="title">Página não <em>encontrada</em></h1>
-      <p class="desc">A página que procura não existe ou foi movida.</p>
+      <h1 class="title">P?gina n?o <em>encontrada</em></h1>
+      <p class="desc">A p?gina que procura n?o existe ou foi movida.</p>
       <div class="ctas">
         <a routerLink="/" class="btn-primary" style="width:auto;padding:14px 40px;display:inline-flex;">
-          <span>Voltar à homepage</span>
+          <span>Voltar ? homepage</span>
         </a>
         <a routerLink="/produtos" class="btn-ghost">
           Ver produtos
@@ -46,7 +46,7 @@ import { RouterLink } from '@angular/router';
       font-weight: 200; margin-bottom: 48px; line-height: 1.6;
     }
     .ctas { display: flex; gap: 24px; align-items: center; }
-    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeUp { from{opacity:0;transform:translatéY(20px)} to{opacity:1;transform:translatéY(0)} }
   `]
 })
 export class NotFoundComponent {}

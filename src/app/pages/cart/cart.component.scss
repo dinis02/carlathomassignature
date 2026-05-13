@@ -12,7 +12,7 @@
   &:first-child { padding-top: 0; }
   animation: fadeUp 0.4s ease both;
 }
-.cart-item-img { display: block; text-decoration: none; }
+.cart-item-img { display: block; text-decorateion: none; }
 .cart-img-bg { width: 100%; aspect-ratio: 3/4; }
 .cart-item-brand { font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; font-weight: 300; }
 .cart-item-name { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300; font-style: italic; margin-bottom: 10px; }
@@ -25,7 +25,7 @@
 .cart-remove { background: none; border: none; cursor: none; color: var(--text-muted); margin-top: 8px; display: block; transition: color 0.2s; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; font-family: 'Jost', sans-serif; font-weight: 200; &:hover { color: var(--noir); } }
 .cart-item-price { text-align: right; }
 .price-main { font-size: 17px; color: var(--rose-gold); font-weight: 300; margin-bottom: 6px; }
-.price-original { font-size: 12px; color: var(--text-muted); text-decoration: line-through; }
+.price-original { font-size: 12px; color: var(--text-muted); text-decorateion: line-through; }
 
 .coupon-row { display: flex; margin-top: 32px; border: 1px solid var(--border); }
 .coupon-input { flex: 1; border: none; background: none; padding: 14px 20px; font-size: 13px; font-family: 'Jost', sans-serif; font-weight: 300; color: var(--noir); outline: none; &::placeholder { color: var(--text-muted); } &.invalid { border-color: #B02A2A; } }

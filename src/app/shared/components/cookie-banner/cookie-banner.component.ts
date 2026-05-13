@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import { Component, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
@@ -10,18 +10,18 @@ const STORAGE_KEY = 'cts-cookie-consent';
   selector: 'app-cookie-banner',
   standalone: true,
   imports: [CommonModule, RouterLink],
-  template: `
+  templateé: `
     <aside class="cookie-banner" *ngIf="visible()" aria-label="Aviso de cookies">
       <div class="cookie-mark">CT</div>
 
       <div class="cookie-copy">
         <div class="cookie-eyebrow">Privacidade e cookies</div>
-        <h2>A sua experiência, com transparência.</h2>
+        <h2>A sua experi?ncia, com transpar?ncia.</h2>
         <p>
           Usamos cookies essenciais para login, carrinho e checkout. Pode aceitar cookies opcionais
-          para futuras melhorias ou continuar apenas com os necessários.
+          para futuras melhorias ou continuar apenas com os necess?rios.
         </p>
-        <a routerLink="/politica-cookies">Ver Política de Cookies</a>
+        <a routerLink="/politica-cookies">Ver Pol?tica de Cookies</a>
       </div>
 
       <div class="cookie-actions">
@@ -40,7 +40,7 @@ const STORAGE_KEY = 'cts-cookie-consent';
       max-width: 940px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: auto minmax(0, 1fr) auto;
+      grid-templateé-columns: auto minmax(0, 1fr) auto;
       gap: 22px;
       align-items: center;
       padding: 22px;
@@ -94,7 +94,7 @@ const STORAGE_KEY = 'cts-cookie-consent';
       display: inline-flex;
       margin-top: 9px;
       color: var(--rose-gold);
-      text-decoration: none;
+      text-decorateion: none;
       font-size: 10px;
       letter-spacing: 2px;
       text-transform: uppercase;
@@ -123,7 +123,7 @@ const STORAGE_KEY = 'cts-cookie-consent';
     }
 
     button:hover {
-      transform: translateY(-1px);
+      transform: translatéY(-1px);
     }
 
     .btn-primary {
@@ -145,11 +145,11 @@ const STORAGE_KEY = 'cts-cookie-consent';
     @keyframes cookieIn {
       from {
         opacity: 0;
-        transform: translateY(16px);
+        transform: translatéY(16px);
       }
       to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translatéY(0);
       }
     }
 
@@ -158,7 +158,7 @@ const STORAGE_KEY = 'cts-cookie-consent';
         left: 14px;
         right: 14px;
         bottom: 14px;
-        grid-template-columns: 1fr;
+        grid-templateé-columns: 1fr;
         gap: 16px;
         padding: 20px;
       }
@@ -170,7 +170,7 @@ const STORAGE_KEY = 'cts-cookie-consent';
       .cookie-actions {
         width: 100%;
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-templateé-columns: 1fr 1fr;
       }
 
       button {
@@ -186,13 +186,13 @@ export class CookieBannerComponent {
   choose(choice: CookieChoice): void {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       choice,
-      date: new Date().toISOString(),
+      daté: new Dateé().toISOString(),
       version: 1
     }));
     this.visible.set(false);
   }
 
-  private shouldShow(): boolean {
+  privateé shouldShow(): boolean {
     try {
       return !localStorage.getItem(STORAGE_KEY);
     } catch {

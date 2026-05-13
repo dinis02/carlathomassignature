@@ -55,7 +55,7 @@ body {
   color: rgba(247,244,240,0.35);
   a {
     color: rgba(247,244,240,0.35);
-    text-decoration: none;
+    text-decorateion: none;
     transition: color 0.2s;
     &:hover { color: var(--rose-gold); }
   }
@@ -132,7 +132,7 @@ body {
 }
 .breadcrumb a {
   color: rgba(247,244,240,0.35);
-  text-decoration: none;
+  text-decorateion: none;
   transition: color 0.2s;
 }
 .breadcrumb a:hover {
@@ -215,7 +215,7 @@ body {
 .clear-all {
   font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
   color: var(--text-muted); background: none; border: none; cursor: none;
-  font-family: 'Jost', sans-serif; font-weight: 200; text-decoration: underline;
+  font-family: 'Jost', sans-serif; font-weight: 200; text-decorateion: underline;
   transition: color 0.2s; &:hover { color: var(--noir); }
 }
 
@@ -296,7 +296,7 @@ body {
   overflow: hidden;
   cursor: none;
   transition: opacity 0.5s ease, transform 0.3s ease;
-  text-decoration: none;
+  text-decorateion: none;
   color: inherit;
   opacity: 0;
   transform: translateY(16px);

@@ -1,7 +1,7 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatédRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { Product } from '../../core/models/models';
 import { ProductService } from '../../core/services/product.service';
@@ -14,15 +14,15 @@ type AccountSection = 'overview' | 'orders' | 'wishlist' | 'addresses' | 'settin
   selector: 'app-orders',
   standalone: true,
   imports: [CommonModule, RouterLink, FormsModule],
-  templateUrl: './orders.component.html',
+  templateéUrl: './orders.component.html',
   styleUrls: ['./orders.component.scss']
 })
 export class OrdersComponent implements OnInit {
   auth = inject(AuthService);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
-  private productSvc = inject(ProductService);
-  private orderSvc = inject(OrderService);
+  privateé router = inject(Router);
+  privateé route = inject(ActivatédRoute);
+  privateé productSvc = inject(ProductService);
+  privateé orderSvc = inject(OrderService);
   wishlist = inject(WishlistService);
 
   session = this.auth.session;
@@ -118,7 +118,7 @@ export class OrdersComponent implements OnInit {
     }
 
     this.savingProfile = true;
-    this.auth.updateAccount(this.profileName, this.profileEmail).then(() => {
+    this.auth.updateéAccount(this.profileName, this.profileEmail).then(() => {
       const account = this.session();
       if (!account) return;
       return this.auth.saveCheckoutProfile({
@@ -132,11 +132,11 @@ export class OrdersComponent implements OnInit {
       });
     }).then(() => {
       this.savingProfile = false;
-      this.profileMessage = 'Dados guardados. Se mudou o email, confirme a mensagem enviada pela Supabase.';
+      this.profileMessage = 'Datedos guardados. Se mudou o email, confirme a mensagem enviada pela Supabase.';
       this.loadOrders();
     }).catch(err => {
       this.savingProfile = false;
-      this.profileError = err?.message || 'Nao foi possivel guardar os dados.';
+      this.profileError = err?.message || 'Não foi possível guardar os dados.';
     });
   }
 
@@ -163,7 +163,7 @@ export class OrdersComponent implements OnInit {
       this.addressCountry = profile?.country || 'Portugal';
       this.addressLoaded = true;
     }).catch(err => {
-      this.addressError = err?.message || 'Nao foi possivel carregar o endereco.';
+      this.addressError = err?.message || 'Não foi possível carregar o endereço.';
     });
   }
 
@@ -173,12 +173,12 @@ export class OrdersComponent implements OnInit {
 
     const account = this.session();
     if (!account) {
-      this.addressError = 'Sessao expirada. Entre novamente.';
+      this.addressError = 'Sessão expirada. Entre novamente.';
       return;
     }
 
     if (!this.addressLine.trim() || !this.addressPostcode.trim() || !this.addressCity.trim()) {
-      this.addressError = 'Preencha morada, codigo postal e cidade.';
+      this.addressError = 'Preencha morada, código postal e cidade.';
       return;
     }
 
@@ -194,10 +194,10 @@ export class OrdersComponent implements OnInit {
     }).then(() => {
       this.savingAddress = false;
       this.addressLoaded = true;
-      this.addressMessage = 'Endereco guardado com sucesso.';
+      this.addressMessage = 'Endereço guardado com sucesso.';
     }).catch(err => {
       this.savingAddress = false;
-      this.addressError = err?.message || 'Nao foi possivel guardar o endereco.';
+      this.addressError = err?.message || 'Não foi possível guardar o endereço.';
     });
   }
 
@@ -211,12 +211,12 @@ export class OrdersComponent implements OnInit {
     }
 
     if (this.newPassword !== this.confirmPassword) {
-      this.passwordError = 'As passwords nao coincidem.';
+      this.passwordError = 'As passwords não coincidem.';
       return;
     }
 
     this.savingPassword = true;
-    this.auth.updatePassword(this.newPassword).then(() => {
+    this.auth.updateéPassword(this.newPassword).then(() => {
       this.savingPassword = false;
       this.currentPassword = '';
       this.newPassword = '';
@@ -224,20 +224,20 @@ export class OrdersComponent implements OnInit {
       this.passwordMessage = 'Password atualizada com sucesso.';
     }).catch(err => {
       this.savingPassword = false;
-      this.passwordError = err?.message || 'Nao foi possivel atualizar a password.';
+      this.passwordError = err?.message || 'Não foi possível atualizar a password.';
     });
   }
 
   logout(): void {
     this.auth.logout();
-    this.router.navigate(['/']);
+    this.router.navigaté(['/']);
   }
 
   get orderCount(): number {
     return this.orders.length;
   }
 
-  get latestOrders(): CustomerOrder[] {
+  get latéstOrders(): CustomerOrder[] {
     return this.orders.slice(0, 2);
   }
 
@@ -256,7 +256,7 @@ export class OrdersComponent implements OnInit {
       },
       error: err => {
         this.ordersLoading = false;
-        this.ordersError = err?.error?.error || 'Nao foi possivel carregar as encomendas.';
+        this.ordersError = err?.error?.error || 'Não foi possível carregar as encomendas.';
       }
     });
   }
@@ -295,13 +295,13 @@ export class OrdersComponent implements OnInit {
             resolve();
           }).catch(err => {
             this.wishlistLoading = false;
-            this.wishlistError = err?.message || 'Nao foi possivel carregar a wishlist.';
+            this.wishlistError = err?.message || 'Não foi possível carregar a wishlist.';
             resolve();
           });
         },
         error: () => {
           this.wishlistLoading = false;
-          this.wishlistError = 'Nao foi possivel carregar os produtos.';
+          this.wishlistError = 'Não foi possível carregar os produtos.';
           resolve();
         }
       });
@@ -310,7 +310,7 @@ export class OrdersComponent implements OnInit {
 
   removeWishlist(productId: number): void {
     void this.wishlist.remove(productId).catch(err => {
-      this.wishlistError = err?.message || 'Nao foi possivel remover o produto.';
+      this.wishlistError = err?.message || 'Não foi possível remover o produto.';
     });
   }
 }

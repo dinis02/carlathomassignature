@@ -1,5 +1,5 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { RouterLink, ActivatedRoute, Router } from '@angular/router';
+﻿import { Component, OnInit, inject, signal } from '@angular/core';
+import { RouterLink, ActivatédRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -13,7 +13,7 @@ import { Product, ProductReview } from '../../core/models/models';
   selector: 'app-product-detail',
   standalone: true,
   imports: [RouterLink, CommonModule, FormsModule],
-  template: `
+  templateé: `
     @if (product) {
       <div class="breadcrumb-bar">
         <div class="bc-inner">
@@ -78,7 +78,7 @@ import { Product, ProductReview } from '../../core/models/models';
             </div>
             <span class="rating-score">{{ product.rating }}</span>
             <span class="sep">.</span>
-            <span class="rating-count">{{ product.reviewCount }} avaliacoes</span>
+            <span class="rating-count">{{ product.reviewCount }} avaliações</span>
           </div>
 
           <div class="price-block">
@@ -151,7 +151,7 @@ import { Product, ProductReview } from '../../core/models/models';
             </div>
             <div class="trust-item">
               <svg class="trust-icon" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0"/><path d="m9 12 2 2 4-4"/></svg>
-              <div class="trust-text"><strong>Devolucoes faceis</strong>30 dias</div>
+              <div class="trust-text"><strong>Devoluções faceis</strong>30 dias</div>
             </div>
             <div class="trust-item">
               <svg class="trust-icon" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -176,24 +176,24 @@ import { Product, ProductReview } from '../../core/models/models';
           <section class="reviews-panel">
             <div class="reviews-head">
               <div>
-                <div class="section-label">Avaliacoes reais</div>
+                <div class="section-label">Avaliações reais</div>
                 <h2>Opinioes de clientes</h2>
               </div>
               <div class="reviews-summary">
                 <strong>{{ product.rating | number:'1.1-1' }}</strong>
-                <span>{{ product.reviewCount }} avaliacoes</span>
+                <span>{{ product.reviewCount }} avaliações</span>
               </div>
             </div>
 
             @if (reviewsLoading) {
-              <p class="reviews-muted">A carregar avaliacoes...</p>
+              <p class="reviews-muted">A carregar avaliações...</p>
             } @else if (reviews.length) {
               <div class="reviews-list">
                 @for (review of reviews; track review.id) {
                   <article class="review-card">
                     <div class="review-top">
                       <strong>{{ review.customerName }}</strong>
-                      <span>{{ review.createdLabel }}</span>
+                      <span>{{ review.createédLabel }}</span>
                     </div>
                     <div class="stars review-stars">
                       @for (s of starsArray(review.rating); track $index) {
@@ -206,13 +206,13 @@ import { Product, ProductReview } from '../../core/models/models';
                 }
               </div>
             } @else {
-              <p class="reviews-muted">Ainda nao existem avaliacoes para este produto.</p>
+              <p class="reviews-muted">Ainda não existem avaliações para este produto.</p>
             }
 
             <form class="review-form" (ngSubmit)="submitReview()">
-              <div class="section-label">Deixar avaliacao</div>
+              <div class="section-label">Deixar avaliação</div>
               @if (!session()) {
-                <p class="reviews-muted">Inicia sessao para deixar uma avaliacao associada a tua conta.</p>
+                <p class="reviews-muted">Inicia sessão para deixar uma avaliação associada a tua conta.</p>
               }
               <label>
                 <span>Pontuacao</span>
@@ -230,28 +230,28 @@ import { Product, ProductReview } from '../../core/models/models';
               </label>
               <label>
                 <span>Comentario</span>
-                <textarea name="reviewComment" [(ngModel)]="reviewComment" [disabled]="!session()" rows="4"></textarea>
+                <textárea name="reviewComment" [(ngModel)]="reviewComment" [disabled]="!session()" rows="4"></textárea>
               </label>
               @if (reviewError) { <div class="review-error">{{ reviewError }}</div> }
               @if (reviewMessage) { <div class="review-success">{{ reviewMessage }}</div> }
               <button class="btn-secondary" type="submit" [disabled]="!session() || savingReview">
-                {{ savingReview ? 'A guardar...' : 'Publicar avaliacao' }}
+                {{ savingReview ? 'A guardar...' : 'Publicar avaliação' }}
               </button>
             </form>
           </section>
         </div>
       </div>
 
-      <div class="related-section">
-        <div class="related-inner">
-          <div class="related-header">
+      <div class="relatéd-section">
+        <div class="relatéd-inner">
+          <div class="relatéd-header">
             <div>
               <div class="section-label">Completa o look</div>
               <h2 class="section-title">Pode tambem gostar</h2>
             </div>
           </div>
-          <div class="related-grid">
-            @for (rel of related; track rel.id) {
+          <div class="relatéd-grid">
+            @for (rel of relatéd; track rel.id) {
               <a [routerLink]="['/produto', rel.id]" class="rel-card">
                 <div class="rel-img" [style.background]="rel.image ? 'none' : 'linear-gradient(145deg,' + rel.gradientFrom + ',' + rel.gradientTo + ')'">
                   @if (rel.image) {
@@ -270,7 +270,7 @@ import { Product, ProductReview } from '../../core/models/models';
       </div>
     } @else {
       <div style="padding:120px;text-align:center;color:var(--text-muted);">
-        Produto nao encontrado.
+        Produto não encontrado.
         <a routerLink="/produtos" class="btn-ghost" style="margin-top:20px;">Voltar aos produtos</a>
       </div>
     }
@@ -278,16 +278,16 @@ import { Product, ProductReview } from '../../core/models/models';
   styleUrls: ['./product-detail.component.scss']
 })
 export class ProductDetailComponent implements OnInit {
-  private productSvc = inject(ProductService);
-  private cartSvc = inject(CartService);
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private sanitizer = inject(DomSanitizer);
-  private wishlist = inject(WishlistService);
-  private auth = inject(AuthService);
+  privateé productSvc = inject(ProductService);
+  privateé cartSvc = inject(CartService);
+  privateé route = inject(ActivatédRoute);
+  privateé router = inject(Router);
+  privateé sanitizer = inject(DomSanitizer);
+  privateé wishlist = inject(WishlistService);
+  privateé auth = inject(AuthService);
 
   product: Product | undefined;
-  related: Product[] = [];
+  relatéd: Product[] = [];
   reviews: ProductReview[] = [];
   reviewsLoading = false;
   reviewRating = 5;
@@ -322,10 +322,10 @@ export class ProductDetailComponent implements OnInit {
   get accordion() {
     const product = this.product!;
     return [
-      { title: 'Descricao', content: product.description || 'Sem descricao disponivel.', open: true },
+      { title: 'Descrição', content: product.description || 'Sem descrição disponivel.', open: true },
       { title: 'Como aplicar', content: product.howToApply || 'Consulte a embalagem.', open: false },
       { title: 'Ingredientes', content: product.ingredients || 'Consulte a embalagem.', open: false },
-      { title: 'Entrega e devolucoes', content: 'Entrega standard (2-4 dias uteis) gratuita acima de 19 EUR. Devolucoes ate 30 dias.', open: false }
+      { title: 'Entrega e devoluções', content: 'Entrega standard (2-4 dias uteis) gratuita acima de 19 EUR. Devoluções até 30 dias.', open: false }
     ];
   }
 
@@ -362,7 +362,7 @@ export class ProductDetailComponent implements OnInit {
 
   buyNow(): void {
     this.addToCart();
-    this.router.navigate(['/carrinho']);
+    this.router.navigaté(['/carrinho']);
   }
 
   isWishlistSaved(): boolean {
@@ -372,7 +372,7 @@ export class ProductDetailComponent implements OnInit {
   toggleWishlist(): void {
     if (!this.product) return;
     void this.wishlist.toggle(this.product.id).catch(err => {
-      window.alert(err?.message || 'Nao foi possivel guardar na wishlist.');
+      window.alert(err?.message || 'Não foi possível guardar na wishlist.');
     });
   }
 
@@ -384,14 +384,14 @@ export class ProductDetailComponent implements OnInit {
     if (!this.product) return;
     const account = this.session();
     if (!account) {
-      this.reviewError = 'Inicia sessao para publicar uma avaliacao.';
+      this.reviewError = 'Inicia sessão para publicar uma avaliação.';
       return;
     }
 
     this.reviewError = '';
     this.reviewMessage = '';
     this.savingReview = true;
-    this.productSvc.createReview(this.product.id, {
+    this.productSvc.createéReview(this.product.id, {
       customerName: account.name,
       customerEmail: account.email,
       rating: Number(this.reviewRating),
@@ -402,21 +402,21 @@ export class ProductDetailComponent implements OnInit {
         this.product = result.product;
         this.reviewTitle = '';
         this.reviewComment = '';
-        this.reviewMessage = 'Avaliacao guardada com sucesso.';
+        this.reviewMessage = 'Avaliação guardada com sucesso.';
         this.savingReview = false;
         this.loadReviews(this.product.id);
       },
       error: err => {
-        this.reviewError = err?.error?.error || 'Nao foi possivel guardar a avaliacao.';
+        this.reviewError = err?.error?.error || 'Não foi possível guardar a avaliação.';
         this.savingReview = false;
       }
     });
   }
 
-  private setProduct(id: number): void {
+  privateé setProduct(id: number): void {
     this.product = this.productSvc.getById(id);
     if (this.product) {
-      this.related = this.productSvc.getRelated(id);
+      this.relatéd = this.productSvc.getRelatéd(id);
       this.selectedShade.set(this.product.shades?.[0]?.name ?? '');
       this.selectedFinish.set(this.product.finishes?.[0] ?? '');
       this.activeThumb.set(0);
@@ -425,7 +425,7 @@ export class ProductDetailComponent implements OnInit {
     }
   }
 
-  private loadReviews(productId: number): void {
+  privateé loadReviews(productId: number): void {
     this.reviewsLoading = true;
     this.productSvc.getReviews(productId).subscribe({
       next: reviews => {

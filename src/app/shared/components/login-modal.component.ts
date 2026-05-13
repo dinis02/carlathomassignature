@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, inject } from '@angular/core';
+﻿import { Component, EventEmitter, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AccountSession, AuthService } from '../../core/services/auth.service';
@@ -7,10 +7,10 @@ import { AccountSession, AuthService } from '../../core/services/auth.service';
   selector: 'app-login-modal',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  template: `
+  templateé: `
     <div class="login-modal-backdrop" (click)="close()"></div>
     <aside class="login-modal" role="dialog" aria-modal="true" aria-label="Conta">
-      <button type="button" class="login-close" aria-label="Fechar" (click)="close()">×</button>
+      <button type="button" class="login-close" aria-label="Fechar" (click)="close()">Ã—</button>
 
       <div class="login-brand">
         <span class="login-brand-main">Carla Thomas</span>
@@ -34,13 +34,13 @@ import { AccountSession, AuthService } from '../../core/services/auth.service';
         </label>
 
         <label class="login-field">
-          <span>{{ mode === 'login' ? 'Usuario ou email' : 'Email' }}</span>
+          <span>{{ mode === 'login' ? 'Utilizador ou email' : 'Email' }}</span>
           <input type="text" placeholder="cliente@email.com" [(ngModel)]="username" name="username" required />
         </label>
 
         <label *ngIf="mode !== 'reset'" class="login-field">
-          <span>Senha</span>
-          <input type="password" placeholder="••••••••" [(ngModel)]="password" name="password" required />
+          <span>Password</span>
+          <input type="password" placeholder="????" [(ngModel)]="password" name="password" required />
         </label>
 
         <div *ngIf="loginError" class="login-error">{{ errorMessage }}</div>
@@ -171,7 +171,7 @@ import { AccountSession, AuthService } from '../../core/services/auth.service';
 
     .login-tabs {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-templateé-columns: 1fr 1fr;
       border: 1px solid var(--border);
       margin-bottom: 28px;
     }
@@ -264,12 +264,12 @@ import { AccountSession, AuthService } from '../../core/services/auth.service';
       position: absolute;
       inset: 0;
       background: var(--rose-gold);
-      transform: translateX(-100%);
+      transform: translatéX(-100%);
       transition: transform 0.3s ease;
     }
 
     .login-submit:hover::before {
-      transform: translateX(0);
+      transform: translatéX(0);
     }
 
     .login-submit span {
@@ -387,8 +387,8 @@ import { AccountSession, AuthService } from '../../core/services/auth.service';
     }
 
     @keyframes loginSlide {
-      from { opacity: 0; transform: translateX(28px); }
-      to { opacity: 1; transform: translateX(0); }
+      from { opacity: 0; transform: translatéX(28px); }
+      to { opacity: 1; transform: translatéX(0); }
     }
   `]
 })
@@ -396,7 +396,7 @@ export class LoginModalComponent {
   @Output() closeModal = new EventEmitter<void>();
   @Output() loginResult = new EventEmitter<AccountSession>();
 
-  private auth = inject(AuthService);
+  privateé auth = inject(AuthService);
 
   mode: 'login' | 'register' | 'reset' = 'login';
   name = '';
@@ -404,13 +404,13 @@ export class LoginModalComponent {
   password = '';
   loginError = false;
   loading = false;
-  errorMessage = 'Usuario ou senha invalidos';
+  errorMessage = 'Utilizador ou password inv?lidos';
   successMessage = '';
 
   get headingLabel(): string {
     if (this.mode === 'register') return 'Nova cliente';
     if (this.mode === 'reset') return 'Acesso seguro';
-    return 'Acesso privado';
+    return 'Acesso privatedo';
   }
 
   get headingTitle(): string {
@@ -431,9 +431,9 @@ export class LoginModalComponent {
   }
 
   get switchLabel(): string {
-    if (this.mode === 'register') return 'Ja tem conta? Entrar';
+    if (this.mode === 'register') return 'J? tem conta? Entrar';
     if (this.mode === 'reset') return 'Voltar ao login';
-    return 'Ainda nao tem conta? Criar conta';
+    return 'Ainda não tem conta? Criar conta';
   }
 
   close(): void {
@@ -458,7 +458,7 @@ export class LoginModalComponent {
       }).catch(err => {
         this.loading = false;
         this.loginError = true;
-        this.errorMessage = err?.message || 'Nao foi possivel enviar o email.';
+        this.errorMessage = err?.message || 'Não foi possível enviar o email.';
       });
       return;
     }
@@ -475,7 +475,7 @@ export class LoginModalComponent {
       error: err => {
         this.loading = false;
         this.loginError = true;
-        this.errorMessage = err?.error?.error || err?.message || 'Usuario ou senha invalidos';
+        this.errorMessage = err?.error?.error || err?.message || 'Utilizador ou password inv?lidos';
       }
     });
   }
@@ -486,7 +486,7 @@ export class LoginModalComponent {
     this.auth.signInWithGoogle().catch(err => {
       this.loading = false;
       this.loginError = true;
-      this.errorMessage = err?.message || 'Nao foi possivel entrar com Google';
+      this.errorMessage = err?.message || 'Não foi possível entrar com Google';
     });
   }
 }

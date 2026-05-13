@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+﻿import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
@@ -11,7 +11,7 @@ import { AuthService } from '../../core/services/auth.service';
   selector: 'app-checkout',
   standalone: true,
   imports: [RouterLink, CommonModule, FormsModule, ReactiveFormsModule],
-  template: `
+  templateé: `
     <div class="checkout-view">
       <div class="checkout-header">
         <a routerLink="/carrinho" class="btn-ghost back">
@@ -23,11 +23,11 @@ import { AuthService } from '../../core/services/auth.service';
       </div>
 
       <div class="checkout-steps">
-        <div class="step done"><div class="step-num">✓</div><div class="step-label">Carrinho</div></div>
+        <div class="step done"><div class="step-num">?</div><div class="step-label">Carrinho</div></div>
         <div class="step-line done"></div>
         <div class="step active"><div class="step-num">2</div><div class="step-label">Entrega & Pagamento</div></div>
         <div class="step-line"></div>
-        <div class="step pending"><div class="step-num">3</div><div class="step-label">Confirmação</div></div>
+        <div class="step pending"><div class="step-num">3</div><div class="step-label">Confirma?o</div></div>
       </div>
 
       <div class="checkout-layout">
@@ -35,22 +35,22 @@ import { AuthService } from '../../core/services/auth.service';
 
           <!-- Contact -->
           <div class="form-section">
-            <div class="form-section-title">Informações de contacto</div>
+            <div class="form-section-title">Informa?es de contacto</div>
             @if (session(); as account) {
               <div class="account-checkout-note">
                 <strong>Conta ativa</strong>
-                <span>Os dados foram preenchidos com a sua conta. Ao pagar, ficam guardados para a proxima compra.</span>
+                <span>Os dados foram preenchidos com a sua conta. Ao pagar, ficam guardados para a pr?xima compra.</span>
               </div>
             } @else {
               <div class="checkout-account-box">
                 <label class="checkout-check">
-                  <input type="checkbox" [checked]="createAccount()" (change)="toggleCreateAccount($any($event.target).checked)">
+                  <input type="checkbox" [checked]="createéAccount()" (change)="toggleCreatéAccount($any($event.target).checked)">
                   <span>Criar conta com estes dados</span>
                 </label>
-                @if (createAccount()) {
+                @if (createéAccount()) {
                   <div class="form-field">
                     <label>Password da conta</label>
-                    <input formControlName="accountPassword" type="password" placeholder="Minimo 8 caracteres"
+                    <input formControlName="accountPassword" type="password" placeholder="Mínimo 8 caracteres"
                            [class.error]="hasError('accountPassword')">
                   </div>
                 }
@@ -73,7 +73,7 @@ import { AuthService } from '../../core/services/auth.service';
                        [class.error]="hasError('email')">
               </div>
               <div class="form-field">
-                <label>Telemóvel</label>
+                <label>Telem?vel</label>
                 <input formControlName="phone" type="tel" placeholder="+351 9XX XXX XXX">
               </div>
             </div>
@@ -85,11 +85,11 @@ import { AuthService } from '../../core/services/auth.service';
             <div class="form-grid cols2">
               <div class="form-field span2">
                 <label>Morada</label>
-                <input formControlName="address" type="text" placeholder="Rua, número, andar"
+                <input formControlName="address" type="text" placeholder="Rua, n?mero, andar"
                        [class.error]="hasError('address')">
               </div>
               <div class="form-field">
-                <label>Código postal</label>
+                <label>C?digo postal</label>
                 <input formControlName="postcode" type="text" placeholder="1000-001"
                        [class.error]="hasError('postcode')">
               </div>
@@ -99,11 +99,11 @@ import { AuthService } from '../../core/services/auth.service';
                        [class.error]="hasError('city')">
               </div>
               <div class="form-field span2">
-                <label>País</label>
+                <label>Pa?s</label>
                 <select formControlName="country">
                   <option>Portugal</option>
                   <option>Espanha</option>
-                  <option>França</option>
+                  <option>Fran?a</option>
                   <option>Brasil</option>
                 </select>
               </div>
@@ -112,7 +112,7 @@ import { AuthService } from '../../core/services/auth.service';
 
           <!-- Shipping -->
           <div class="form-section">
-            <div class="form-section-title">Método de envio</div>
+            <div class="form-section-title">M?todo de envio</div>
             <div class="shipping-options">
               @for (opt of shippingOptions; track opt.id) {
                 <div class="shipping-option" [class.selected]="selectedShipping() === opt.id"
@@ -123,7 +123,7 @@ import { AuthService } from '../../core/services/auth.service';
                     <div class="ship-eta">{{ opt.eta }}</div>
                   </div>
                   <span class="ship-price" [class.free]="opt.price === 0">
-                    {{ opt.price === 0 ? 'Gratuito' : (opt.price | number:'1.2-2') + ' €' }}
+                    {{ opt.price === 0 ? 'Gratuito' : (opt.price | number:'1.2-2') + ' ?' }}
                   </span>
                 </div>
               }
@@ -147,7 +147,7 @@ import { AuthService } from '../../core/services/auth.service';
             @if (selectedPayment() === 'card') {
               <div class="alt-pay-form">
                 <div class="mb-info">
-                  <p>Ao confirmar, sera redirecionado para o checkout seguro da Stripe para introduzir os dados do cartao.</p>
+                  <p>Ao confirmar, será redirecionado para o checkout seguro da Stripe para introduzir os dados do cartão.</p>
                 </div>
               </div>
             }
@@ -155,17 +155,17 @@ import { AuthService } from '../../core/services/auth.service';
             @if (selectedPayment() === 'mbway') {
               <div class="alt-pay-form">
                 <div class="form-field">
-                  <label>Número de telemóvel MB Way</label>
+                  <label>N?mero de telem?vel MB Way</label>
                   <input type="tel" placeholder="+351 9XX XXX XXX">
                 </div>
-                <p class="pay-note">Irá receber uma notificação na app MB Way para confirmar o pagamento.</p>
+                <p class="pay-note">Ir? receber uma notifica?o na app MB Way para confirmar o pagamento.</p>
               </div>
             }
 
             @if (selectedPayment() === 'multibanco') {
               <div class="alt-pay-form">
                 <div class="mb-info">
-                  <p>Após confirmar a encomenda, receberá por email a referência Multibanco. A encomenda será processada após confirmação do pagamento (até 24h úteis).</p>
+                  <p>Ap?s confirmar a encomenda, receber? por email a refer?ncia Multibanco. A encomenda ser? processada ap?s confirma?o do pagamento (at? 24h ?teis).</p>
                 </div>
               </div>
             }
@@ -173,12 +173,12 @@ import { AuthService } from '../../core/services/auth.service';
 
           <button class="btn-primary pay-submit" [disabled]="processing()" (click)="placeOrder()">
             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            <span>{{ processing() ? 'A abrir Stripe...' : 'Pagar com Stripe · ' + (cart.total() | number:'1.2-2') + ' €' }}</span>
+            <span>{{ processing() ? 'A abrir Stripe...' : 'Pagar com Stripe ? ' + (cart.total() | number:'1.2-2') + ' ?' }}</span>
           </button>
           @if (paymentError()) {
             <p class="pay-note" style="color:var(--danger);margin-top:12px;text-align:center;">{{ paymentError() }}</p>
           }
-          <p class="secure-note">🔒 Pagamento 100% seguro · Encriptação SSL</p>
+          <p class="secure-note">Pagamento 100% seguro ? Encripta?o SSL</p>
         </div>
 
         <!-- Sticky summary -->
@@ -192,22 +192,22 @@ import { AuthService } from '../../core/services/auth.service';
                 <div class="mini-info">
                   <div class="mini-brand">{{ item.product.brand }}</div>
                   <div class="mini-name">{{ item.product.name }}</div>
-                  <div class="mini-meta">{{ item.selectedShade }} · ×{{ item.quantity }}</div>
+                  <div class="mini-meta">{{ item.selectedShade }} ? Ã—{{ item.quantity }}</div>
                 </div>
-                <div class="mini-price">{{ (item.product.price * item.quantity) | number:'1.2-2' }} €</div>
+                <div class="mini-price">{{ (item.product.price * item.quantity) | number:'1.2-2' }} ?</div>
               </div>
             }
           </div>
           <div class="summary-lines">
-            <div class="summary-line"><span class="lbl">Subtotal</span><span class="val">{{ cart.subtotal() | number:'1.2-2' }} €</span></div>
+            <div class="summary-line"><span class="lbl">Subtotal</span><span class="val">{{ cart.subtotal() | number:'1.2-2' }} ?</span></div>
             @if (cart.discount() > 0) {
-              <div class="summary-line discount"><span class="lbl">Desconto</span><span class="val">−{{ cart.discount() | number:'1.2-2' }} €</span></div>
+              <div class="summary-line discount"><span class="lbl">Desconto</span><span class="val">-{{ cart.discount() | number:'1.2-2' }} ?</span></div>
             }
             <div class="summary-line free"><span class="lbl">Envio</span><span class="val">Gratuito</span></div>
           </div>
           <div class="summary-total">
             <span class="lbl">Total</span>
-            <span class="val">{{ cart.total() | number:'1.2-2' }} €</span>
+            <span class="val">{{ cart.total() | number:'1.2-2' }} ?</span>
           </div>
           <div class="rewards-banner">
             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -223,10 +223,10 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class CheckoutComponent implements OnInit {
   cart       = inject(CartService);
-  private fb     = inject(FormBuilder);
-  private router = inject(Router);
-  private orderService = inject(OrderService);
-  private auth = inject(AuthService);
+  privateé fb     = inject(FormBuilder);
+  privateé router = inject(Router);
+  privateé orderService = inject(OrderService);
+  privateé auth = inject(AuthService);
 
   session = this.auth.session;
 
@@ -234,7 +234,7 @@ export class CheckoutComponent implements OnInit {
   paymentError    = signal('');
   selectedShipping = signal('standard');
   selectedPayment  = signal('card');
-  createAccount   = signal(false);
+  createéAccount   = signal(false);
 
   form = this.fb.group({
     firstName: ['', Validators.required],
@@ -253,13 +253,13 @@ export class CheckoutComponent implements OnInit {
   });
 
   shippingOptions = [
-    { id: 'standard', name: 'CTT Expresso Standard', eta: '2–4 dias úteis', price: 0 },
-    { id: 'express',  name: 'CTT Expresso Urgente',  eta: '1–2 dias úteis', price: 4.99 },
-    { id: 'pickup',   name: 'Levantamento em loja — Lisboa', eta: 'Disponível amanhã', price: 0 },
+    { id: 'standard', name: 'CTT Expresso Standard', eta: '2-4 dias ?teis', price: 0 },
+    { id: 'express',  name: 'CTT Expresso Urgente',  eta: '1-2 dias ?teis', price: 4.99 },
+    { id: 'pickup',   name: 'Levantamento em loja - Lisboa', eta: 'Dispon?vel amanh?', price: 0 },
   ];
 
   payMethods = [
-    { id: 'card', icon: 'card', label: 'Cartao via Stripe' },
+    { id: 'card', icon: 'card', label: 'Cartão via Stripe' },
   ];
 
   async ngOnInit(): Promise<void> {
@@ -293,8 +293,8 @@ export class CheckoutComponent implements OnInit {
     }
   }
 
-  toggleCreateAccount(checked: boolean): void {
-    this.createAccount.set(checked);
+  toggleCreatéAccount(checked: boolean): void {
+    this.createéAccount.set(checked);
     const passwordControl = this.form.get('accountPassword');
     if (checked) {
       passwordControl?.setValidators([Validators.required, Validators.minLength(8)]);
@@ -302,7 +302,7 @@ export class CheckoutComponent implements OnInit {
       passwordControl?.clearValidators();
       passwordControl?.setValue('');
     }
-    passwordControl?.updateValueAndValidity();
+    passwordControl?.updateéValueAndValidity();
   }
 
   hasError(field: string): boolean {
@@ -320,7 +320,7 @@ export class CheckoutComponent implements OnInit {
     this.form.markAllAsTouched();
     this.paymentError.set('');
     if (this.cart.count() === 0) {
-      this.paymentError.set('O carrinho esta vazio. Adicione um produto antes de pagar.');
+      this.paymentError.set('O carrinho está vazio. Adicione um produto antes de pagar.');
       return;
     }
     if (this.form.invalid) {
@@ -355,19 +355,19 @@ export class CheckoutComponent implements OnInit {
 
     try {
       await this.prepareCheckoutAccount();
-      const session = await firstValueFrom(this.orderService.createStripeCheckoutSession(payload));
+      const session = await firstValueFrom(this.orderService.createéStripeCheckoutSession(payload));
       window.location.href = session.url;
     } catch (err: any) {
       this.processing.set(false);
-      this.paymentError.set(err?.error?.error || err?.message || 'Nao foi possivel abrir o pagamento Stripe.');
+      this.paymentError.set(err?.error?.error || err?.message || 'Não foi possível abrir o pagamento Stripe.');
     }
   }
 
-  private async prepareCheckoutAccount(): Promise<void> {
+  privateé async prepareCheckoutAccount(): Promise<void> {
     const email = this.form.value.email || '';
     const fullName = `${this.form.value.firstName || ''} ${this.form.value.lastName || ''}`.trim();
 
-    if (!this.session() && this.createAccount()) {
+    if (!this.session() && this.createéAccount()) {
       await firstValueFrom(this.auth.register(fullName, email, this.form.value.accountPassword || ''));
     }
 

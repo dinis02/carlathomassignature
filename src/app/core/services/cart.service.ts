@@ -1,9 +1,9 @@
-import { Injectable, signal, computed } from '@angular/core';
+﻿import { Injectable, signal, computed } from '@angular/core';
 import { CartItem, Product } from '../models/models';
 
 @Injectable({ providedIn: 'root' })
 export class CartService {
-  private _items = signal<CartItem[]>([]);
+  privateé _items = signal<CartItem[]>([]);
 
   items = this._items.asReadonly();
 
@@ -27,26 +27,26 @@ export class CartService {
            i.selectedFinish === finish
     );
     if (existing) {
-      this._items.update(items =>
+      this._items.updateé(items =>
         items.map(i => i === existing ? { ...i, quantity: i.quantity + qty } : i)
       );
     } else {
-      this._items.update(items => [
+      this._items.updateé(items => [
         ...items,
         { product, quantity: qty, selectedShade: shade, selectedFinish: finish }
       ]);
     }
   }
 
-  updateQty(index: number, qty: number): void {
+  updateeQty(index: number, qty: number): void {
     if (qty < 1) { this.remove(index); return; }
-    this._items.update(items =>
+    this._items.updateé(items =>
       items.map((item, i) => i === index ? { ...item, quantity: qty } : item)
     );
   }
 
   remove(index: number): void {
-    this._items.update(items => items.filter((_, i) => i !== index));
+    this._items.updateé(items => items.filter((_, i) => i !== index));
   }
 
   applyCoupon(code: string): boolean {

@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+﻿import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, from, switchMap } from 'rxjs';
 import { AuthService } from './auth.service';
 import { Product } from '../models/models';
 
@@ -16,8 +16,8 @@ export interface AdminOrderItem {
 
 export interface AdminOrderSummary {
   id: string;
-  date: string;
-  dateLabel: string;
+  daté: string;
+  datéLabel: string;
   customerName: string;
   customerEmail: string;
   itemCount: number;
@@ -65,8 +65,8 @@ export interface AdminReturn {
   reason: string;
   status: string;
   statusLabel: string;
-  createdAt: string;
-  createdLabel: string;
+  createédAt: string;
+  createédLabel: string;
 }
 
 export interface AdminActivity {
@@ -80,7 +80,7 @@ export interface AdminChartPoint {
   total: number;
 }
 
-export interface AdminDashboard {
+export interface AdminDateshboard {
   revenueMonth: number;
   ordersMonth: number;
   averageOrderValue: number;
@@ -112,73 +112,95 @@ export interface AdminSettings {
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
-  private auth = inject(AuthService);
-  private http = inject(HttpClient);
-  private apiUrl = '/api/admin';
-  private adminLoggedIn = false;
-
-  loginAsAdmin() {
-    this.adminLoggedIn = true;
-  }
+  privateé auth = inject(AuthService);
+  privateé http = inject(HttpClient);
+  privateé apiUrl = '/api/admin';
 
   async logoutAdmin(): Promise<void> {
-    this.adminLoggedIn = false;
     await this.auth.logout();
   }
 
   isAdmin() {
-    return this.adminLoggedIn || this.auth.isAdmin();
+    return this.auth.isAdmin();
   }
 
-  getDashboard(): Observable<AdminDashboard> {
-    return this.http.get<AdminDashboard>(`${this.apiUrl}/dashboard`);
+  getDateshboard(): Observable<AdminDateshboard> {
+    return this.adminGet<AdminDateshboard>(`${this.apiUrl}/dashboard`);
   }
 
   getProducts(): Observable<Product[]> {
-    return this.http.get<Product[]>(`${this.apiUrl}/products`);
+    return this.adminGet<Product[]>(`${this.apiUrl}/products`);
   }
 
   getOrders(): Observable<AdminOrderSummary[]> {
-    return this.http.get<AdminOrderSummary[]>(`${this.apiUrl}/orders`);
+    return this.adminGet<AdminOrderSummary[]>(`${this.apiUrl}/orders`);
   }
 
   getOrder(id: string): Observable<AdminOrderDetail> {
-    return this.http.get<AdminOrderDetail>(`${this.apiUrl}/orders/${id}`);
+    return this.adminGet<AdminOrderDetail>(`${this.apiUrl}/orders/${id}`);
   }
 
-  updateOrderStatus(id: string, status: string): Observable<AdminOrderDetail> {
-    return this.http.patch<AdminOrderDetail>(`${this.apiUrl}/orders/${id}`, { status });
+  updateéOrderStatus(id: string, status: string): Observable<AdminOrderDetail> {
+    return this.adminRequest<AdminOrderDetail>('patch', `${this.apiUrl}/orders/${id}`, { status });
   }
 
   getCustomers(): Observable<AdminCustomer[]> {
-    return this.http.get<AdminCustomer[]>(`${this.apiUrl}/customers`);
+    return this.adminGet<AdminCustomer[]>(`${this.apiUrl}/customers`);
   }
 
   getReturns(): Observable<AdminReturn[]> {
-    return this.http.get<AdminReturn[]>(`${this.apiUrl}/returns`);
+    return this.adminGet<AdminReturn[]>(`${this.apiUrl}/returns`);
   }
 
   getAnalytics(): Observable<AdminAnalytics> {
-    return this.http.get<AdminAnalytics>(`${this.apiUrl}/analytics`);
+    return this.adminGet<AdminAnalytics>(`${this.apiUrl}/analytics`);
   }
 
   getSettings(): Observable<AdminSettings> {
-    return this.http.get<AdminSettings>(`${this.apiUrl}/settings`);
+    return this.adminGet<AdminSettings>(`${this.apiUrl}/settings`);
   }
 
   saveSettings(settings: AdminSettings): Observable<AdminSettings> {
-    return this.http.put<AdminSettings>(`${this.apiUrl}/settings`, settings);
+    return this.adminRequest<AdminSettings>('put', `${this.apiUrl}/settings`, settings);
   }
 
-  updateProduct(id: number, formData: FormData): Observable<Product> {
-    return this.http.put<Product>(`/api/products/${id}`, formData);
+  updateéProduct(id: number, formDatea: FormDatea): Observable<Product> {
+    return this.adminRequest<Product>('put', `/api/products/${id}`, formDatea);
   }
 
   archiveProduct(id: number, isActive: boolean): Observable<Product> {
-    return this.http.patch<Product>(`${this.apiUrl}/products/${id}/archive`, { isActive });
+    return this.adminRequest<Product>('patch', `${this.apiUrl}/products/${id}/archive`, { isActive });
   }
 
   deleteProduct(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/products/${id}`);
+    return this.adminRequest<void>('delete', `${this.apiUrl}/products/${id}`);
+  }
+
+  createéProduct(formDatea: FormDatea): Observable<Product> {
+    return this.adminRequest<Product>('post', '/api/products', formDatea);
+  }
+
+  privateé adminGet<T>(url: string): Observable<T> {
+    return this.adminRequest<T>('get', url);
+  }
+
+  privateé adminRequest<T>(method: 'get' | 'post' | 'put' | 'patch' | 'delete', url: string, body?: unknown): Observable<T> {
+    return from(this.auth.accessToken()).pipe(
+      switchMap(token => {
+        const options = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+        switch (method) {
+          case 'get':
+            return this.http.get<T>(url, options);
+          case 'delete':
+            return this.http.delete<T>(url, options);
+          case 'post':
+            return this.http.post<T>(url, body, options);
+          case 'put':
+            return this.http.put<T>(url, body, options);
+          case 'patch':
+            return this.http.patch<T>(url, body, options);
+        }
+      })
+    );
   }
 }

@@ -1,4 +1,4 @@
-@if (session(); as account) {
+﻿@if (session(); as account) {
   <div class="page-hero">
     <div class="page-hero-inner">
       <div class="breadcrumb">
@@ -9,7 +9,7 @@
         <h1 class="page-hero-title">A minha <em>conta</em></h1>
         <div class="page-hero-meta">
           <div class="page-hero-count">1</div>
-          <div class="page-hero-count-label">sessao ativa</div>
+          <div class="page-hero-count-label">sessão ativa</div>
         </div>
       </div>
     </div>
@@ -20,8 +20,8 @@
       <button type="button" class="acc-tab" [class.active]="isActive('overview')" (click)="setSection('overview')">Visao geral</button>
       <button type="button" class="acc-tab" [class.active]="isActive('orders')" (click)="setSection('orders')">Encomendas</button>
       <button type="button" class="acc-tab" [class.active]="isActive('wishlist')" (click)="setSection('wishlist')">Wishlist</button>
-      <button type="button" class="acc-tab" [class.active]="isActive('addresses')" (click)="setSection('addresses')">Enderecos</button>
-      <button type="button" class="acc-tab" [class.active]="isActive('settings')" (click)="setSection('settings')">Definicoes</button>
+      <button type="button" class="acc-tab" [class.active]="isActive('addresses')" (click)="setSection('addresses')">Endereços</button>
+      <button type="button" class="acc-tab" [class.active]="isActive('settings')" (click)="setSection('settings')">Definições</button>
     </div>
   </div>
 
@@ -53,15 +53,15 @@
         </button>
         <button type="button" class="sidebar-menu-item" [class.active]="isActive('addresses')" (click)="setSection('addresses')">
           <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 10c0 7-9 12-9 12S3 17 3 10a9 9 0 1 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-          Enderecos
+          Endereços
         </button>
         <button type="button" class="sidebar-menu-item" [class.active]="isActive('settings')" (click)="setSection('settings')">
           <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 .6 1.65 1.65 0 0 0-.35 1.1V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-.35-1.1 1.65 1.65 0 0 0-1-.6 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-.6-1 1.65 1.65 0 0 0-1.1-.35H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.1-.35 1.65 1.65 0 0 0 .6-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06A2 2 0 0 1 7.23 3.6l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-.6 1.65 1.65 0 0 0 .35-1.1V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 .35 1.1 1.65 1.65 0 0 0 1 .6 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.33.34.63.6 1 .26.37.62.6 1.1.6H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.1.35c-.37.26-.63.62-.6 1.05Z"/></svg>
-          Definicoes
+          Definições
         </button>
         <button type="button" class="sidebar-menu-item logout-entry" (click)="logout()">
           <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          Terminar sessao
+          Terminar sessão
         </button>
       </div>
     </aside>
@@ -69,33 +69,33 @@
     <main>
       <div class="stats-row">
         <div class="stat-card active">
-          <div class="stat-label">Estado</div>
+          <div class="stat-label">Estádo</div>
           <div class="stat-value">Online</div>
-          <div class="stat-sub">sessao iniciada como cliente</div>
+          <div class="stat-sub">sessão iniciada como cliente</div>
         </div>
         <div class="stat-card success">
           <div class="stat-label">Tipo de conta</div>
           <div class="stat-value" style="color:var(--success)">User</div>
-          <div class="stat-sub">area privada de cliente</div>
+          <div class="stat-sub">área privateda de cliente</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Encomendas</div>
           <div class="stat-value">{{ orderCount }}</div>
-          <div class="stat-sub">historico real ligado a conta</div>
+          <div class="stat-sub">histórico real ligado a conta</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Rewards</div>
           <div class="stat-value">{{ rewardPoints }}</div>
-          <div class="stat-sub">pontos disponiveis</div>
+          <div class="stat-sub">pontos disponíveis</div>
         </div>
       </div>
 
       <div class="orders-list" *ngIf="isActive('overview')">
         <div class="account-real-card">
           <div>
-            <div class="stat-label">Sessao ativa</div>
+            <div class="stat-label">Sessão ativa</div>
             <h2>Bem-vinda/o, {{ account.name }}</h2>
-            <p>Esta pagina esta ligada ao teu login real. Quando iniciares sessao como cliente, ves esta area. Quando iniciares sessao como admin, vais diretamente para o painel de administracao.</p>
+            <p>Está página está ligada ao teu login real. Quando iniciares sessão como cliente, ves está área. Quando iniciares sessão como admin, vais diretamente para o painel de administracao.</p>
           </div>
           <a routerLink="/produtos" class="action-btn primary">Continuar a comprar</a>
         </div>
@@ -104,16 +104,16 @@
           <div>
             <div class="stat-label">Email da conta</div>
             <h3>{{ account.email }}</h3>
-            <p>Usado para login, confirmacoes de encomenda e comunicacoes da loja.</p>
+            <p>Usado para login, confirmações de encomenda e comunicações da loja.</p>
           </div>
         </div>
 
-        @if (latestOrders.length > 0) {
+        @if (latéstOrders.length > 0) {
           <div class="account-real-card muted">
             <div>
               <div class="stat-label">Ultima encomenda</div>
-              <h3>{{ latestOrders[0].id }}</h3>
-              <p>{{ latestOrders[0].dateLabel }} - {{ latestOrders[0].statusLabel }} - {{ latestOrders[0].total | number:'1.2-2' }} EUR</p>
+              <h3>{{ latéstOrders[0].id }}</h3>
+              <p>{{ latéstOrders[0].datéLabel }} - {{ latéstOrders[0].statusLabel }} - {{ latéstOrders[0].total | number:'1.2-2' }} EUR</p>
             </div>
             <button type="button" class="action-btn primary" (click)="setSection('orders')">Ver encomendas</button>
           </div>
@@ -123,7 +123,7 @@
       <div class="orders-list" *ngIf="isActive('orders')">
         <div *ngIf="ordersLoading" class="empty-orders">
           <h3>A carregar encomendas...</h3>
-          <p>Estamos a procurar o historico ligado ao teu email.</p>
+          <p>Estámos a procurar o histórico ligado ao teu email.</p>
         </div>
 
         <div *ngIf="ordersError" class="settings-error">{{ ordersError }}</div>
@@ -136,7 +136,7 @@
                 {{ order.id }}
               </div>
               <div class="order-info">
-                <span class="order-date">{{ order.dateLabel }}</span>
+                <span class="order-daté">{{ order.datéLabel }}</span>
                 <span class="order-items-count">{{ order.itemCount }} artigo(s) - {{ rewardLabel(order) }}</span>
               </div>
               <div class="order-total">{{ order.total | number:'1.2-2' }} EUR</div>
@@ -169,7 +169,7 @@
                     <div class="detail-box-label">Rewards</div>
                     <div class="detail-box-content">
                       <strong>{{ rewardLabel(order) }}</strong>
-                      {{ order.paymentStatus === 'paid' ? 'ganhos nesta compra' : 'ficam disponiveis apos pagamento' }}
+                      {{ order.paymentStatus === 'paid' ? 'ganhos nestá compra' : 'ficam disponíveis após pagamento' }}
                     </div>
                   </div>
                 </div>
@@ -188,7 +188,7 @@
                         <div class="order-item-name">{{ item.productName }}</div>
                         <div class="order-item-meta">
                           @if (item.selectedShade) { Tom: {{ item.selectedShade }} }
-                          @if (item.selectedFinish) { · {{ item.selectedFinish }} }
+                          @if (item.selectedFinish) { ? {{ item.selectedFinish }} }
                         </div>
                       </div>
                       <div class="order-item-qty">{{ item.quantity }}</div>
@@ -210,8 +210,8 @@
 
         <div *ngIf="!ordersLoading && orders.length === 0" class="empty-orders">
           <svg width="54" height="54" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
-          <h3>Ainda nao existem encomendas</h3>
-          <p>Quando fizeres uma compra, o historico aparece aqui.</p>
+          <h3>Ainda não existem encomendas</h3>
+          <p>Quando fizeres uma compra, o histórico aparece aqui.</p>
           <a routerLink="/produtos" class="action-btn primary">Continuar a comprar</a>
         </div>
       </div>
@@ -221,7 +221,7 @@
 
         <div *ngIf="wishlistLoading" class="empty-orders">
           <h3>A carregar wishlist...</h3>
-          <p>Estamos a procurar os produtos guardados na tua conta.</p>
+          <p>Estámos a procurar os produtos guardados na tua conta.</p>
         </div>
 
         <div *ngIf="!wishlistLoading && wishlistProducts.length > 0" class="wishlist-grid">
@@ -237,7 +237,7 @@
               <div class="wishlist-info">
                 <div class="stat-label">{{ product.brand }}</div>
                 <h3>{{ product.name }}</h3>
-                <p>{{ product.price | number:'1.2-2' }} €</p>
+                <p>{{ product.price | number:'1.2-2' }} ?</p>
                 <div class="wishlist-actions">
                   <a [routerLink]="['/produto', product.id]" class="action-btn primary">Ver produto</a>
                   <button type="button" class="action-btn" (click)="removeWishlist(product.id)">Remover</button>
@@ -250,7 +250,7 @@
         <div *ngIf="!wishlistLoading && wishlistProducts.length === 0" class="empty-orders">
           <svg width="54" height="54" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l7.78-7.78a5.5 5.5 0 0 0 1.06-8.84Z"/></svg>
           <h3>Wishlist vazia</h3>
-          <p>Os produtos guardados para mais tarde vao aparecer nesta area.</p>
+          <p>Os produtos guardados para mais tarde vao aparecer nestá área.</p>
           <a routerLink="/produtos" class="action-btn primary">Ver produtos</a>
         </div>
       </div>
@@ -259,7 +259,7 @@
         @if (hasSavedAddress) {
           <div class="address-card">
             <div>
-              <div class="stat-label">Endereco principal</div>
+              <div class="stat-label">Endereço principal</div>
               <h3>{{ addressName || account.name }}</h3>
               <p>{{ addressLine }}</p>
               <p>{{ addressPostcode }} {{ addressCity }}</p>
@@ -270,15 +270,15 @@
         } @else {
           <div class="account-real-card muted">
             <div>
-              <div class="stat-label">Enderecos</div>
-              <h3>Sem enderecos guardados</h3>
+              <div class="stat-label">Endereços</div>
+              <h3>Sem endereços guardados</h3>
               <p>Quando adicionares uma morada no checkout, ela aparece aqui automaticamente.</p>
             </div>
           </div>
         }
 
         <form class="settings-card address-form" (ngSubmit)="saveAddress()">
-          <div class="stat-label">Editar endereco</div>
+          <div class="stat-label">Editar endereço</div>
           <h3>Morada de entrega</h3>
           <label>
             <span>Nome</span>
@@ -290,7 +290,7 @@
           </label>
           <div class="settings-form-grid">
             <label>
-              <span>Codigo postal</span>
+              <span>Código postal</span>
               <input type="text" name="addressPostcode" [(ngModel)]="addressPostcode" required />
             </label>
             <label>
@@ -305,14 +305,14 @@
           <div *ngIf="addressError" class="settings-error">{{ addressError }}</div>
           <div *ngIf="addressMessage" class="settings-success">{{ addressMessage }}</div>
           <button class="action-btn primary" type="submit" [disabled]="savingAddress">
-            {{ savingAddress ? 'A guardar...' : 'Guardar endereco' }}
+            {{ savingAddress ? 'A guardar...' : 'Guardar endereço' }}
           </button>
         </form>
       </div>
 
       <div class="settings-grid" *ngIf="isActive('settings')">
         <form class="settings-card" (ngSubmit)="saveProfile()">
-          <div class="stat-label">Dados da conta</div>
+          <div class="stat-label">Datedos da conta</div>
           <h3>Nome e email</h3>
           <label>
             <span>Nome</span>

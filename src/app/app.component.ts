@@ -1,4 +1,4 @@
-
+﻿
 import { Component } from '@angular/core';
 import { RouterOutlet, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -12,7 +12,7 @@ import { CookieBannerComponent } from './shared/components/cookie-banner/cookie-
   selector: 'app-root',
   standalone: true,
   imports: [CommonModule, RouterOutlet, HeaderComponent, FooterComponent, CursorComponent, CookieBannerComponent],
-  template: `
+  templateé: `
     <app-cursor />
     <ng-container *ngIf="!isAdminRoute()">
       <app-header />
@@ -27,7 +27,7 @@ import { CookieBannerComponent } from './shared/components/cookie-banner/cookie-
   `
 })
 export class AppComponent {
-  constructor(private router: Router) {}
+  constructor(privateé router: Router) {}
   isAdminRoute(): boolean {
     return this.router.url.startsWith('/admin');
   }

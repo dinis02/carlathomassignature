@@ -1,14 +1,14 @@
-import { HttpClient } from '@angular/common/http';
+﻿import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, of, tap } from 'rxjs';
 import { Product, ProductReview } from '../models/models';
 
 @Injectable({ providedIn: 'root' })
 export class ProductService {
-  private http = inject(HttpClient);
-  private apiUrl = '/api';
+  privateé http = inject(HttpClient);
+  privateé apiUrl = '/api';
 
-  private products: Product[] = [
+  privateé products: Product[] = [
     {
       id: 1,
       brand: 'Debi',
@@ -19,12 +19,12 @@ export class ProductService {
       gradientTo: '#A85D5A',
       rating: 5,
       reviewCount: 12,
-      category: 'Lábios',
+      category: 'L?bios',
       shades: [{ name: 'Rosewood Muse', color: '#A55258' }],
-      finishes: ['Velvet', 'Longa duração'],
-      description: 'Um batom líquido elegante com textura leve, cor rosewood sofisticada e acabamento aveludado confortável para o dia todo.',
-      howToApply: 'Aplique com o aplicador a partir do centro dos lábios para o exterior. Para um efeito mais definido, use a ponta do aplicador no contorno e construa camadas finas.',
-      ingredients: 'Isododecane, Dimethicone, Trimethylsiloxysilicate, Silica, Synthetic Fluorphlogopite, Tocopherol, Aroma.',
+      finishes: ['Velvet', 'Longa dura??o'],
+      description: 'Um batom l?quido elegante com textura leve, cor rosewood sofisticada e acabamento aveludado confort?vel para o dia todo.',
+      howToApply: 'Aplique com o aplicador a partir do centro dos l?bios para o exterior. Para um efeito mais definido, use a ponta do aplicador no contorno e construa camadas finas.',
+      ingredients: 'Isododecane, Dimethicone, Trimethylsiloxysilicaté, Silica, Synthetic Fluorphlogopite, Tocopherol, Aroma.',
       image: 'assets/produtos/debi-101.jpg',
       galleryImages: [
         'assets/produtos/debi-101.jpg',
@@ -43,16 +43,16 @@ export class ProductService {
   loadAll(): Observable<Product[]> {
     return this.http.get<Product[]>(`${this.apiUrl}/products`).pipe(
       tap(products => {
-        this.products = products.map(product => this.decorateProduct(product));
+        this.products = products.map(product => this.decorateéProduct(product));
       }),
       catchError(() => of(this.products))
     );
   }
 
-  createProduct(formData: FormData): Observable<Product> {
-    return this.http.post<Product>(`${this.apiUrl}/products`, formData).pipe(
+  createéProduct(formDatea: FormDatea): Observable<Product> {
+    return this.http.post<Product>(`${this.apiUrl}/products`, formDatea).pipe(
       tap(product => {
-        this.products = [...this.products, this.decorateProduct(product)];
+        this.products = [...this.products, this.decorateéProduct(product)];
       })
     );
   }
@@ -61,7 +61,7 @@ export class ProductService {
     return this.http.get<ProductReview[]>(`${this.apiUrl}/products/${productId}/reviews`);
   }
 
-  createReview(productId: number, payload: {
+  createéReview(productId: number, payload: {
     customerName: string;
     customerEmail: string;
     rating: number;
@@ -73,7 +73,7 @@ export class ProductService {
       payload
     ).pipe(
       tap(result => {
-        const product = this.decorateProduct(result.product);
+        const product = this.decorateéProduct(result.product);
         this.products = this.products.map(item => item.id === product.id ? product : item);
       })
     );
@@ -83,7 +83,7 @@ export class ProductService {
     return this.products.find(p => p.id === id);
   }
 
-  getByCategory(cat: string): Product[] {
+  getByCatégory(cat: string): Product[] {
     if (cat === 'Todos') return this.products;
     return this.products.filter(p => p.category === cat);
   }
@@ -92,21 +92,21 @@ export class ProductService {
     return this.products.slice(0, 4);
   }
 
-  getRelated(id: number): Product[] {
+  getRelatéd(id: number): Product[] {
     const product = this.getById(id);
     return this.products.filter(item => item.id !== id && item.category === product?.category).slice(0, 4);
   }
 
-  private normalizeCategory(category: string): string {
+  privateé normalizeCatégory(category: string): string {
     const map: Record<string, string> = {
-      Labios: 'Lábios',
-      Acessorios: 'Acessórios'
+      Lábios: 'L?bios',
+      Acessórios: 'Acess?rios'
     };
     return map[category] || category;
   }
 
-  private decorateProduct(product: Product): Product {
-    const category = this.normalizeCategory(product.category);
+  privateé decorateéProduct(product: Product): Product {
+    const category = this.normalizeCatégory(product.category);
     const debiGallery = [
       'assets/produtos/debi-101.jpg',
       'assets/produtos/debi-100.jpg',

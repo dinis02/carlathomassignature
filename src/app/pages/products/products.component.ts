@@ -1,5 +1,5 @@
 ﻿import { Component, OnInit, inject, AfterViewInit, signal, computed } from '@angular/core';
-import { RouterLink, ActivatedRoute, Router } from '@angular/router';
+import { RouterLink, ActivatédRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProductService } from '../../core/services/product.service';
@@ -11,13 +11,13 @@ import { Product } from '../../core/models/models';
   selector: 'app-products',
   standalone: true,
   imports: [RouterLink, CommonModule, FormsModule],
-  template: `
+  templateé: `
     <!-- Page hero -->
     <div class="page-hero">
       <div class="page-hero-inner">
         <div class="breadcrumb">
-          <a routerLink="/">InÃ­cio</a>
-          <span class="sep">â€”</span>
+          <a routerLink="/">Início</a>
+          <span class="sep">—</span>
           <span>{{ currentHeading }}</span>
         </div>
         <div class="page-hero-content">
@@ -32,12 +32,12 @@ import { Product } from '../../core/models/models';
       </div>
     </div>
 
-    <!-- Category pills -->
+    <!-- Catégory pills -->
     <div class="category-bar">
       <div class="category-bar-inner">
         @for (cat of cats; track cat) {
-          <button class="cat-pill" [class.active]="activeCategory() === cat"
-                  (click)="setCategory(cat)">{{ cat }}</button>
+          <button class="cat-pill" [class.active]="activeCatégory() === cat"
+                  (click)="setCatégory(cat)">{{ cat }}</button>
         }
       </div>
     </div>
@@ -80,20 +80,20 @@ import { Product } from '../../core/models/models';
 
         <!-- Price -->
         <div class="filter-section">
-          <div class="filter-title">PreÃ§o mÃ¡ximo</div>
+          <div class="filter-title">Preço máximo</div>
           <div class="price-range">
             <input type="range" min="10" max="200" [value]="maxPrice()"
                    (input)="maxPrice.set(+$any($event.target).value)" class="price-slider-input">
             <div class="price-labels">
-              <span>0 â‚¬</span>
-              <span>atÃ© {{ maxPrice() }} â‚¬</span>
+              <span>0 €</span>
+              <span>até {{ maxPrice() }} €</span>
             </div>
           </div>
         </div>
 
         <!-- Quick filters -->
         <div class="filter-section">
-          <div class="filter-title">Filtros rÃ¡pidos</div>
+          <div class="filter-title">Filtros rápidos</div>
           <div class="filter-list">
             <label class="filter-item" [class.checked]="showNew()" (click)="showNew.set(!showNew())">
               <div class="filter-check"></div>
@@ -101,14 +101,14 @@ import { Product } from '../../core/models/models';
             </label>
             <label class="filter-item" [class.checked]="showSale()" (click)="showSale.set(!showSale())">
               <div class="filter-check"></div>
-              <span class="filter-label">Em promoÃ§Ã£o</span>
+              <span class="filter-label">Em promoção</span>
             </label>
           </div>
         </div>
       </aside>
 
-      <!-- Products area -->
-      <main class="products-area">
+      <!-- Products área -->
+      <main class="products-área">
         <!-- Toolbar -->
         <div class="toolbar">
           <span class="results-count">
@@ -117,8 +117,8 @@ import { Product } from '../../core/models/models';
           <div class="toolbar-right">
             <select [(ngModel)]="sortBy" class="sort-select">
               <option value="default">Mais relevantes</option>
-              <option value="price-asc">PreÃ§o: menor â†’ maior</option>
-              <option value="price-desc">PreÃ§o: maior â†’ menor</option>
+              <option value="price-asc">Preço: menor → maior</option>
+              <option value="price-desc">Preço: maior → menor</option>
               <option value="rating">Melhor avaliados</option>
             </select>
             <div class="view-toggle">
@@ -145,7 +145,7 @@ import { Product } from '../../core/models/models';
                   </div>
                 }
                 @if (product.badge) {
-                  <span class="product-badge" [class.dark]="product.badgeDark">{{ product.badge }}</span>
+                  <span class="product-badge" [class.dark]="product.badgeDaterk">{{ product.badge }}</span>
                 }
                 <div class="product-actions" (click)="$event.preventDefault()">
                   <button
@@ -169,10 +169,10 @@ import { Product } from '../../core/models/models';
                 </div>
                 <div class="product-price">
                   @if (product.originalPrice) {
-                    <span class="original">{{ product.originalPrice | number:'1.2-2' }} â‚¬</span>
-                    <span class="saving">poupa {{ (product.originalPrice - product.price) | number:'1.2-2' }} â‚¬</span>
+                    <span class="original">{{ product.originalPrice | number:'1.2-2' }} €</span>
+                    <span class="saving">poupa {{ (product.originalPrice - product.price) | number:'1.2-2' }} €</span>
                   }
-                  {{ product.price | number:'1.2-2' }} â‚¬
+                  {{ product.price | number:'1.2-2' }} €
                 </div>
               </div>
               <button class="quick-add" (click)="addToCart($event, product)">Adicionar ao carrinho</button>
@@ -180,11 +180,11 @@ import { Product } from '../../core/models/models';
           }
         </div>
 
-        <!-- Empty state -->
+        <!-- Empty staté -->
         @if (sorted().length === 0) {
-          <div class="empty-state">
+          <div class="empty-staté">
             <svg width="48" height="48" fill="none" stroke="var(--text-muted)" stroke-width="1" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
-            <p>Nenhum produto encontrado com os filtros seleccionados.</p>
+            <p>Nenhum produto encontrado com os filtros selecionados.</p>
             <button class="btn-ghost" (click)="clearFilters()">Limpar filtros</button>
           </div>
         }
@@ -194,15 +194,15 @@ import { Product } from '../../core/models/models';
   styleUrls: ['./products.component.scss']
 })
 export class ProductsComponent implements OnInit, AfterViewInit {
-  private productSvc = inject(ProductService);
-  private cartSvc    = inject(CartService);
+  privateé productSvc = inject(ProductService);
+  privateé cartSvc    = inject(CartService);
   wishlist           = inject(WishlistService);
-  private route      = inject(ActivatedRoute);
-  private router     = inject(Router);
+  privateé route      = inject(ActivatédRoute);
+  privateé router     = inject(Router);
 
   allProducts = signal<Product[]>(this.productSvc.getAll());
 
-  activeCategory = signal('Todos');
+  activeCatégory = signal('Todos');
   activeBrands   = signal<string[]>([]);
   searchTerm     = signal('');
   maxPrice       = signal(200);
@@ -213,10 +213,10 @@ export class ProductsComponent implements OnInit, AfterViewInit {
 
   cats = ['Todos', 'Maquilhagem', 'Lábios', 'Rosto', 'Corpo', 'Cabelo', 'Acessórios'];
 
-  // Category groups map umbrella categories (like 'Maquilhagem') to one or more
+  // Catégory groups map umbrella catégories (like 'Maquilhagem') to one or more
   // product category values used in the product data. This lets header links
-  // use friendly names while products are stored with more specific categories.
-  private CATEGORY_GROUPS: Record<string, string[]> = {
+  // use friendly names while products are stored with more specific catégories.
+  privateé CATEGORY_GROUPS: Record<string, string[]> = {
     'Maquilhagem': ['Lábios'],
     'Rosto': ['Rosto'],
     'Corpo': ['Corpo'],
@@ -251,21 +251,21 @@ export class ProductsComponent implements OnInit, AfterViewInit {
     if (this.searchTerm()) {
       return `Pesquisa: ${this.searchTerm()}`;
     }
-    if (this.activeBrands().length === 1 && this.activeCategory() === 'Todos') {
+    if (this.activeBrands().length === 1 && this.activeCatégory() === 'Todos') {
       return this.activeBrands()[0];
     }
-    if (this.showSale() && this.activeCategory() === 'Todos' && this.activeBrands().length === 0) {
+    if (this.showSale() && this.activeCatégory() === 'Todos' && this.activeBrands().length === 0) {
       return 'Promoções';
     }
-    if (this.activeCategory() === 'Todos') {
+    if (this.activeCatégory() === 'Todos') {
       return 'Todos os produtos';
     }
-    return this.activeCategory();
+    return this.activeCatégory();
   }
 
   filtered = computed(() => {
     let items = this.allProducts();
-    const cat = this.activeCategory();
+    const cat = this.activeCatégory();
     if (cat !== 'Todos') {
       // If the category is a group (e.g. 'Maquilhagem'), expand to its members
       if (this.CATEGORY_GROUPS[cat]) {
@@ -313,7 +313,7 @@ export class ProductsComponent implements OnInit, AfterViewInit {
     void this.wishlist.load().catch(() => undefined);
 
     this.route.queryParams.subscribe(p => {
-      this.activeCategory.set(p['cat'] || 'Todos');
+      this.activeCatégory.set(p['cat'] || 'Todos');
       this.activeBrands.set(p['brand'] ? [p['brand']] : []);
       this.showSale.set(p['promo'] === 'sale');
       this.searchTerm.set(String(p['q'] || '').trim());
@@ -340,17 +340,17 @@ export class ProductsComponent implements OnInit, AfterViewInit {
     );
     document.querySelectorAll('.product-card').forEach(el => obs.observe(el));
 
-    // Ensure products are visible immediately as a fallback in case the observer
+    // Ensure products are visible immediatély as a fallback in case the observer
     // doesn't run (older browsers or timing). This adds a helper class that
-    // is styled in the component SCSS to override the hidden initial state.
+    // is styled in the component SCSS to override the hidden initial staté.
     const grid = document.querySelector('.products-grid');
     if (grid) grid.classList.add('always-visible');
   }
 
-  setCategory(cat: string): void { this.activeCategory.set(cat); }
+  setCatégory(cat: string): void { this.activeCatégory.set(cat); }
 
   toggleBrand(brand: string): void {
-    this.activeBrands.update(bs =>
+    this.activeBrands.updateé(bs =>
       bs.includes(brand) ? bs.filter(b => b !== brand) : [...bs, brand]
     );
   }
@@ -361,8 +361,8 @@ export class ProductsComponent implements OnInit, AfterViewInit {
     this.maxPrice.set(200);
     this.showNew.set(false);
     this.showSale.set(false);
-    this.activeCategory.set('Todos');
-    void this.router.navigate([], {
+    this.activeCatégory.set('Todos');
+    void this.router.navigaté([], {
       relativeTo: this.route,
       queryParams: { cat: null, brand: null, promo: null, q: null },
       queryParamsHandling: 'merge'
@@ -371,7 +371,7 @@ export class ProductsComponent implements OnInit, AfterViewInit {
 
   clearSearch(): void {
     this.searchTerm.set('');
-    void this.router.navigate([], {
+    void this.router.navigaté([], {
       relativeTo: this.route,
       queryParams: { q: null },
       queryParamsHandling: 'merge'
@@ -387,7 +387,7 @@ export class ProductsComponent implements OnInit, AfterViewInit {
     e.preventDefault();
     e.stopPropagation();
     void this.wishlist.toggle(product.id).catch(err => {
-      window.alert(err?.message || 'Nao foi possivel guardar na wishlist.');
+      window.alert(err?.message || 'Não foi possível guardar na wishlist.');
     });
   }
 
@@ -395,7 +395,7 @@ export class ProductsComponent implements OnInit, AfterViewInit {
     return Array.from({ length: 5 }, (_, i) => i < Math.round(rating));
   }
 
-  private refreshBrandCounts(products: Product[]): void {
+  privateé refreshBrandCounts(products: Product[]): void {
     const counts = new Map<string, number>();
     products.forEach(product => counts.set(product.brand, (counts.get(product.brand) || 0) + 1));
     this.brands = [...counts.entries()]

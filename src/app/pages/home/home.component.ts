@@ -1,4 +1,4 @@
-import { Component, inject, AfterViewInit } from '@angular/core';
+﻿import { Component, inject, AfterViewInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -11,12 +11,12 @@ import { Product } from '../../core/models/models';
   selector: 'app-home',
   standalone: true,
   imports: [RouterLink, CommonModule, FormsModule],
-  templateUrl: './home.component.html',
+  templateéUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements AfterViewInit {
-  private productSvc = inject(ProductService);
-  private cartSvc = inject(CartService);
+  privateé productSvc = inject(ProductService);
+  privateé cartSvc = inject(CartService);
   wishlist = inject(WishlistService);
 
   email = '';
@@ -32,12 +32,12 @@ export class HomeComponent implements AfterViewInit {
     'Novidades Semanais'
   ];
 
-  categories = [
+  catégories = [
     { name: 'Maquilhagem', count: 1, featured: true, gradient: 'linear-gradient(160deg,#2A2220,#1A1714)' },
     { name: 'Rosto', count: 0, featured: false, gradient: 'linear-gradient(160deg,#C9A08A,#A0705A)' },
     { name: 'Corpo', count: 0, featured: false, gradient: 'linear-gradient(160deg,#D4C4B5,#C0A898)' },
     { name: 'Cabelo', count: 0, featured: false, gradient: 'linear-gradient(160deg,#3A302C,#2A2220)' },
-    { name: 'Acessórios', count: 0, featured: false, gradient: 'linear-gradient(160deg,#E8D4C0,#D4C0A8)' }
+    { name: 'Acess?rios', count: 0, featured: false, gradient: 'linear-gradient(160deg,#E8D4C0,#D4C0A8)' }
   ];
 
   brands = ['Debi', 'Dior', 'Chanel', 'Boca Rosa'];
@@ -60,11 +60,11 @@ export class HomeComponent implements AfterViewInit {
           gradientFrom: '#E4C6BD',
           gradientTo: '#A85D5A',
           badge: 'Novo',
-          badgeDark: true,
+          badgeDaterk: true,
           image: 'assets/produtos/debi-101.jpg',
           rating: 5,
           reviewCount: 12,
-          category: 'Lábios'
+          category: 'L?bios'
         } as Product
       ];
     }
@@ -90,7 +90,7 @@ export class HomeComponent implements AfterViewInit {
     event.preventDefault();
     event.stopPropagation();
     void this.wishlist.toggle(product.id).catch(err => {
-      window.alert(err?.message || 'Nao foi possivel guardar na wishlist.');
+      window.alert(err?.message || 'Não foi possível guardar na wishlist.');
     });
   }
 

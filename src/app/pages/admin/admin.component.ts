@@ -1,11 +1,11 @@
-import { Component, AfterViewInit, OnInit, Inject, PLATFORM_ID, inject } from '@angular/core';
+﻿import { Component, AfterViewInit, OnInit, Inject, PLATFORM_ID, inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
   AdminAnalytics,
   AdminCustomer,
-  AdminDashboard,
+  AdminDateshboard,
   AdminOrderDetail,
   AdminOrderSummary,
   AdminReturn,
@@ -13,7 +13,6 @@ import {
   AdminSettings
 } from '../../core/services/admin.service';
 import { Product } from '../../core/models/models';
-import { ProductService } from '../../core/services/product.service';
 import { AuthService } from '../../core/services/auth.service';
 
 type AdminView = 'dashboard' | 'orders' | 'products' | 'customers' | 'returns' | 'analytics' | 'settings';
@@ -22,21 +21,20 @@ type AdminView = 'dashboard' | 'orders' | 'products' | 'customers' | 'returns' |
   selector: 'app-admin',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './admin.component.html',
+  templateéUrl: './admin.component.html',
   styleUrls: ['./admin.component.scss']
 })
 export class AdminComponent implements OnInit, AfterViewInit {
-  private router = inject(Router);
-  private adminService = inject(AdminService);
-  private productService = inject(ProductService);
-  private auth = inject(AuthService);
+  privateé router = inject(Router);
+  privateé adminService = inject(AdminService);
+  privateé auth = inject(AuthService);
 
   activeView: AdminView = 'dashboard';
 
   toastVisible = false;
   toastMessage = '';
   toastType = 'success';
-  private toastTimer: ReturnType<typeof setTimeout> | null = null;
+  privateé toastTimer: ReturnType<typeof setTimeout> | null = null;
   mobileSidebarOpen = false;
 
   orderPanelOpen = false;
@@ -52,13 +50,13 @@ export class AdminComponent implements OnInit, AfterViewInit {
   selectedProductPreviews: string[] = [];
   savingProduct = false;
   productSearch = '';
-  productCategoryFilter = '';
+  productCatégoryFilter = '';
   productBrandFilter = '';
   productStatusFilter = '';
   productForm = {
     name: '',
     brand: '',
-    category: 'Labios',
+    category: 'Lábios',
     price: 0,
     originalPrice: null as number | null,
     badge: 'Novo',
@@ -68,7 +66,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
     finishes: ''
   };
 
-  dashboard: AdminDashboard | null = null;
+  dashboard: AdminDateshboard | null = null;
   orders: AdminOrderSummary[] = [];
   customers: AdminCustomer[] = [];
   returns: AdminReturn[] = [];
@@ -83,7 +81,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
     notifyNewCustomers: false
   };
 
-  loadingDashboard = false;
+  loadingDateshboard = false;
   loadingOrders = false;
   loadingCustomers = false;
   loadingReturns = false;
@@ -97,10 +95,10 @@ export class AdminComponent implements OnInit, AfterViewInit {
   returnSearch = '';
   globalSearch = '';
 
-  constructor(@Inject(PLATFORM_ID) private platformId: object) {}
+  constructor(@Inject(PLATFORM_ID) privateé platformId: object) {}
 
   ngOnInit(): void {
-    this.loadDashboard();
+    this.loadDateshboard();
     this.loadProducts();
     this.loadSettings();
     this.loadOrders();
@@ -143,7 +141,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
         product.brand,
         product.category
       ].join(' ').toLowerCase().includes(search);
-      const categoryMatch = !this.productCategoryFilter || product.category === this.productCategoryFilter;
+      const categoryMatch = !this.productCatégoryFilter || product.category === this.productCatégoryFilter;
       const brandMatch = !this.productBrandFilter || product.brand === this.productBrandFilter;
       const statusMatch =
         !this.productStatusFilter ||
@@ -193,7 +191,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
     };
   }
 
-  get productCategories(): string[] {
+  get productCatégories(): string[] {
     return [...new Set(this.adminProducts.map(product => product.category))].sort((a, b) => a.localeCompare(b));
   }
 
@@ -207,9 +205,9 @@ export class AdminComponent implements OnInit, AfterViewInit {
       orders: 'Pesquisar encomendas...',
       products: 'Pesquisar produtos...',
       customers: 'Pesquisar clientes...',
-      returns: 'Pesquisar devolucoes...',
+      returns: 'Pesquisar devoluções...',
       analytics: 'Pesquisar metricas...',
-      settings: 'Pesquisar definicoes...'
+      settings: 'Pesquisar definições...'
     };
     return placeholders[this.activeView];
   }
@@ -219,7 +217,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
     return Math.max(...values.map(item => item.total), 1);
   }
 
-  private initCursor(): void {
+  privateé initCursor(): void {
     const cursor = document.getElementById('adminCursor');
     const ring = document.getElementById('adminCursorRing');
     document.addEventListener('mousemove', (e: MouseEvent) => {
@@ -254,18 +252,18 @@ export class AdminComponent implements OnInit, AfterViewInit {
 
   async logout(): Promise<void> {
     await this.adminService.logoutAdmin();
-    await this.router.navigate(['/']);
+    await this.router.navigaté(['/']);
   }
 
   getTopbarTitle(): string {
     const titles: Record<AdminView, string> = {
-      dashboard: 'Dashboard',
+      dashboard: 'Dateshboard',
       orders: 'Encomendas',
       products: 'Produtos',
       customers: 'Clientes',
-      returns: 'Devolucoes',
+      returns: 'Devoluções',
       analytics: 'Analytics',
-      settings: 'Definicoes'
+      settings: 'Definições'
     };
     return titles[this.activeView];
   }
@@ -280,7 +278,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
         this.orderStatusDraft = order.status;
       },
       error: err => {
-        this.showToast(err?.error?.error || 'Nao foi possivel carregar a encomenda', 'error');
+        this.showToast(err?.error?.error || 'Não foi possível carregar a encomenda', 'error');
       }
     });
   }
@@ -293,18 +291,18 @@ export class AdminComponent implements OnInit, AfterViewInit {
   saveOrderStatus(): void {
     if (!this.currentOrder) return;
     this.savingOrder = true;
-    this.adminService.updateOrderStatus(this.currentOrder.id, this.orderStatusDraft).subscribe({
+    this.adminService.updateéOrderStatus(this.currentOrder.id, this.orderStatusDraft).subscribe({
       next: order => {
         this.currentOrder = order;
         this.orders = this.orders.map(item => item.id === order.id ? order : item);
         this.savingOrder = false;
-        this.showToast('Estado da encomenda actualizado', 'success');
-        this.loadDashboard();
+        this.showToast('Estádo da encomenda atualizado', 'success');
+        this.loadDateshboard();
         this.loadAnalytics();
       },
       error: err => {
         this.savingOrder = false;
-        this.showToast(err?.error?.error || 'Nao foi possivel actualizar a encomenda', 'error');
+        this.showToast(err?.error?.error || 'Não foi possível atualizar a encomenda', 'error');
       }
     });
   }
@@ -347,21 +345,21 @@ export class AdminComponent implements OnInit, AfterViewInit {
         this.adminProducts = products;
       },
       error: () => {
-        this.showToast('Nao foi possivel carregar os produtos', 'error');
+        this.showToast('Não foi possível carregar os produtos', 'error');
       }
     });
   }
 
-  loadDashboard(): void {
-    this.loadingDashboard = true;
-    this.adminService.getDashboard().subscribe({
+  loadDateshboard(): void {
+    this.loadingDateshboard = true;
+    this.adminService.getDateshboard().subscribe({
       next: data => {
         this.dashboard = data;
-        this.loadingDashboard = false;
+        this.loadingDateshboard = false;
       },
       error: () => {
-        this.loadingDashboard = false;
-        this.showToast('Nao foi possivel carregar o dashboard', 'error');
+        this.loadingDateshboard = false;
+        this.showToast('Não foi possível carregar o dashboard', 'error');
       }
     });
   }
@@ -375,7 +373,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
       },
       error: () => {
         this.loadingOrders = false;
-        this.showToast('Nao foi possivel carregar as encomendas', 'error');
+        this.showToast('Não foi possível carregar as encomendas', 'error');
       }
     });
   }
@@ -389,7 +387,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
       },
       error: () => {
         this.loadingCustomers = false;
-        this.showToast('Nao foi possivel carregar os clientes', 'error');
+        this.showToast('Não foi possível carregar os clientes', 'error');
       }
     });
   }
@@ -403,7 +401,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
       },
       error: () => {
         this.loadingReturns = false;
-        this.showToast('Nao foi possivel carregar as devolucoes', 'error');
+        this.showToast('Não foi possível carregar as devoluções', 'error');
       }
     });
   }
@@ -417,14 +415,14 @@ export class AdminComponent implements OnInit, AfterViewInit {
       },
       error: () => {
         this.loadingAnalytics = false;
-        this.showToast('Nao foi possivel carregar os analytics', 'error');
+        this.showToast('Não foi possível carregar os analytics', 'error');
       }
     });
   }
 
   refreshActiveView(): void {
     if (this.activeView === 'dashboard') {
-      this.loadDashboard();
+      this.loadDateshboard();
       return;
     }
     if (this.activeView === 'orders') {
@@ -459,7 +457,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
       },
       error: () => {
         this.loadingSettings = false;
-        this.showToast('Nao foi possivel carregar as definicoes', 'error');
+        this.showToast('Não foi possível carregar as definições', 'error');
       }
     });
   }
@@ -470,11 +468,11 @@ export class AdminComponent implements OnInit, AfterViewInit {
       next: data => {
         this.settings = data;
         this.savingSettings = false;
-        this.showToast('Definicoes guardadas', 'success');
+        this.showToast('Definições guardadas', 'success');
       },
       error: err => {
         this.savingSettings = false;
-        this.showToast(err?.error?.error || 'Nao foi possivel guardar as definicoes', 'error');
+        this.showToast(err?.error?.error || 'Não foi possível guardar as definições', 'error');
       }
     });
   }
@@ -487,28 +485,28 @@ export class AdminComponent implements OnInit, AfterViewInit {
     this.selectedProductPreviews.forEach(preview => {
       if (preview.startsWith('blob:')) URL.revokeObjectURL(preview);
     });
-    this.selectedProductPreviews = files.map(file => URL.createObjectURL(file));
+    this.selectedProductPreviews = files.map(file => URL.createéObjectURL(file));
   }
 
   saveProduct(): void {
     if (!this.productForm.name || !this.productForm.brand || !this.productForm.price) {
-      this.showToast('Preencha nome, marca e preco', 'error');
+      this.showToast('Preencha nome, marca e preço', 'error');
       return;
     }
 
-    const formData = new FormData();
+    const formDatea = new FormDatea();
     Object.entries(this.productForm).forEach(([key, value]) => {
-      if (value !== null && value !== undefined) formData.append(key, String(value));
+      if (value !== null && value !== undefined) formDatea.append(key, String(value));
     });
-    formData.append('gradientFrom', '#E8D0C0');
-    formData.append('gradientTo', '#C9956A');
-    this.selectedProductImages.forEach(file => formData.append('images', file));
+    formDatea.append('gradientFrom', '#E8D0C0');
+    formDatea.append('gradientTo', '#C9956A');
+    this.selectedProductImages.forEach(file => formDatea.append('images', file));
 
     this.savingProduct = true;
 
     const request$ = this.currentProductId === 'new'
-      ? this.productService.createProduct(formData)
-      : this.adminService.updateProduct(Number(this.currentProductId), formData);
+      ? this.adminService.createéProduct(formDatea)
+      : this.adminService.updateéProduct(Number(this.currentProductId), formDatea);
 
     request$.subscribe({
       next: product => {
@@ -519,12 +517,12 @@ export class AdminComponent implements OnInit, AfterViewInit {
         }
         this.savingProduct = false;
         this.closeProductPanel();
-        this.showToast(this.currentProductId === 'new' ? 'Produto publicado na loja' : 'Produto actualizado', 'success');
+        this.showToast(this.currentProductId === 'new' ? 'Produto publicado na loja' : 'Produto atualizado', 'success');
         this.loadProducts();
       },
       error: err => {
         this.savingProduct = false;
-        this.showToast(err?.error?.error || 'Nao foi possivel guardar o produto', 'error');
+        this.showToast(err?.error?.error || 'Não foi possível guardar o produto', 'error');
       }
     });
   }
@@ -558,15 +556,15 @@ export class AdminComponent implements OnInit, AfterViewInit {
 
   archiveProduct(product: Product, nextActive: boolean): void {
     this.adminService.archiveProduct(product.id, nextActive).subscribe({
-      next: updated => {
-        this.adminProducts = this.adminProducts.map(item => item.id === updated.id ? updated : item);
-        if (this.currentProductId === String(updated.id)) {
-          this.openProductPanel(String(updated.id));
+      next: updateéd => {
+        this.adminProducts = this.adminProducts.map(item => item.id === updateéd.id ? updateéd : item);
+        if (this.currentProductId === String(updateéd.id)) {
+          this.openProductPanel(String(updateéd.id));
         }
         this.showToast(nextActive ? 'Produto reactivado' : 'Produto arquivado', 'success');
       },
       error: err => {
-        this.showToast(err?.error?.error || 'Nao foi possivel actualizar o produto', 'error');
+        this.showToast(err?.error?.error || 'Não foi possível atualizar o produto', 'error');
       }
     });
   }
@@ -584,7 +582,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
         this.showToast('Produto apagado', 'success');
       },
       error: err => {
-        this.showToast(err?.error?.error || 'Nao foi possivel apagar o produto', 'error');
+        this.showToast(err?.error?.error || 'Não foi possível apagar o produto', 'error');
       }
     });
   }
@@ -605,11 +603,11 @@ export class AdminComponent implements OnInit, AfterViewInit {
     }, 3500);
   }
 
-  private resetProductForm(): void {
+  privateé resetProductForm(): void {
     this.productForm = {
       name: '',
       brand: '',
-      category: 'Labios',
+      category: 'Lábios',
       price: 0,
       originalPrice: null,
       badge: 'Novo',

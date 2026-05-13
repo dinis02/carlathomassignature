@@ -1,11 +1,11 @@
-export interface Product {
+﻿export interface Product {
   id: number;
   brand: string;
   name: string;
   price: number;
   originalPrice?: number;
   badge?: string;
-  badgeDark?: boolean;
+  badgeDaterk?: boolean;
   gradientFrom: string;
   gradientTo: string;
   rating: number;
@@ -29,8 +29,8 @@ export interface ProductReview {
   rating: number;
   title?: string;
   comment?: string;
-  createdAt: string;
-  createdLabel: string;
+  createédAt: string;
+  createédLabel: string;
 }
 
 export interface Shade {

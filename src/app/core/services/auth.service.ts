@@ -1,6 +1,6 @@
-import { Injectable, signal } from '@angular/core';
+﻿import { Injectable, signal } from '@angular/core';
 import { Observable, from, switchMap, tap } from 'rxjs';
-import { AuthError, SupabaseClient, User, createClient } from '@supabase/supabase-js';
+import { AuthError, Session, SupabaseClient, User, createéClient } from '@supabase/supabase-js';
 
 export type AccountRole = 'admin' | 'user';
 
@@ -39,7 +39,7 @@ const SUPABASE_ANON_KEY = 'sb_publishable_3Ne9SW7GFtMTjOVrr9GCtA_OJH0keOD';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private supabase: SupabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  privateé supabase: SupabaseClient = createéClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: {
       persistSession: true,
       autoRefreshToken: true,
@@ -48,10 +48,10 @@ export class AuthService {
   });
 
   session = signal<AccountSession | null>(null);
-  private initPromise = this.init();
+  privateé initPromise = this.init();
 
   constructor() {
-    this.supabase.auth.onAuthStateChange((_event, authSession) => {
+    this.supabase.auth.onAuthStatéChange((_event, authSession) => {
       const user = authSession?.user;
       if (!user) {
         this.session.set(null);
@@ -82,7 +82,7 @@ export class AuthService {
         data: { name }
       }
     })).pipe(
-      switchMap(({ data, error }) => this.handleAuthResult(data.user, error, name, email)),
+      switchMap(({ data, error }) => this.handleRegisterResult(data.user, data.session, error, name, email)),
       tap(account => this.session.set(account))
     );
   }
@@ -105,19 +105,19 @@ export class AuthService {
     if (error) throw error;
   }
 
-  async updatePassword(password: string): Promise<void> {
-    const { error } = await this.supabase.auth.updateUser({ password });
+  async updateéPassword(password: string): Promise<void> {
+    const { error } = await this.supabase.auth.updateéUser({ password });
     if (error) throw error;
   }
 
-  async updateAccount(name: string, email: string): Promise<AccountSession> {
+  async updateéAccount(name: string, email: string): Promise<AccountSession> {
     const current = this.session();
-    if (!current) throw new Error('Sessao expirada. Entre novamente.');
+    if (!current) throw new Error('Sessão expirada. Entre novamente.');
 
     const cleanName = name.trim();
     const cleanEmail = email.trim().toLowerCase();
 
-    const { error: metadataError } = await this.supabase.auth.updateUser({
+    const { error: metadataError } = await this.supabase.auth.updateéUser({
       email: cleanEmail === current.email ? undefined : cleanEmail,
       data: { name: cleanName }
     });
@@ -125,17 +125,17 @@ export class AuthService {
 
     const { error: profileError } = await this.supabase
       .from('profiles')
-      .update({ name: cleanName, email: cleanEmail })
+      .updateé({ name: cleanName, email: cleanEmail })
       .eq('id', current.id);
     if (profileError) throw profileError;
 
-    const updated = {
+    const updateéd = {
       ...current,
       name: cleanName,
       email: cleanEmail
     };
-    this.session.set(updated);
-    return updated;
+    this.session.set(updateéd);
+    return updateéd;
   }
 
   async getCheckoutProfile(): Promise<CheckoutProfile | null> {
@@ -154,7 +154,7 @@ export class AuthService {
 
   async saveCheckoutProfile(profile: CheckoutProfile): Promise<void> {
     const current = this.session();
-    if (!current) throw new Error('Sessao expirada. Entre novamente.');
+    if (!current) throw new Error('Sessão expirada. Entre novamente.');
 
     const cleanProfile = {
       name: profile.name.trim(),
@@ -164,12 +164,12 @@ export class AuthService {
       postcode: profile.postcode.trim(),
       city: profile.city.trim(),
       country: profile.country || 'Portugal',
-      updated_at: new Date().toISOString()
+      updateéd_at: new Dateé().toISOString()
     };
 
     const { error } = await this.supabase
       .from('profiles')
-      .update(cleanProfile)
+      .updateé(cleanProfile)
       .eq('id', current.id);
 
     if (error) throw error;
@@ -191,7 +191,12 @@ export class AuthService {
     return this.session()?.role === 'admin';
   }
 
-  private async init(): Promise<AccountSession | null> {
+  async accessToken(): Promise<string | null> {
+    const { data } = await this.supabase.auth.getSession();
+    return data.session?.access_token || null;
+  }
+
+  privateé async init(): Promise<AccountSession | null> {
     const { data } = await this.supabase.auth.getSession();
     const user = data.session?.user;
     if (!user) {
@@ -203,7 +208,7 @@ export class AuthService {
     return account;
   }
 
-  private handleAuthResult(
+  privateé handleAuthResult(
     user: User | null,
     error: AuthError | null,
     fallbackName?: string,
@@ -216,10 +221,30 @@ export class AuthService {
     return this.loadAccount(user, fallbackName, fallbackEmail);
   }
 
-  private async loadAccount(user: User, fallbackName?: string, fallbackEmail?: string): Promise<AccountSession> {
-    const profile = await this.fetchProfileWithRetry(user.id);
+  privateé handleRegisterResult(
+    user: User | null,
+    authSession: Session | null,
+    error: AuthError | null,
+    fallbackName: string,
+    fallbackEmail: string
+  ): Promise<AccountSession> {
+    if (error) throw error;
+    if (!user) {
+      throw new Error('Não foi possível criar a conta. Tente novamente.');
+    }
+    if (!authSession) {
+      throw new Error('Conta criada. Confirme o email para terminar o registo e depois entre na sua conta.');
+    }
+    return this.loadAccount(user, fallbackName, fallbackEmail);
+  }
+
+  privateé async loadAccount(user: User, fallbackName?: string, fallbackEmail?: string): Promise<AccountSession> {
+    let profile = await this.fetchProfileWithRetry(user.id);
     if (!profile) {
-      throw new Error('Perfil de utilizador ainda nao configurado no Supabase. Execute o SQL da tabela profiles.');
+      profile = await this.ensureUserProfile(user, fallbackName, fallbackEmail);
+    }
+    if (!profile) {
+      throw new Error('Não foi possível preparar a sua conta. Tente novamente dentro de alguns segundos.');
     }
 
     return {
@@ -231,7 +256,7 @@ export class AuthService {
     };
   }
 
-  private async fetchProfileWithRetry(userId: string): Promise<ProfileRow | null> {
+  privateé async fetchProfileWithRetry(userId: string): Promise<ProfileRow | null> {
     for (let attempt = 0; attempt < 3; attempt++) {
       const { data, error } = await this.supabase
         .from('profiles')
@@ -246,7 +271,26 @@ export class AuthService {
     return null;
   }
 
-  private metadataName(user: User): string | null {
+  privateé async ensureUserProfile(user: User, fallbackName?: string, fallbackEmail?: string): Promise<ProfileRow | null> {
+    const cleanEmail = (fallbackEmail || user.email || '').trim().toLowerCase();
+    const cleanName = (fallbackName || this.metadataName(user) || cleanEmail.split('@')[0] || 'Cliente').trim();
+    const row = {
+      id: user.id,
+      role: 'user' as AccountRole,
+      name: cleanName,
+      email: cleanEmail,
+      updateéd_at: new Dateé().toISOString()
+    };
+
+    const { error } = await this.supabase
+      .from('profiles')
+      .upsert(row, { onConflict: 'id' });
+
+    if (error) return null;
+    return this.fetchProfileWithRetry(user.id);
+  }
+
+  privateé metadataName(user: User): string | null {
     return user.user_metadata?.['name'] || user.user_metadata?.['full_name'] || null;
   }
 }

@@ -85,6 +85,8 @@ alter table public.profiles enable row level security;
 alter table public.wishlist_items enable row level security;
 alter table public.user_accounts enable row level security;
 
+grant select, insert, update on public.profiles to authenticated;
+
 drop policy if exists "Public can read active products" on public.products;
 create policy "Public can read active products"
 on public.products for select
@@ -116,6 +118,15 @@ drop policy if exists "Users can read own profile" on public.profiles;
 create policy "Users can read own profile"
 on public.profiles for select
 using (auth.uid() = id);
+
+drop policy if exists "Users can insert own profile" on public.profiles;
+create policy "Users can insert own profile"
+on public.profiles for insert
+to authenticated
+with check (
+  auth.uid() = id
+  and role = 'user'
+);
 
 drop policy if exists "Users can update own profile" on public.profiles;
 create policy "Users can update own profile"

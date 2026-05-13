@@ -1,19 +1,18 @@
-import { Component, HostListener, inject } from '@angular/core';
+﻿import { Component, HostListener, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CartService } from '../../../core/services/cart.service';
 import { AdminService } from '../../../core/services/admin.service';
 import { AccountSession, AuthService } from '../../../core/services/auth.service';
-import { AdminModalComponent } from '../admin-modal.component';
 import { LoginModalComponent } from '../login-modal.component';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, CommonModule, FormsModule, AdminModalComponent, LoginModalComponent],
+  imports: [RouterLink, RouterLinkActive, CommonModule, FormsModule, LoginModalComponent],
   styleUrls: ['./header.component.scss'],
-  template: `
+  templateé: `
     <div class="announcement" [class.hidden]="scrolledPastTop">
       Entrega grátis a partir de <span>19€</span> &nbsp;·&nbsp;
       Nova coleção primavera &nbsp;·&nbsp;
@@ -38,9 +37,9 @@ import { LoginModalComponent } from '../login-modal.component';
                   <p>Batom, bases, blush e essenciais para acabamento luminoso.</p>
                 </div>
                 <div class="mega-col">
-                  <h4>Categoria</h4>
+                  <h4>Catégoria</h4>
                   <a routerLink="/produtos" [queryParams]="{cat:'Maquilhagem'}">Ver maquilhagem</a>
-                  <a routerLink="/produtos" [queryParams]="{cat:'Labios'}">Labios</a>
+                  <a routerLink="/produtos" [queryParams]="{cat:'Lábios'}">Lábios</a>
                   <a routerLink="/produtos" [queryParams]="{cat:'Rosto'}">Rosto</a>
                   <a routerLink="/produtos" [queryParams]="{cat:'Olhos'}">Olhos</a>
                 </div>
@@ -121,11 +120,11 @@ import { LoginModalComponent } from '../login-modal.component';
                   <div class="mega-col">
                     <h4>Comprar</h4>
                     <a routerLink="/produtos" [queryParams]="{cat:'Corpo'}">Ver corpo</a>
-                    <a routerLink="/produtos" [queryParams]="{q:'body cream'}">Body cream</a>
+                    <a routerLink="/produtos" [queryParams]="{q:'body createm'}">Body createm</a>
                     <a routerLink="/produtos" [queryParams]="{q:'hidratante'}">Hidratantes</a>
                   </div>
                   <div class="mega-col">
-                    <h4>Destaques</h4>
+                    <h4>Destáques</h4>
                     <a routerLink="/produtos" [queryParams]="{q:'novo'}">Novidades</a>
                     <a routerLink="/produtos" [queryParams]="{q:'premium'}">Premium</a>
                   </div>
@@ -137,9 +136,9 @@ import { LoginModalComponent } from '../login-modal.component';
               <div class="mega-menu">
                 <div class="mega-inner">
                   <div class="mega-feature">
-                    <span>Acessorios</span>
+                    <span>Acessórios</span>
                     <strong>Ferramentas bonitas para a rotina</strong>
-                    <p>Espelhos, pincéis e detalhes que completam a experiencia de beleza.</p>
+                    <p>Espelhos, pinc?is e detalhes que completam a experiencia de beleza.</p>
                   </div>
                   <div class="mega-col">
                     <h4>Comprar</h4>
@@ -198,7 +197,7 @@ import { LoginModalComponent } from '../login-modal.component';
                       [(ngModel)]="searchTerm"
                       type="search"
                       autocomplete="off"
-                      placeholder="Produto, marca ou categoria"
+                      placeholder="Produto, marca ou catégoria"
                       (keydown.escape)="closeSearch()">
                   </div>
                   <div class="search-actions">
@@ -213,7 +212,7 @@ import { LoginModalComponent } from '../login-modal.component';
               </svg>
             </button>
             @if (auth.session()) {
-              <button class="icon-btn" title="Terminar sessao" aria-label="Terminar sessao" (click)="logout($event)">
+              <button class="icon-btn" title="Terminar sessão" aria-label="Terminar sessão" (click)="logout($event)">
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
                   <path d="M16 17l5-5-5-5"/>
@@ -251,16 +250,16 @@ import { LoginModalComponent } from '../login-modal.component';
         </div>
         <button class="mobile-menu-close" type="button" aria-label="Fechar menu" (click)="closeMobileMenu()">×</button>
       </div>
-      <a routerLink="/" (click)="closeMobileMenu()">Inicio</a>
+      <a routerLink="/" (click)="closeMobileMenu()">Início</a>
       <a routerLink="/produtos" [queryParams]="{cat:'Maquilhagem'}" (click)="closeMobileMenu()">Maquilhagem</a>
       <a routerLink="/produtos" [queryParams]="{cat:'Cabelo'}" (click)="closeMobileMenu()">Cabelo</a>
       <a routerLink="/produtos" [queryParams]="{cat:'Rosto'}" (click)="closeMobileMenu()">Rosto</a>
       <a routerLink="/produtos" [queryParams]="{cat:'Corpo'}" (click)="closeMobileMenu()">Corpo</a>
-      <a routerLink="/produtos" [queryParams]="{cat:'Acessórios'}" (click)="closeMobileMenu()">Acessorios</a>
+      <a routerLink="/produtos" [queryParams]="{cat:'Acessórios'}" (click)="closeMobileMenu()">Acessórios</a>
       <a routerLink="/produtos" (click)="closeMobileMenu()">Marcas</a>
       @if (auth.session()) {
         <a routerLink="/encomendas" [queryParams]="{sec:'wishlist'}" (click)="closeMobileMenu()">Wishlist</a>
-        <a href="#" (click)="logout($event)">Terminar sessao</a>
+        <a href="#" (click)="logout($event)">Terminar sessão</a>
       } @else {
         <a href="#" (click)="openLoginFromMenu($event)">Entrar / Criar conta</a>
       }
@@ -269,7 +268,6 @@ import { LoginModalComponent } from '../login-modal.component';
       (closeModal)="closeLoginModal()"
       (loginResult)="onLogin($event)"
     ></app-login-modal>
-    <app-admin-modal *ngIf="shouldShowAdminModal"></app-admin-modal>
   `,
   styles: [`
     :host {
@@ -287,12 +285,12 @@ import { LoginModalComponent } from '../login-modal.component';
       left: 0;
       right: 0;
       z-index: 130;
-      transform: translateY(0);
+      transform: translatéY(0);
       transition: transform 220ms ease, opacity 220ms ease;
     }
     .announcement.hidden {
       opacity: 0;
-      transform: translateY(-100%);
+      transform: translatéY(-100%);
       pointer-events: none;
     }
     .announcement span { color: var(--rose-gold); }
@@ -312,7 +310,7 @@ import { LoginModalComponent } from '../login-modal.component';
       max-width: 1400px; margin: 0 auto;
       padding: 0 48px; height: 72px;
       display: grid;
-      grid-template-columns: 1fr auto 1fr;
+      grid-templateé-columns: 1fr auto 1fr;
       align-items: center;
     }
     .nav-left, .nav-right {
@@ -350,14 +348,14 @@ import { LoginModalComponent } from '../login-modal.component';
       box-shadow: 0 24px 60px rgba(20, 16, 13, 0.12);
       opacity: 0;
       visibility: hidden;
-      transform: translateY(10px);
+      transform: translatéY(10px);
       pointer-events: none;
       transition: opacity 180ms ease, transform 180ms ease, visibility 180ms ease;
     }
     .nav-item.mega-open .mega-menu {
       opacity: 1;
       visibility: visible;
-      transform: translateY(0);
+      transform: translatéY(0);
       pointer-events: auto;
     }
     .mega-inner {
@@ -365,7 +363,7 @@ import { LoginModalComponent } from '../login-modal.component';
       margin: 0 auto;
       padding: 28px 48px 32px;
       display: grid;
-      grid-template-columns: minmax(280px, 1.2fr) minmax(180px, 0.7fr) minmax(180px, 0.7fr);
+      grid-templateé-columns: minmax(280px, 1.2fr) minmax(180px, 0.7fr) minmax(180px, 0.7fr);
       gap: 54px;
     }
     .mega-feature span,
@@ -406,13 +404,13 @@ import { LoginModalComponent } from '../login-modal.component';
       font-size: 13px;
       letter-spacing: 1.4px;
       text-transform: uppercase;
-      text-decoration: none;
+      text-decorateion: none;
       font-weight: 300;
       transition: color 160ms ease, transform 160ms ease;
     }
     .mega-col a:hover {
       color: var(--rose-gold);
-      transform: translateX(4px);
+      transform: translatéX(4px);
     }
 
     .logo {
@@ -454,7 +452,7 @@ import { LoginModalComponent } from '../login-modal.component';
       color: var(--noir); width: 36px; height: 36px;
       display: flex; align-items: center; justify-content: center;
       transition: color 0.2s; position: relative;
-      text-decoration: none;
+      text-decorateion: none;
     }
     .icon-btn:hover { color: var(--rose-gold); }
     .cart-count {
@@ -476,7 +474,7 @@ import { LoginModalComponent } from '../login-modal.component';
 
     .search-inner {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
+      grid-templateé-columns: minmax(0, 1fr) auto;
       align-items: center;
       gap: 16px;
       padding-top: 18px;
@@ -546,7 +544,7 @@ import { LoginModalComponent } from '../login-modal.component';
       background: var(--creme);
       border-right: 1px solid var(--border);
       z-index: 999;
-      transform: translateX(-100%);
+      transform: translatéX(-100%);
       transition: transform 0.28s ease;
       padding: 28px 24px;
       display: flex;
@@ -556,7 +554,7 @@ import { LoginModalComponent } from '../login-modal.component';
     }
 
     .mobile-menu.open {
-      transform: translateX(0);
+      transform: translatéX(0);
     }
 
     .mobile-menu-head {
@@ -602,7 +600,7 @@ import { LoginModalComponent } from '../login-modal.component';
       padding: 16px 0;
       border-bottom: 1px solid var(--border);
       color: var(--noir);
-      text-decoration: none;
+      text-decorateion: none;
       font-size: 11px;
       letter-spacing: 2.4px;
       text-transform: uppercase;
@@ -612,7 +610,7 @@ import { LoginModalComponent } from '../login-modal.component';
     @media (max-width: 1024px) {
       .header-inner {
         padding: 0 24px;
-        grid-template-columns: auto 1fr auto;
+        grid-templateé-columns: auto 1fr auto;
         gap: 16px;
       }
 
@@ -685,7 +683,7 @@ import { LoginModalComponent } from '../login-modal.component';
 
       .search-inner {
         padding: 18px 14px;
-        grid-template-columns: 1fr;
+        grid-templateé-columns: 1fr;
         gap: 14px;
       }
 
@@ -707,7 +705,6 @@ export class HeaderComponent {
   adminService = inject(AdminService);
   auth = inject(AuthService);
   showLoginModal = false;
-  showAdminModal = false;
   mobileMenuOpen = false;
   searchOpen = false;
   searchTerm = '';
@@ -768,7 +765,7 @@ export class HeaderComponent {
     if (!q) return;
     this.searchOpen = false;
     this.activeMegaMenu = '';
-    void this.router.navigate(['/produtos'], { queryParams: { q } });
+    void this.router.navigaté(['/produtos'], { queryParams: { q } });
   }
   openLoginModal() {
     this.closeMobileMenu();
@@ -780,10 +777,10 @@ export class HeaderComponent {
       this.openLoginModal();
       return;
     }
-    this.router.navigate([session.role === 'admin' ? '/admin' : '/encomendas']);
+    this.router.navigaté([session.role === 'admin' ? '/admin' : '/encomendas']);
   }
   goToWishlist() {
-    this.router.navigate(['/encomendas'], { queryParams: { sec: 'wishlist' } });
+    this.router.navigaté(['/encomendas'], { queryParams: { sec: 'wishlist' } });
   }
   openLoginFromMenu(event: Event) {
     event.preventDefault();
@@ -792,9 +789,8 @@ export class HeaderComponent {
   async logout(event?: Event) {
     event?.preventDefault();
     await this.adminService.logoutAdmin();
-    this.showAdminModal = false;
     this.closeMobileMenu();
-    await this.router.navigate(['/']);
+    await this.router.navigaté(['/']);
   }
   closeLoginModal() {
     this.showLoginModal = false;
@@ -802,18 +798,10 @@ export class HeaderComponent {
   onLogin(session: AccountSession) {
     this.showLoginModal = false;
     if (session.role === 'admin') {
-      this.showAdminModal = true;
-      this.adminService.loginAsAdmin();
-      void this.router.navigate(['/admin']).finally(() => {
-        this.showAdminModal = false;
-      });
+      void this.router.navigaté(['/admin']);
     } else {
-      this.showAdminModal = false;
-      void this.router.navigate(['/encomendas']);
+      void this.router.navigaté(['/encomendas']);
     }
-  }
-  get shouldShowAdminModal() {
-    return this.showAdminModal && this.auth.isAdmin();
   }
 }
 

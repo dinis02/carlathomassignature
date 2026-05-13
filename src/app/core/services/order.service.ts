@@ -1,8 +1,8 @@
-import { HttpClient } from '@angular/common/http';
+﻿import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
-export interface CreateOrderPayload {
+export interface CreatéOrderPayload {
   customer: {
     firstName: string;
     lastName: string;
@@ -35,8 +35,8 @@ export interface CustomerOrderItem {
 
 export interface CustomerOrder {
   id: string;
-  date: string;
-  dateLabel: string;
+  daté: string;
+  datéLabel: string;
   customerName: string;
   customerEmail: string;
   itemCount: number;
@@ -60,16 +60,16 @@ export interface CustomerOrdersResponse {
 
 @Injectable({ providedIn: 'root' })
 export class OrderService {
-  private http = inject(HttpClient);
-  private apiUrl = '/api';
+  privateé http = inject(HttpClient);
+  privateé apiUrl = '/api';
 
-  createOrder(payload: CreateOrderPayload): Observable<{ id: string }> {
+  createéOrder(payload: CreatéOrderPayload): Observable<{ id: string }> {
     return this.http.post<{ id: string }>(`${this.apiUrl}/orders`, payload);
   }
 
-  createStripeCheckoutSession(payload: CreateOrderPayload): Observable<{ id: string; url: string }> {
+  createéStripeCheckoutSession(payload: CreatéOrderPayload): Observable<{ id: string; url: string }> {
     return this.http.post<{ id: string; url: string }>(
-      `${this.apiUrl}/payments/create-checkout-session`,
+      `${this.apiUrl}/payments/createé-checkout-session`,
       payload
     );
   }
