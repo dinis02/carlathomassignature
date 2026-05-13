@@ -1,5 +1,5 @@
-/* ===== CSS ADMIN DASHBOARD REMOVIDO ===== */
-/* --- GLOBAL STYLES (extraído do site2.html) --- */
+﻿/* ===== CSS ADMIN DASHBOARD REMOVIDO ===== */
+/* --- GLOBAL STYLES (extraÃ­do do site2.html) --- */
 
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -47,9 +47,9 @@ body {
   cursor: none;
 }
 
-a { text-decorateion: none; color: inherit; }
+a { text-decoration: none; color: inherit; }
 
-/* ── Shared nav link style ── */
+/* â”€â”€ Shared nav link style â”€â”€ */
 .nav-link {
   font-size: 11px;
   letter-spacing: 2px;
@@ -75,7 +75,7 @@ a { text-decorateion: none; color: inherit; }
 .nav-link.active::after { width: 100%; }
 .nav-link.active { color: var(--rose-gold); }
 
-/* ── Shared buttons ── */
+/* â”€â”€ Shared buttons â”€â”€ */
 .btn-primary {
   background: var(--noir);
   color: var(--creme);
@@ -154,7 +154,7 @@ a { text-decorateion: none; color: inherit; }
 .btn-ghost:hover svg { transform: translateX(4px); }
 .btn-ghost.back:hover svg { transform: translateX(-4px); }
 
-/* ── Shared section typography ── */
+/* â”€â”€ Shared section typography â”€â”€ */
 .section-label {
   font-size: 10px;
   letter-spacing: 4px;
@@ -170,12 +170,12 @@ a { text-decorateion: none; color: inherit; }
   line-height: 1.1;
 }
 
-/* ── Stars ── */
+/* â”€â”€ Stars â”€â”€ */
 .stars { display: flex; gap: 3px; }
 .star { width: 12px; height: 12px; fill: var(--rose-gold); }
 .star.empty { fill: none; stroke: var(--text-muted); stroke-width: 1.5; }
 
-/* ── Checkout steps ── */
+/* â”€â”€ Checkout steps â”€â”€ */
 .checkout-steps {
   display: flex;
   align-items: center;
@@ -198,7 +198,7 @@ a { text-decorateion: none; color: inherit; }
 .step-line { flex: 1; height: 1px; background: var(--border); margin: 0 16px; }
 .step-line.done { background: var(--noir); }
 
-/* ── Order summary card ── */
+/* â”€â”€ Order summary card â”€â”€ */
 .order-summary {
   background: var(--creme-dark);
   padding: 36px;
@@ -246,7 +246,7 @@ a { text-decorateion: none; color: inherit; }
 .rewards-banner-text { font-size: 12px; font-weight: 200; line-height: 1.5; }
 .rewards-banner-text strong { display: block; font-weight: 300; font-size: 13px; }
 
-/* ── Trust badges ── */
+/* â”€â”€ Trust badges â”€â”€ */
 .trust-row {
   display: flex; gap: 24px;
   padding: 24px 0;
@@ -259,14 +259,14 @@ a { text-decorateion: none; color: inherit; }
 .trust-text { font-size: 11px; line-height: 1.5; color: var(--text-muted); font-weight: 200; }
 .trust-text strong { display: block; color: var(--noir); font-weight: 300; font-size: 12px; }
 
-/* ── Reveal animation ── */
+/* â”€â”€ Reveal animation â”€â”€ */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(24px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 .fade-up { animation: fadeUp 0.6s ease forwards; }
 
-/* ── Page wrapper ── */
+/* â”€â”€ Page wrapper â”€â”€ */
 .page-wrapper {
   min-height: calc(100vh - 108px);
   width: 100%;
@@ -331,7 +331,7 @@ header {
 }
 .nav-left, .nav-right { display:flex; gap:36px; align-items:center; }
 .nav-right { justify-content:flex-end; }
-.logo { text-align:center; text-decorateion:none; color:var(--noir); }
+.logo { text-align:center; text-decoration:none; color:var(--noir); }
 .logo-main {
   font-family: 'Cormorant Garamond', serif;
   font-size: 26px;
@@ -411,7 +411,7 @@ header {
 .product-brand { font-size:9px; letter-spacing:2.5px; text-transform:uppercase; color:var(--text-muted); margin-bottom:6px; font-weight:300; }
 .product-name { font-family:'Cormorant Garamond', serif; font-size:17px; font-weight:300; margin-bottom:10px; font-style:italic; line-height:1.3; }
 .product-price { font-size:14px; color:var(--rose-gold); font-weight:300; letter-spacing:0.5px; }
-.product-price .original { color:var(--text-muted); text-decorateion: line-through; margin-right:8px; font-size:12px; }
+.product-price .original { color:var(--text-muted); text-decoration: line-through; margin-right:8px; font-size:12px; }
 
 /* Brands strip */
 .brands-section { padding:80px 48px; max-width:1400px; margin:0 auto; text-align:center; }
@@ -455,11 +455,11 @@ footer { background: var(--noir); color: var(--creme); padding:80px 48px 40px; }
 .footer-col h4 { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--rose-gold); margin-bottom:24px; font-weight:300; }
 .footer-col ul { list-style:none; }
 .footer-col ul li { margin-bottom:12px; }
-.footer-col ul li a { color: rgba(247,244,240,0.4); text-decorateion:none; font-size:13px; font-weight:200; transition: color 0.2s; }
+.footer-col ul li a { color: rgba(247,244,240,0.4); text-decoration:none; font-size:13px; font-weight:200; transition: color 0.2s; }
 .footer-col ul li a:hover { color: var(--creme); }
 .footer-bottom { display:flex; justify-content:space-between; align-items:center; padding-top:32px; font-size:11px; color: rgba(247,244,240,0.25); font-weight:200; letter-spacing:0.5px; }
 .social-links { display:flex; gap:20px; }
-.social-links a { color: rgba(247,244,240,0.4); text-decorateion:none; font-size:11px; letter-spacing:1px; text-transform:uppercase; transition: color 0.2s; font-weight:200; }
+.social-links a { color: rgba(247,244,240,0.4); text-decoration:none; font-size:11px; letter-spacing:1px; text-transform:uppercase; transition: color 0.2s; font-weight:200; }
 .social-links a:hover { color: var(--rose-gold); }
 
 /* Rewards badge */
@@ -505,7 +505,7 @@ body {
   cursor: none;
 }
 
-/* ── Cursor ── */
+/* â”€â”€ Cursor â”€â”€ */
 .cursor { width:8px;height:8px;background:var(--rose-gold);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform 0.1s ease; }
 .cursor-ring { width:32px;height:32px;border:1px solid var(--rose-gold);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:left 0.12s ease,top 0.12s ease,transform 0.2s ease,opacity 0.2s;opacity:0.6; }
 
@@ -550,8 +550,8 @@ body {
   }
 
   .logo-img {
-    width: 220px;
-    max-width: 42vw;
+    width: 140px;
+    max-width: 30vw;
   }
 
   .hero,
@@ -607,8 +607,8 @@ body {
   }
 
   .logo-img {
-    width: 178px;
-    max-width: 50vw;
+    width: 120px;
+    max-width: 40vw;
   }
 
   .header-icons {
@@ -710,4 +710,5 @@ body {
     margin: 0 !important;
   }
 }
+
 

@@ -74,7 +74,7 @@ import { AuthService } from '../../core/services/auth.service';
 
     .reset-brand {
       display: inline-block;
-      text-decorateion: none;
+      text-decoration: none;
       color: var(--noir);
       margin-bottom: 54px;
     }
@@ -227,4 +227,5 @@ export class ResetPasswordComponent {
     });
   }
 }
+
 

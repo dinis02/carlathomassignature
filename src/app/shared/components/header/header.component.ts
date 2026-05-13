@@ -103,7 +103,7 @@ import { LoginModalComponent } from '../login-modal.component';
         </nav>
 
         <a routerLink="/" class="logo">
-          <img src="assets/logo-carla-thomas.png" alt="Carla Thomas Logo" class="logo-img" />
+          <img src="assets/logo-principal-hq.png" alt="Carla Thomas Signature" class="logo-img" />
         </a>
 
         <div class="nav-right">
@@ -404,7 +404,7 @@ import { LoginModalComponent } from '../login-modal.component';
       font-size: 13px;
       letter-spacing: 1.4px;
       text-transform: uppercase;
-      text-decorateion: none;
+      text-decoration: none;
       font-weight: 300;
       transition: color 160ms ease, transform 160ms ease;
     }
@@ -418,8 +418,8 @@ import { LoginModalComponent } from '../login-modal.component';
     }
     .logo-img {
       display: block;
-      width: 310px;
-      max-width: 34vw;
+      width: 150px;
+      max-width: 18vw;
       height: auto;
       transform-origin: center;
     }
@@ -452,7 +452,7 @@ import { LoginModalComponent } from '../login-modal.component';
       color: var(--noir); width: 36px; height: 36px;
       display: flex; align-items: center; justify-content: center;
       transition: color 0.2s; position: relative;
-      text-decorateion: none;
+      text-decoration: none;
     }
     .icon-btn:hover { color: var(--rose-gold); }
     .cart-count {
@@ -600,7 +600,7 @@ import { LoginModalComponent } from '../login-modal.component';
       padding: 16px 0;
       border-bottom: 1px solid var(--border);
       color: var(--noir);
-      text-decorateion: none;
+      text-decoration: none;
       font-size: 11px;
       letter-spacing: 2.4px;
       text-transform: uppercase;
@@ -608,7 +608,12 @@ import { LoginModalComponent } from '../login-modal.component';
     }
 
     @media (max-width: 1024px) {
+      :host {
+        height: 107px;
+      }
+
       .header-inner {
+        height: 72px;
         padding: 0 24px;
         grid-template-columns: auto 1fr auto;
         gap: 16px;
@@ -628,8 +633,8 @@ import { LoginModalComponent } from '../login-modal.component';
       }
 
       .logo-img {
-        width: 220px;
-        max-width: 42vw;
+        width: 140px;
+        max-width: 30vw;
       }
     }
 
@@ -661,8 +666,8 @@ import { LoginModalComponent } from '../login-modal.component';
       }
 
       .logo-img {
-        width: 178px;
-        max-width: 50vw;
+        width: 120px;
+        max-width: 40vw;
       }
 
       .header-icons {
@@ -806,5 +811,6 @@ export class HeaderComponent {
     }
   }
 }
+
 
 

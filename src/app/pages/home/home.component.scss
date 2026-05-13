@@ -1,4 +1,4 @@
-/* Editorial section button size fix */
+﻿/* Editorial section button size fix */
 .editorial-text .btn-primary {
   max-width: 180px;
   width: 100%;
@@ -6,7 +6,7 @@
 }
 // Bestseller bloco hero
 // O bloco bestseller agora usa o CSS global .hero-tag
-/* ── Hero ── */
+/* â”€â”€ Hero â”€â”€ */
 .hero {
   min-height: calc(100vh - 108px);
   display: grid;
@@ -92,7 +92,7 @@
 }
 
 
-/* ── Marquee ── */
+/* â”€â”€ Marquee â”€â”€ */
 .marquee-section {
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
@@ -111,7 +111,7 @@
   width: 4px; height: 4px; background: var(--rose-gold); border-radius: 50;
 }
 
-/* ── Categories ── */
+/* â”€â”€ Categories â”€â”€ */
 .section {
   max-width: 1400px; margin: 0 auto; padding: 120px 48px;
 }
@@ -127,7 +127,7 @@
 }
 .category-card {
   position: relative; overflow: hidden; cursor: none;
-  text-decorateion: none; display: block;
+  text-decoration: none; display: block;
   &:first-child { grid-row: 1 / 3; }
   &:hover .category-info { transform: translateY(0); }
   &:hover .category-photo { transform: scale(1.04); }
@@ -161,14 +161,14 @@
   color: rgba(255,255,255,0.6); font-weight: 200;
 }
 
-/* ── Featured products ── */
+/* â”€â”€ Featured products â”€â”€ */
 .products-section { background: var(--creme-dark); padding: 120px 0; }
 .products-inner { max-width: 1400px; margin: 0 auto; padding: 0 48px; }
 .products-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 2px; }
 
 .product-card {
   background: var(--creme); position: relative; overflow: hidden;
-  cursor: none; transition: transform 0.3s ease; text-decorateion: none; color: inherit;
+  cursor: none; transition: transform 0.3s ease; text-decoration: none; color: inherit;
   display: block;
   &:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(26,23,20,0.08); }
   &:hover .product-actions { opacity: 1; transform: translateX(0); }
@@ -219,11 +219,11 @@
 }
 .product-price { font-size: 14px; color: var(--rose-gold); font-weight: 300; }
 .product-price .original {
-  color: var(--text-muted); text-decorateion: line-through;
+  color: var(--text-muted); text-decoration: line-through;
   margin-right: 8px; font-size: 12px;
 }
 
-/* ── Brands ── */
+/* â”€â”€ Brands â”€â”€ */
 .brands-section {
   padding: 80px 48px; max-width: 1400px; margin: 0 auto; text-align: center;
 }
@@ -239,12 +239,12 @@
   font-family: 'Cormorant Garamond', serif;
   font-size: 20px; font-weight: 300; letter-spacing: 2px;
   text-transform: uppercase; font-style: italic;
-  text-decorateion: none; display: inline-block;
+  text-decoration: none; display: inline-block;
   color: #5b473d; transition: color 0.3s; cursor: none;
   &:hover { color: var(--noir); }
 }
 
-/* ── Editorial ── */
+/* â”€â”€ Editorial â”€â”€ */
 .editorial { background: var(--noir); padding: 120px 48px; }
 .editorial-inner {
   max-width: 1400px; margin: 0 auto;
@@ -289,7 +289,7 @@
   object-position: center 28%;
 }
 
-/* ── Newsletter ── */
+/* â”€â”€ Newsletter â”€â”€ */
 .newsletter-section {
   padding: 120px 48px; text-align: center;
   max-width: 640px; margin: 0 auto;
@@ -324,14 +324,14 @@
   letter-spacing: 0.5px; font-weight: 300;
 }
 
-/* ── Reveal ── */
+/* â”€â”€ Reveal â”€â”€ */
 .reveal {
   opacity: 0; transform: translateY(28px);
   transition: opacity 0.7s ease, transform 0.7s ease;
   &.visible { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Animations ── */
+/* â”€â”€ Animations â”€â”€ */
 @keyframes marquee {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
@@ -478,3 +478,4 @@
     font-size: 40px;
   }
 }
+

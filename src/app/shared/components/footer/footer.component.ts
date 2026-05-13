@@ -130,7 +130,7 @@ import { RouterLink } from '@angular/router';
     .footer-col ul li a,
     .social-links a {
       color: rgba(247,244,240,0.4);
-      text-decorateion: none;
+      text-decoration: none;
       transition: color 0.2s;
     }
 
@@ -192,4 +192,5 @@ import { RouterLink } from '@angular/router';
   `]
 })
 export class FooterComponent {}
+
 

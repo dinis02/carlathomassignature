@@ -1,4 +1,4 @@
-/* --- CSS do mockup convertido para SCSS --- */
+﻿/* --- CSS do mockup convertido para SCSS --- */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
@@ -48,14 +48,14 @@ body {
   align-items: center;
   gap: 10px;
   margin-bottom: 28px;
-  /* --- PRODUCT GRID & CARD STYLES (extraído do site2.html) --- */
+  /* --- PRODUCT GRID & CARD STYLES (extraÃ­do do site2.html) --- */
   letter-spacing: 2px;
   text-transform: uppercase;
   font-weight: 200;
   color: rgba(247,244,240,0.35);
   a {
     color: rgba(247,244,240,0.35);
-    text-decorateion: none;
+    text-decoration: none;
     transition: color 0.2s;
     &:hover { color: var(--rose-gold); }
   }
@@ -97,13 +97,13 @@ body {
   font-weight: 200;
 }
 
-// ...continua com o resto do CSS do mockup, convertendo para SCSS se necessário...
+// ...continua com o resto do CSS do mockup, convertendo para SCSS se necessÃ¡rio...
 
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(24px); }
   to { opacity: 1; transform: translateY(0); }
 }
-// Correção de aninhamento SCSS: cada seletor no topo
+// CorreÃ§Ã£o de aninhamento SCSS: cada seletor no topo
 .page-hero {
   background: var(--noir); padding: 64px 48px; position: relative; overflow: hidden;
   &::before {
@@ -132,7 +132,7 @@ body {
 }
 .breadcrumb a {
   color: rgba(247,244,240,0.35);
-  text-decorateion: none;
+  text-decoration: none;
   transition: color 0.2s;
 }
 .breadcrumb a:hover {
@@ -215,7 +215,7 @@ body {
 .clear-all {
   font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
   color: var(--text-muted); background: none; border: none; cursor: none;
-  font-family: 'Jost', sans-serif; font-weight: 200; text-decorateion: underline;
+  font-family: 'Jost', sans-serif; font-weight: 200; text-decoration: underline;
   transition: color 0.2s; &:hover { color: var(--noir); }
 }
 
@@ -296,7 +296,7 @@ body {
   overflow: hidden;
   cursor: none;
   transition: opacity 0.5s ease, transform 0.3s ease;
-  text-decorateion: none;
+  text-decoration: none;
   color: inherit;
   opacity: 0;
   transform: translateY(16px);
@@ -329,11 +329,11 @@ body {
   justify-content: center;
   border-radius: 0;
   transition: transform 0.6s ease;
-  /* Garante que cobre toda a área e não é transparente */
+  /* Garante que cobre toda a Ã¡rea e nÃ£o Ã© transparente */
 }
 
 .product-card:hover .img-placeholder {
-    // background removido para não sobrepor gradiente inline
+    // background removido para nÃ£o sobrepor gradiente inline
 }
 .product-badge {
   position: absolute; top: 16px; left: 16px;
@@ -552,3 +552,4 @@ body {
     padding: 56px 20px;
   }
 }
+

@@ -94,7 +94,7 @@ const STORAGE_KEY = 'cts-cookie-consent';
       display: inline-flex;
       margin-top: 9px;
       color: var(--rose-gold);
-      text-decorateion: none;
+      text-decoration: none;
       font-size: 10px;
       letter-spacing: 2px;
       text-transform: uppercase;
@@ -200,4 +200,5 @@ export class CookieBannerComponent {
     }
   }
 }
+
 
