@@ -10,8 +10,6 @@ import { AccountSession, AuthService } from '../../core/services/auth.service';
   template: `
     <div class="login-modal-backdrop" (click)="close()"></div>
     <aside class="login-modal" role="dialog" aria-modal="true" aria-label="Conta">
-      <button type="button" class="login-close" aria-label="Fechar" (click)="close()">Ã—</button>
-
       <div class="login-brand">
         <span class="login-brand-main">Carla Thomas</span>
         <span class="login-brand-sub">Signature</span>
@@ -102,28 +100,6 @@ import { AccountSession, AuthService } from '../../core/services/auth.service';
       padding: 42px;
       overflow-y: auto;
       animation: loginSlide 0.32s ease both;
-    }
-
-    .login-close {
-      position: absolute;
-      top: 20px;
-      right: 22px;
-      width: 36px;
-      height: 36px;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--noir);
-      font-size: 26px;
-      line-height: 1;
-      font-family: 'Cormorant Garamond', serif;
-      cursor: none;
-      transition: all 0.2s ease;
-    }
-
-    .login-close:hover {
-      border-color: var(--noir);
-      background: var(--noir);
-      color: var(--creme);
     }
 
     .login-brand {

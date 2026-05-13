@@ -248,7 +248,6 @@ import { LoginModalComponent } from '../login-modal.component';
           <span class="mobile-menu-brand">Carla Thomas</span>
           <span class="mobile-menu-sub">Signature</span>
         </div>
-        <button class="mobile-menu-close" type="button" aria-label="Fechar menu" (click)="closeMobileMenu()">×</button>
       </div>
       <a routerLink="/" (click)="closeMobileMenu()">Início</a>
       <a routerLink="/produtos" [queryParams]="{cat:'Maquilhagem'}" (click)="closeMobileMenu()">Maquilhagem</a>
@@ -582,18 +581,6 @@ import { LoginModalComponent } from '../login-modal.component';
       font-size: 8px;
       letter-spacing: 5px;
       text-transform: uppercase;
-    }
-
-    .mobile-menu-close {
-      border: 1px solid var(--border);
-      background: transparent;
-      width: 34px;
-      height: 34px;
-      color: var(--noir);
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 24px;
-      line-height: 1;
-      cursor: none;
     }
 
     .mobile-menu a {
