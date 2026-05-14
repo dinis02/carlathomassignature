@@ -1,0 +1,6 @@
+
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="512" cy="512" r="330" fill="none" stroke="#C98D72" stroke-width="14"/>
+  <text x="512" y="590" text-anchor="middle" font-size="320" fill="#C98D72"
+        font-family="Times New Roman, serif">GT</text>
+</svg>
