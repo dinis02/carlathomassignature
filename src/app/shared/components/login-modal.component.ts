@@ -11,8 +11,8 @@ import { AccountSession, AuthService } from '../../core/services/auth.service';
     <div class="login-modal-backdrop" (click)="close()"></div>
     <aside class="login-modal" role="dialog" aria-modal="true" aria-label="Conta">
       <div class="login-brand">
-        <span class="login-brand-main">Carla Thomas</span>
-        <span class="login-brand-sub">Signature</span>
+        <span class="login-brand-main">CARLA THOMAS</span>
+        <span class="login-brand-sub">SIGNATURE</span>
       </div>
 
       <div class="login-heading">
@@ -110,21 +110,32 @@ import { AccountSession, AuthService } from '../../core/services/auth.service';
     .login-brand-main {
       display: block;
       font-family: 'Cormorant Garamond', serif;
-      font-size: 28px;
-      line-height: 1;
-      font-weight: 300;
-      font-style: italic;
-      color: var(--noir);
+      font-size: 30px;
+      line-height: 0.92;
+      font-weight: 500;
+      color: var(--rose-gold);
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
     }
 
     .login-brand-sub {
-      display: block;
-      margin-top: 6px;
+      display: grid;
+      grid-template-columns: minmax(28px, 70px) auto minmax(28px, 70px);
+      align-items: center;
+      column-gap: 10px;
+      margin-top: 10px;
       color: var(--rose-gold);
-      font-size: 8px;
-      letter-spacing: 6px;
+      font-size: 10px;
+      letter-spacing: 1.5px;
       text-transform: uppercase;
-      font-weight: 300;
+      font-weight: 400;
+    }
+
+    .login-brand-sub::before,
+    .login-brand-sub::after {
+      content: '';
+      height: 1px;
+      background: currentColor;
     }
 
     .login-heading {

@@ -11,9 +11,9 @@ import { AuthService } from '../../core/services/auth.service';
   template: `
     <main class="reset-page">
       <section class="reset-panel">
-        <a routerLink="/" class="reset-brand">
-          <span>Carla Thomas</span>
-          <small>Signature</small>
+        <a routerLink="/" class="reset-brand" aria-label="Carla Thomas Signature">
+          <span>CARLA THOMAS</span>
+          <small>SIGNATURE</small>
         </a>
 
         <div class="section-label">Acesso seguro</div>
@@ -82,20 +82,32 @@ import { AuthService } from '../../core/services/auth.service';
     .reset-brand span {
       display: block;
       font-family: 'Cormorant Garamond', serif;
-      font-size: 30px;
-      line-height: 1;
-      font-weight: 300;
-      font-style: italic;
+      font-size: 32px;
+      line-height: 0.92;
+      font-weight: 500;
+      letter-spacing: 1.2px;
+      color: var(--rose-gold);
+      text-transform: uppercase;
     }
 
     .reset-brand small {
-      display: block;
-      margin-top: 6px;
+      display: grid;
+      grid-template-columns: minmax(28px, 76px) auto minmax(28px, 76px);
+      align-items: center;
+      column-gap: 10px;
+      margin-top: 10px;
       color: var(--rose-gold);
-      font-size: 8px;
-      letter-spacing: 6px;
+      font-size: 10px;
+      letter-spacing: 1.5px;
       text-transform: uppercase;
-      font-weight: 300;
+      font-weight: 400;
+    }
+
+    .reset-brand small::before,
+    .reset-brand small::after {
+      content: '';
+      height: 1px;
+      background: currentColor;
     }
 
     h1 {

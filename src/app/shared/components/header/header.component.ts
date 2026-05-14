@@ -102,8 +102,9 @@ import { LoginModalComponent } from '../login-modal.component';
           </div>
         </nav>
 
-        <a routerLink="/" class="logo">
-          <img src="assets/logo-principal-hq.png" alt="Carla Thomas Signature" class="logo-img" />
+        <a routerLink="/" class="logo" aria-label="Carla Thomas Signature">
+          <span class="logo-main">CARLA THOMAS</span>
+          <span class="logo-sub">SIGNATURE</span>
         </a>
 
         <div class="nav-right">
@@ -244,9 +245,9 @@ import { LoginModalComponent } from '../login-modal.component';
     <div class="mobile-menu-backdrop" *ngIf="mobileMenuOpen" (click)="closeMobileMenu()"></div>
     <nav class="mobile-menu" [class.open]="mobileMenuOpen" aria-label="Menu mobile">
       <div class="mobile-menu-head">
-        <div>
-          <span class="mobile-menu-brand">Carla Thomas</span>
-          <span class="mobile-menu-sub">Signature</span>
+        <div class="mobile-brand-lockup">
+          <span class="mobile-menu-brand">CARLA THOMAS</span>
+          <span class="mobile-menu-sub">SIGNATURE</span>
         </div>
       </div>
       <a routerLink="/" (click)="closeMobileMenu()">Início</a>
@@ -413,25 +414,43 @@ import { LoginModalComponent } from '../login-modal.component';
     }
 
     .logo {
-      text-align: center; color: var(--noir); cursor: none;
-    }
-    .logo-img {
-      display: block;
-      width: 150px;
-      max-width: 18vw;
-      height: auto;
-      transform-origin: center;
+      display: inline-grid;
+      gap: 5px;
+      justify-items: center;
+      text-align: center;
+      color: var(--rose-gold);
+      cursor: none;
+      text-decoration: none;
     }
     .logo-main {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 26px; font-weight: 300;
-      letter-spacing: 1px; font-style: italic;
-      display: block; line-height: 1;
+      font-size: clamp(18px, 1.55vw, 24px);
+      font-weight: 500;
+      letter-spacing: 0.85px;
+      display: block;
+      line-height: 0.92;
+      color: currentColor;
+      text-transform: uppercase;
+      white-space: nowrap;
     }
     .logo-sub {
-      font-size: 8px; letter-spacing: 6px;
-      text-transform: uppercase; color: var(--rose-gold);
-      font-weight: 200; display: block; margin-top: 3px;
+      display: grid;
+      grid-template-columns: minmax(28px, 1fr) auto minmax(28px, 1fr);
+      align-items: center;
+      column-gap: 8px;
+      width: min(100%, 146px);
+      font-size: 7px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: currentColor;
+      font-weight: 400;
+      line-height: 1;
+    }
+    .logo-sub::before,
+    .logo-sub::after {
+      content: '';
+      height: 1px;
+      background: currentColor;
     }
 
     .header-icons { display: flex; gap: 20px; align-items: center; }
@@ -565,22 +584,38 @@ import { LoginModalComponent } from '../login-modal.component';
       border-bottom: 1px solid var(--border);
     }
 
+    .mobile-brand-lockup {
+      display: grid;
+      gap: 8px;
+      color: var(--rose-gold);
+    }
+
     .mobile-menu-brand {
       display: block;
       font-family: 'Cormorant Garamond', serif;
-      font-size: 26px;
-      font-style: italic;
-      font-weight: 300;
-      line-height: 1;
+      font-size: 24px;
+      font-weight: 500;
+      line-height: 0.92;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
     }
 
     .mobile-menu-sub {
-      display: block;
-      margin-top: 5px;
-      color: var(--rose-gold);
-      font-size: 8px;
-      letter-spacing: 5px;
+      display: grid;
+      grid-template-columns: minmax(22px, 1fr) auto minmax(22px, 1fr);
+      align-items: center;
+      column-gap: 10px;
+      font-size: 9px;
+      letter-spacing: 1.4px;
       text-transform: uppercase;
+      line-height: 1;
+    }
+
+    .mobile-menu-sub::before,
+    .mobile-menu-sub::after {
+      content: '';
+      height: 1px;
+      background: currentColor;
     }
 
     .mobile-menu a {
@@ -619,9 +654,13 @@ import { LoginModalComponent } from '../login-modal.component';
         justify-content: flex-end;
       }
 
-      .logo-img {
-        width: 140px;
-        max-width: 30vw;
+      .logo-main {
+        font-size: clamp(17px, 2.1vw, 22px);
+      }
+
+      .logo-sub {
+        width: min(100%, 132px);
+        font-size: 7px;
       }
     }
 
@@ -652,9 +691,20 @@ import { LoginModalComponent } from '../login-modal.component';
         top: 0;
       }
 
-      .logo-img {
-        width: 120px;
-        max-width: 40vw;
+      .logo {
+        gap: 4px;
+      }
+
+      .logo-main {
+        font-size: clamp(14px, 4.3vw, 17px);
+        letter-spacing: 0.55px;
+      }
+
+      .logo-sub {
+        width: min(100%, 96px);
+        column-gap: 5px;
+        font-size: 6px;
+        letter-spacing: 0.6px;
       }
 
       .header-icons {

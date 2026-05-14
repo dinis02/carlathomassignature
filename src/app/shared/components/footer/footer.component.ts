@@ -10,8 +10,8 @@ import { RouterLink } from '@angular/router';
       <div class="footer-inner">
         <div class="footer-top">
           <div class="footer-brand">
-            <span class="logo-main">Carla Thomas</span>
-            <span class="logo-sub">Signature</span>
+            <span class="logo-main">CARLA THOMAS</span>
+            <span class="logo-sub">SIGNATURE</span>
             <p class="footer-desc">Curadoria de beleza premium para quem valoriza autenticidade, qualidade e ritual.</p>
           </div>
 
@@ -82,22 +82,34 @@ import { RouterLink } from '@angular/router';
 
     .logo-main {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 26px;
-      font-weight: 300;
-      font-style: italic;
+      font-size: 34px;
+      font-weight: 500;
       display: block;
-      color: var(--creme);
-      margin-bottom: 4px;
+      color: var(--rose-gold);
+      letter-spacing: 1.4px;
+      line-height: 0.92;
+      text-transform: uppercase;
     }
 
     .logo-sub {
-      font-size: 8px;
-      letter-spacing: 6px;
+      display: grid;
+      grid-template-columns: minmax(28px, 92px) auto minmax(28px, 92px);
+      align-items: center;
+      column-gap: 12px;
+      width: fit-content;
+      font-size: 11px;
+      letter-spacing: 1.6px;
       text-transform: uppercase;
       color: var(--rose-gold);
-      font-weight: 200;
-      display: block;
+      font-weight: 400;
       margin-bottom: 20px;
+    }
+
+    .logo-sub::before,
+    .logo-sub::after {
+      content: '';
+      height: 1px;
+      background: currentColor;
     }
 
     .footer-desc {
